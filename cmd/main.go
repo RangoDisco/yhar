@@ -13,11 +13,6 @@ import (
 	anna "github.com/rangodisco/yhar/thirdpartyAPIs/anna/config"
 	annaDB "github.com/rangodisco/yhar/thirdpartyAPIs/anna/config/database"
 	annaRouter "github.com/rangodisco/yhar/thirdpartyAPIs/anna/config/router"
-	"golang.org/x/sync/errgroup"
-)
-
-var (
-	g errgroup.Group
 )
 
 func init() {

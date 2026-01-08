@@ -5,7 +5,7 @@ type Track struct {
 	ExternalID  string `json:"external_id"`
 	Name        string `json:"name"`
 	AlbumID     int64
-	Album       Artist   `gorm:"foreignKey:AlbumID;references:ID; default:null"`
+	Album       Album    `gorm:"foreignKey:AlbumID;references:ID; default:null"`
 	TrackNumber int64    `json:"track_number"`
 	DiskNumber  int64    `json:"disk_number"`
 	Duration    int64    `json:"duration"`

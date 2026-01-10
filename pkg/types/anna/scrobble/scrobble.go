@@ -12,10 +12,9 @@ type InfoResponse struct {
 }
 
 type TrackInfo struct {
-	ImageUrl string       `json:"imageUrl"`
-	Title    string       `json:"title"`
-	Artists  []ArtistInfo `json:"artists"`
-	Album    []AlbumInfo  `json:"album"`
+	Title   string       `json:"title"`
+	Artists []ArtistInfo `json:"artists"`
+	Album   []AlbumInfo  `json:"album"`
 }
 
 type ArtistInfo struct {

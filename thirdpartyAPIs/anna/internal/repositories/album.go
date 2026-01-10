@@ -7,7 +7,7 @@ import (
 
 func FindAlbumById(id int64) (*[]models.Album, error) {
 	var a []models.Album
-	err := database.GetDB().Preload("artists").Where("id = ?", id).Find(&a).Error
+	err := database.GetDB().Preload("Images").Preload("Artists.Images").Where("id = ?", id).Find(&a).Error
 	if err != nil {
 		return nil, err
 	}

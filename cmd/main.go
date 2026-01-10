@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"log"
-	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
@@ -11,8 +10,6 @@ import (
 
 	"github.com/rangodisco/yhar/config"
 	anna "github.com/rangodisco/yhar/thirdpartyAPIs/anna/config"
-	annaDB "github.com/rangodisco/yhar/thirdpartyAPIs/anna/config/database"
-	annaRouter "github.com/rangodisco/yhar/thirdpartyAPIs/anna/config/router"
 )
 
 func init() {
@@ -23,24 +20,10 @@ func init() {
 }
 
 func main() {
-	err := annaDB.SetupDatabase()
+
+	annaServer, err := anna.Init()
 	if err != nil {
-		log.Fatalf("failed to setup anna's database: %v", err)
-	}
-
-	r := annaRouter.SetupRouter()
-	annaRouter.LoadRoutes(r)
-
-	err = r.Run()
-	if err != nil {
-		log.Fatalf("failed to run server: %v", err)
-	}
-
-	annaServer := &http.Server{
-		Addr:         ":8081",
-		Handler:      anna.Router(),
-		ReadTimeout:  5 * time.Second,
-		WriteTimeout: 10 * time.Second,
+		log.Fatalf(err.Error())
 	}
 
 	go func() {

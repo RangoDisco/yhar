@@ -8,9 +8,11 @@ import (
 
 func FindTrackInfoByScrobble(scrobble scrobble.InfoRequest) (*models.Track, error) {
 	var t models.Track
-	err := database.GetDB().Preload("Artists").Where("name = ?", scrobble.Title).Order("popularity").Last(&t).Error
+
+	err := database.GetDB().Preload("Artists.Images").Where("name = ?", scrobble.Title).Order("popularity desc").Last(&t).Error
 	if err != nil {
 		return nil, err
 	}
+
 	return &t, nil
 }

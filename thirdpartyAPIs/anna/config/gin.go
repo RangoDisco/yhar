@@ -7,8 +7,8 @@ import (
 )
 
 func Router() http.Handler {
+	SetupLogger()
 	e := gin.New()
-	e.Use(gin.Recovery())
 
 	return e
 }

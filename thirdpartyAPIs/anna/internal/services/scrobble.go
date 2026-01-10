@@ -30,24 +30,13 @@ func formatToInfoByScrobbleResponse(track *models.Track, albums *[]models.Album)
 	var trackAlbums []scrobble.AlbumInfo
 
 	for _, artist := range track.Artists {
-		trackArtists = append(trackArtists, scrobble.ArtistInfo{
-			Name:     artist.Name,
-			ImageUrl: "",
-		})
+		arInfo := FormatArtistToScrobbleInfo(&artist)
+		trackArtists = append(trackArtists, *arInfo)
 	}
 
 	for _, a := range *albums {
-		var albumArtists []scrobble.ArtistInfo
-		for _, aa := range a.Artists {
-			albumArtists = append(albumArtists, scrobble.ArtistInfo{
-				Name:     aa.Name,
-				ImageUrl: "",
-			})
-		}
-		trackAlbums = append(trackAlbums, scrobble.AlbumInfo{
-			Title:   a.Name,
-			Artists: albumArtists,
-		})
+		alInfo := FormatAlbumToScrobbleInfo(&a)
+		trackAlbums = append(trackAlbums, *alInfo)
 	}
 
 	info.Track = scrobble.TrackInfo{

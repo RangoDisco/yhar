@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/rangodisco/yhar/thirdpartyAPIs/anna/config/database"
-	"github.com/rangodisco/yhar/thirdpartyAPIs/anna/config/router"
 )
 
 func Init() (*http.Server, error) {
@@ -16,12 +15,12 @@ func Init() (*http.Server, error) {
 		return nil, errors.New(fmt.Sprintf("unable to setup anna's database: %v", err))
 	}
 
-	r := router.SetupRouter()
-	router.LoadRoutes(r)
+	r := SetupRouter()
+	LoadRoutes(r)
 
 	return &http.Server{
 		Addr:         ":8081",
-		Handler:      Router(),
+		Handler:      r,
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
 	}, nil

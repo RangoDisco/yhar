@@ -1,4 +1,4 @@
-package router
+package config
 
 import (
 	"github.com/gin-gonic/gin"
@@ -6,6 +6,7 @@ import (
 )
 
 func SetupRouter() *gin.Engine {
+	SetupLogger()
 	r := gin.Default()
 
 	// TOOD: middleware

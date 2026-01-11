@@ -7,7 +7,7 @@ import (
 )
 
 func Router() http.Handler {
-	SetupLogger()
+
 	e := gin.New()
 
 	return e

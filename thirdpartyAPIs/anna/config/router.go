@@ -7,13 +7,14 @@ import (
 
 func SetupRouter() *gin.Engine {
 	SetupLogger()
-	r := gin.Default()
+	r := gin.New()
+	loadRoutes(r)
 
 	// TOOD: middleware
 	return r
 }
 
-func LoadRoutes(r *gin.Engine) {
+func loadRoutes(r *gin.Engine) {
 	api := r.Group("/api")
 	tracks := api.Group("/tracks")
 	tracks.GET("/by-scrobble", handlers.GetTrackInfoByScrobble)

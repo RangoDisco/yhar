@@ -1,27 +1,18 @@
 package config
 
 import (
-	"errors"
-	"fmt"
-	"net/http"
-	"time"
+	"log"
 
+	"github.com/gin-gonic/gin"
 	"github.com/rangodisco/yhar/thirdpartyAPIs/anna/config/database"
 )
 
-func Init() (*http.Server, error) {
+func Init() *gin.Engine {
 	err := database.SetupDatabase()
 	if err != nil {
-		return nil, errors.New(fmt.Sprintf("unable to setup anna's database: %v", err))
+		log.Fatal(err)
 	}
 
 	r := SetupRouter()
-	LoadRoutes(r)
-
-	return &http.Server{
-		Addr:         ":8081",
-		Handler:      r,
-		ReadTimeout:  5 * time.Second,
-		WriteTimeout: 10 * time.Second,
-	}, nil
+	return r
 }

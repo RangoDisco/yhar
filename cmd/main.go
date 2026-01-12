@@ -1,15 +1,17 @@
 package main
 
 import (
-	"context"
 	"log"
-	"os"
-	"os/signal"
-	"syscall"
+	"net/http"
 	"time"
 
 	"github.com/rangodisco/yhar/config"
 	anna "github.com/rangodisco/yhar/thirdpartyAPIs/anna/config"
+	"golang.org/x/sync/errgroup"
+)
+
+var (
+	g errgroup.Group
 )
 
 func init() {
@@ -20,28 +22,18 @@ func init() {
 }
 
 func main() {
-
-	annaServer, err := anna.Init()
-	if err != nil {
-		log.Fatalf(err.Error())
+	annaServer := &http.Server{
+		Addr:         ":8081",
+		Handler:      anna.Init(),
+		ReadTimeout:  120 * time.Second,
+		WriteTimeout: 120 * time.Second,
 	}
 
-	go func() {
-		err := annaServer.ListenAndServe()
-		if err != nil {
-			log.Fatalf("failed to start anna server: %v", err)
-		}
-	}()
+	g.Go(func() error {
+		return annaServer.ListenAndServe()
+	})
 
-	quit := make(chan os.Signal, 1)
-	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
-	<-quit
-
-	log.Println("Shutting down server...")
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
-	if err := annaServer.Shutdown(ctx); err != nil {
-		log.Fatalf("server forced to shutdown: %v", err.Error())
+	if err := g.Wait(); err != nil {
+		log.Fatal(err)
 	}
 }

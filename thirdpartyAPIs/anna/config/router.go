@@ -17,5 +17,5 @@ func SetupRouter() *gin.Engine {
 func loadRoutes(r *gin.Engine) {
 	api := r.Group("/api")
 	tracks := api.Group("/tracks")
-	tracks.GET("/by-scrobble", handlers.GetTrackInfoByScrobble)
+	tracks.POST("/by-scrobble", handlers.GetTrackInfoByScrobble)
 }

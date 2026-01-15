@@ -9,14 +9,14 @@ type GetNowPlayingResponse struct {
 	Type          string     `xml:"type,attr"`
 	ServerVersion string     `xml:"serverVersion,attr"`
 	OpenSubsonic  string     `xml:"openSubsonic,attr"`
-	NowPlaying    nowPlaying `xml:"nowPlaying"`
+	NowPlaying    NowPlaying `xml:"nowPlaying"`
 }
 
-type nowPlaying struct {
-	Entry []entry `xml:"entry"`
+type NowPlaying struct {
+	Entry []Entry `xml:"entry"`
 }
 
-type entry struct {
+type Entry struct {
 	ID                 string        `xml:"id,attr"`
 	Parent             string        `xml:"parent,attr"`
 	IsDir              string        `xml:"isDir,attr"`

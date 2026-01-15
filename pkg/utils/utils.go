@@ -2,11 +2,10 @@ package utils
 
 import (
 	"bytes"
-	"io"
 	"net/http"
 )
 
-func SendHTTPRequest(method, url, format string, body *bytes.Buffer) (io.ReadCloser, error) {
+func PrepareHTTPRequest(method, url, format string, body *bytes.Buffer) (*http.Request, error) {
 	req, err := http.NewRequest(method, url, body)
 	if err != nil {
 		return nil, err
@@ -24,17 +23,5 @@ func SendHTTPRequest(method, url, format string, body *bytes.Buffer) (io.ReadClo
 	}
 	req.Header.Set("Content-Type", contentType)
 
-	res, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-
-	defer func(Body io.ReadCloser) {
-		err := Body.Close()
-		if err != nil {
-
-		}
-	}(res.Body)
-
-	return res.Body, nil
+	return req, nil
 }

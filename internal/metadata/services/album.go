@@ -1,8 +1,8 @@
 package services
 
 import (
-	"github.com/rangodisco/yhar/pkg/types/anna/scrobble"
-	"github.com/rangodisco/yhar/thirdpartyAPIs/anna/internal/models"
+	"github.com/rangodisco/yhar/internal/metadata/models"
+	"github.com/rangodisco/yhar/internal/metadata/types/scrobble"
 )
 
 func FormatAlbumToScrobbleInfo(album *models.Album) *scrobble.AlbumInfo {

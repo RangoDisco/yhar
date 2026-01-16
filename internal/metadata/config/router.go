@@ -2,7 +2,7 @@ package config
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/rangodisco/yhar/thirdpartyAPIs/anna/internal/api/handlers"
+	"github.com/rangodisco/yhar/internal/api/handlers/metadata"
 )
 
 func SetupRouter() *gin.Engine {
@@ -17,5 +17,5 @@ func SetupRouter() *gin.Engine {
 func loadRoutes(r *gin.Engine) {
 	api := r.Group("/api")
 	tracks := api.Group("/tracks")
-	tracks.POST("/by-scrobble", handlers.GetTrackInfoByScrobble)
+	tracks.POST("/by-scrobble", metadata.GetTrackInfoByScrobble)
 }

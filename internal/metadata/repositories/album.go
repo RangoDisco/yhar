@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"github.com/rangodisco/yhar/thirdpartyAPIs/anna/config/database"
-	"github.com/rangodisco/yhar/thirdpartyAPIs/anna/internal/models"
+	"github.com/rangodisco/yhar/internal/metadata/config/database"
+	"github.com/rangodisco/yhar/internal/metadata/models"
 )
 
 func FindAlbumById(id int64) (*[]models.Album, error) {

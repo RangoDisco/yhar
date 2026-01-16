@@ -8,7 +8,7 @@ import (
 )
 
 func SetupLogger() {
-	f, _ := os.Create("logs/anna.log")
+	f, _ := os.Create("logs/metadata.log")
 	gin.DefaultWriter = io.MultiWriter(f)
 	gin.DefaultWriter = io.MultiWriter(f, os.Stdout)
 }

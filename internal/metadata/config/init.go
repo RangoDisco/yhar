@@ -4,7 +4,7 @@ import (
 	"log"
 
 	"github.com/gin-gonic/gin"
-	"github.com/rangodisco/yhar/thirdpartyAPIs/anna/config/database"
+	"github.com/rangodisco/yhar/internal/metadata/config/database"
 )
 
 func Init() *gin.Engine {

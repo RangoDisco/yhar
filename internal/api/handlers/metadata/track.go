@@ -1,11 +1,11 @@
-package handlers
+package metadata
 
 import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/rangodisco/yhar/pkg/types/anna/scrobble"
-	"github.com/rangodisco/yhar/thirdpartyAPIs/anna/internal/services"
+	"github.com/rangodisco/yhar/internal/metadata/services"
+	"github.com/rangodisco/yhar/internal/metadata/types/scrobble"
 )
 
 func GetTrackInfoByScrobble(c *gin.Context) {

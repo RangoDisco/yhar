@@ -1,7 +1,10 @@
 package services
 
 import (
+	"bytes"
 	"encoding/xml"
+	"fmt"
+	"io"
 	"net/http"
 	"os"
 
@@ -18,15 +21,31 @@ var (
 
 // GetNowPlaying fetch current playing tracks from all sources (only subsonic for now)
 func GetNowPlaying() (*subsonic.GetNowPlayingResponse, error) {
+	baseUrl := os.Getenv("subsonicBaseUrl")
+	version := os.Getenv("subsonicVersion")
+	pass := os.Getenv("subsonicPassword")
+	user := os.Getenv("subsonicUser")
 	var nowPlaying subsonic.GetNowPlayingResponse
 	url := baseUrl + "/rest/getNowPlaying?u=" + user + "&v=" + version + "&c=yhar&p=" + pass
 
-	res, err := utils.SendHTTPRequest(http.MethodGet, url, "xml", nil)
+	req, err := utils.PrepareHTTPRequest(http.MethodGet, url, "xml", &bytes.Buffer{})
 	if err != nil {
 		return nil, err
 	}
 
-	err = xml.NewDecoder(res).Decode(&nowPlaying)
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			fmt.Println(err)
+		}
+	}(res.Body)
+
+	err = xml.NewDecoder(res.Body).Decode(&nowPlaying)
 	if err != nil {
 		return nil, err
 	}

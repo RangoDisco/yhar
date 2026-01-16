@@ -1,9 +1,9 @@
 package services
 
 import (
-	"github.com/rangodisco/yhar/pkg/types/anna/scrobble"
-	"github.com/rangodisco/yhar/thirdpartyAPIs/anna/internal/models"
-	"github.com/rangodisco/yhar/thirdpartyAPIs/anna/internal/repositories"
+	"github.com/rangodisco/yhar/internal/metadata/models"
+	"github.com/rangodisco/yhar/internal/metadata/repositories"
+	"github.com/rangodisco/yhar/internal/metadata/types/scrobble"
 )
 
 func GetInfoByScrobble(scrobble scrobble.InfoRequest) (*scrobble.InfoResponse, error) {

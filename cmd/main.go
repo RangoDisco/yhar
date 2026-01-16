@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/rangodisco/yhar/config"
+	anna "github.com/rangodisco/yhar/internal/metadata/config"
 	server "github.com/rangodisco/yhar/server/config"
-	anna "github.com/rangodisco/yhar/thirdpartyAPIs/anna/config"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -26,8 +26,8 @@ func main() {
 	annaServer := &http.Server{
 		Addr:         ":8081",
 		Handler:      anna.Init(),
-		ReadTimeout:  120 * time.Second,
-		WriteTimeout: 120 * time.Second,
+		ReadTimeout:  500 * time.Second,
+		WriteTimeout: 500 * time.Second,
 	}
 
 	g.Go(func() error {
@@ -37,8 +37,8 @@ func main() {
 	yharServer := &http.Server{
 		Addr:         ":8080",
 		Handler:      server.Init(),
-		ReadTimeout:  120 * time.Second,
-		WriteTimeout: 120 * time.Second,
+		ReadTimeout:  500 * time.Second,
+		WriteTimeout: 500 * time.Second,
 	}
 	g.Go(func() error {
 		return yharServer.ListenAndServe()

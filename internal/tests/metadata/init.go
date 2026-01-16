@@ -1,4 +1,4 @@
-package tests
+package metadata
 
 import (
 	"os"
@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/rangodisco/yhar/config"
-	"github.com/rangodisco/yhar/thirdpartyAPIs/anna/config/database"
+	"github.com/rangodisco/yhar/internal/metadata/config/database"
 	"github.com/rangodisco/yhar/thirdpartyAPIs/anna/config/router"
 )
 

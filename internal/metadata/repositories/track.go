@@ -3,9 +3,9 @@ package repositories
 import (
 	"database/sql"
 
-	"github.com/rangodisco/yhar/pkg/types/anna/scrobble"
-	"github.com/rangodisco/yhar/thirdpartyAPIs/anna/config/database"
-	"github.com/rangodisco/yhar/thirdpartyAPIs/anna/internal/models"
+	"github.com/rangodisco/yhar/internal/metadata/config/database"
+	"github.com/rangodisco/yhar/internal/metadata/models"
+	"github.com/rangodisco/yhar/internal/metadata/types/scrobble"
 )
 
 // rawSql is god awful, but it should do the job for now, even if a bit slow sometimes.

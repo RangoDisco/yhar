@@ -3,9 +3,12 @@ package services
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
+	"io"
+	"net/http"
 	"os"
 
-	"github.com/rangodisco/yhar/pkg/types/anna/scrobble"
+	"github.com/rangodisco/yhar/internal/metadata/types/scrobble"
 	"github.com/rangodisco/yhar/pkg/types/subsonic"
 	"github.com/rangodisco/yhar/pkg/utils"
 )
@@ -20,6 +23,8 @@ func GetTrackMetadata(entry *subsonic.Entry) (*scrobble.InfoResponse, error) {
 		Artist: entry.Artist,
 	}
 
+	aRes = anna
+
 	var buf bytes.Buffer
 	err := json.NewEncoder(&buf).Encode(scrobbleRequest)
 	if err != nil {
@@ -27,12 +32,24 @@ func GetTrackMetadata(entry *subsonic.Entry) (*scrobble.InfoResponse, error) {
 	}
 
 	baseUrl := os.Getenv("annaBaseUrl")
-	res, err := utils.SendHTTPRequest("POST", baseUrl+"/api/tracks/by-scrobble", "json", &buf)
+	req, err := utils.PrepareHTTPRequest("POST", baseUrl+"/api/tracks/by-scrobble", "json", &buf)
 	if err != nil {
 		return nil, err
 	}
 
-	err = json.NewDecoder(res).Decode(&aRes)
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			fmt.Println(err)
+		}
+	}(res.Body)
+
+	err = json.NewDecoder(res.Body).Decode(&aRes)
 	if err != nil {
 		return nil, err
 	}

@@ -6,7 +6,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/rangodisco/yhar/config"
-	"github.com/rangodisco/yhar/internal/metadata/config/database"
+	ydb "github.com/rangodisco/yhar/internal/api/config/database"
+	mdb "github.com/rangodisco/yhar/internal/metadata/config/database"
 )
 
 func init() {
@@ -18,7 +19,12 @@ func init() {
 
 func main() {
 
-	err := database.InitDatabase()
+	err := mdb.SetupDatabase()
+	if err != nil {
+		log.Fatalf("failed to init database: %v", err)
+	}
+
+	err = ydb.SetupDatabase()
 	if err != nil {
 		log.Fatalf("failed to init database: %v", err)
 	}

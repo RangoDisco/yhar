@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/rangodisco/yhar/pkg/types/subsonic"
-	"github.com/rangodisco/yhar/pkg/utils"
+	"github.com/rangodisco/yhar/internal/api/types/subsonic"
+	"github.com/rangodisco/yhar/internal/utils"
 )
 
 var (

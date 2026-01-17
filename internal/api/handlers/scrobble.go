@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"github.com/gin-gonic/gin"
+	"github.com/rangodisco/yhar/internal/api/services"
 	"github.com/rangodisco/yhar/internal/metadata/types/scrobble"
-	"github.com/rangodisco/yhar/server/internal/services"
 )
 
 func GetNowPlaying(c *gin.Context) {

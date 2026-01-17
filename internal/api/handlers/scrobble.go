@@ -1,15 +1,13 @@
 package handlers
 
 import (
-	"fmt"
-
 	"github.com/gin-gonic/gin"
 	"github.com/rangodisco/yhar/internal/api/services"
 	"github.com/rangodisco/yhar/internal/metadata/types/scrobble"
 )
 
-func GetNowPlaying(c *gin.Context) {
-	var annaRes scrobble.InfoResponse
+func ManualNowPlayingPoll(c *gin.Context) {
+	var res []*scrobble.InfoResponse
 	subRes, err := services.GetNowPlaying()
 	if err != nil {
 		c.JSON(500, gin.H{})
@@ -25,10 +23,10 @@ func GetNowPlaying(c *gin.Context) {
 			// TODO: log
 			continue
 		}
-		fmt.Println(data)
+		res = append(res, data)
 	}
 
 	c.JSON(200, gin.H{
-		"data": annaRes,
+		"data": res,
 	})
 }

@@ -2,7 +2,7 @@ package config
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/rangodisco/yhar/server/internal/api/handlers"
+	"github.com/rangodisco/yhar/internal/api/handlers"
 )
 
 func SetupRouter() *gin.Engine {

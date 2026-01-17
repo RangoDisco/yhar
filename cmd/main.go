@@ -2,17 +2,11 @@ package main
 
 import (
 	"log"
-	"net/http"
-	"time"
+	"os"
 
+	"github.com/gin-gonic/gin"
 	"github.com/rangodisco/yhar/config"
-	anna "github.com/rangodisco/yhar/internal/metadata/config"
-	server "github.com/rangodisco/yhar/server/config"
-	"golang.org/x/sync/errgroup"
-)
-
-var (
-	g errgroup.Group
+	"github.com/rangodisco/yhar/internal/metadata/config/database"
 )
 
 func init() {
@@ -23,28 +17,19 @@ func init() {
 }
 
 func main() {
-	annaServer := &http.Server{
-		Addr:         ":8081",
-		Handler:      anna.Init(),
-		ReadTimeout:  500 * time.Second,
-		WriteTimeout: 500 * time.Second,
+
+	err := database.InitDatabase()
+	if err != nil {
+		log.Fatalf("failed to init database: %v", err)
 	}
 
-	g.Go(func() error {
-		return annaServer.ListenAndServe()
-	})
-
-	yharServer := &http.Server{
-		Addr:         ":8080",
-		Handler:      server.Init(),
-		ReadTimeout:  500 * time.Second,
-		WriteTimeout: 500 * time.Second,
+	if os.Getenv("GIN_MODE") == "release" {
+		gin.SetMode(gin.ReleaseMode)
 	}
-	g.Go(func() error {
-		return yharServer.ListenAndServe()
-	})
 
-	if err := g.Wait(); err != nil {
-		log.Fatal(err)
+	r := config.SetupRouter()
+	err = r.Run()
+	if err != nil {
+		log.Fatalf("failed to run: %v", err)
 	}
 }

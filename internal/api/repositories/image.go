@@ -15,7 +15,7 @@ func FindActiveImageByUrl(url string) (*models.Image, error) {
 	return &i, err
 }
 
-func CreateImage(url string) (*models.Image, error) {
+func PersistImage(url string) (*models.Image, error) {
 	img := &models.Image{
 		Url: url,
 	}

@@ -14,7 +14,7 @@ func GetOrCreateAlbum(info scrobble.AlbumInfo, artists []models.Artist) (*models
 	img, _ := GetOrCreateImage(info.ImageUrl)
 	model := scrobbleInfoToAlbumModel(info, artists, img)
 
-	newAlbum, err := repositories.CreateAlbum(model)
+	newAlbum, err := repositories.PersistAlbum(model)
 	if err != nil {
 		return nil, err
 	}
@@ -26,5 +26,7 @@ func scrobbleInfoToAlbumModel(info scrobble.AlbumInfo, artists []models.Artist, 
 		Title:     info.Title,
 		Artists:   artists,
 		PictureID: img.ID,
+		// TODO: Handle type
+		Type: "ALBUM",
 	}
 }

@@ -1,8 +1,8 @@
 package repositories
 
 import (
+	"github.com/rangodisco/yhar/internal/api/config/database"
 	"github.com/rangodisco/yhar/internal/api/models"
-	"github.com/rangodisco/yhar/internal/metadata/config/database"
 )
 
 func FindActiveAlbumByTitle(title string) (*models.Album, error) {
@@ -14,7 +14,7 @@ func FindActiveAlbumByTitle(title string) (*models.Album, error) {
 	return &a, nil
 }
 
-func CreateAlbum(album *models.Album) (*models.Album, error) {
+func PersistAlbum(album *models.Album) (*models.Album, error) {
 	res := database.GetDB().Create(&album)
 	if res.Error != nil {
 		return nil, res.Error

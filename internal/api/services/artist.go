@@ -6,14 +6,15 @@ import (
 	"github.com/rangodisco/yhar/internal/metadata/types/scrobble"
 )
 
-func GetOrCreateArtist(info scrobble.ArtistInfo) (*models.Artist, error) {
+func GetOrCreateArtist(info scrobble.ArtistInfo, img *models.Image) (*models.Artist, error) {
 	existingArtist, err := repositories.FindActiveArtistByName(info.Name)
 	if err == nil && existingArtist.Name != "" {
 		return existingArtist, err
 	}
 
-	model := createModelFromScrobbleInfo(info)
-	newArtist, err := repositories.CreateArtist(model)
+	model := scrobbleInfoToArtistModel(info, img)
+
+	newArtist, err := repositories.PersistArtist(model)
 	if err != nil {
 		return nil, err
 	}
@@ -21,10 +22,9 @@ func GetOrCreateArtist(info scrobble.ArtistInfo) (*models.Artist, error) {
 	return newArtist, nil
 }
 
-func createModelFromScrobbleInfo(info scrobble.ArtistInfo) *models.Artist {
-	image, _ := GetOrCreateImage(info.ImageUrl)
+func scrobbleInfoToArtistModel(info scrobble.ArtistInfo, img *models.Image) *models.Artist {
 	return &models.Artist{
 		Name:      info.Name,
-		PictureID: image.ID,
+		PictureID: img.ID,
 	}
 }

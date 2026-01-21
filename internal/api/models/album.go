@@ -1,6 +1,9 @@
 package models
 
-import "database/sql/driver"
+import (
+	"database/sql/driver"
+	"fmt"
+)
 
 type AlbumType string
 
@@ -12,8 +15,21 @@ const (
 )
 
 func (at *AlbumType) Scan(value interface{}) error {
-	*at = AlbumType(value.([]byte))
-	return nil
+	if value == nil {
+		*at = ""
+		return nil
+	}
+
+	switch v := value.(type) {
+	case []byte:
+		*at = AlbumType(v)
+		return nil
+	case string:
+		*at = AlbumType(v)
+		return nil
+	default:
+		return fmt.Errorf("cannot scan type %T into AlbumType", value)
+	}
 }
 
 func (at AlbumType) Value() (driver.Value, error) {

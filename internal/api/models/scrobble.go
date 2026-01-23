@@ -5,7 +5,7 @@ import "database/sql/driver"
 type scrobbleOrigin string
 
 const (
-	SUBSONIC albumType = "SUBSONIC"
+	SUBSONIC scrobbleOrigin = "SUBSONIC"
 )
 
 func (so *scrobbleOrigin) Scan(value interface{}) error {

@@ -40,7 +40,7 @@ ORDER BY tr_rank + al_rank + ar_rank DESC LIMIT 1;
 func FindTrackInfoByScrobble(scrobble scrobble.InfoRequest) (*models.Track, error) {
 	var t models.Track
 
-	err := database.GetDB().Preload("Artists.Images").Raw(rawSql,
+	err := database.GetDB().Preload("Artists.Images").Preload("Artists.Genres").Raw(rawSql,
 		sql.Named("track_name", scrobble.Title),
 		sql.Named("album_name", scrobble.Album),
 		sql.Named("artist_name", scrobble.Artist),

@@ -14,8 +14,14 @@ func FormatArtistToScrobbleInfo(artist *models.Artist) *scrobble.ArtistInfo {
 		}
 	}
 
+	var genres []string
+	for _, genre := range artist.Genres {
+		genres = append(genres, genre.Name)
+	}
+
 	return &scrobble.ArtistInfo{
 		Name:     artist.Name,
 		ImageUrl: imgUrl,
+		Genres:   genres,
 	}
 }

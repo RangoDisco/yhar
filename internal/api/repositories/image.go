@@ -15,13 +15,8 @@ func FindActiveImageByUrl(url string) (*models.Image, error) {
 	return &i, err
 }
 
-func PersistImage(url string) (*models.Image, error) {
-	img := &models.Image{
-		Url: url,
-	}
-	err := database.GetDB().Create(&img).Error
-	if err != nil {
-		return nil, err
-	}
-	return img, err
+func PersistImage(img *models.Image) error {
+
+	res := database.GetDB().Create(img)
+	return res.Error
 }

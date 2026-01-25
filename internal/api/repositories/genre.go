@@ -16,10 +16,6 @@ func FindActiveGenreByName(name string) (*models.Genre, error) {
 }
 
 func CreateGenre(g *models.Genre) error {
-	err := database.GetDB().Create(g).Error
-	if err != nil {
-		return err
-	}
-
-	return nil
+	res := database.GetDB().Create(g)
+	return res.Error
 }

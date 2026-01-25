@@ -12,9 +12,17 @@ func GetOrCreateImage(url string) (*models.Image, error) {
 		return existingImage, nil
 	}
 
-	newImage, err := repositories.PersistImage(url)
+	model := buildImageModel(url)
+
+	err = repositories.PersistImage(model)
 	if err != nil {
 		return nil, err
 	}
-	return newImage, nil
+	return model, nil
+}
+
+func buildImageModel(url string) *models.Image {
+	return &models.Image{
+		Url: url,
+	}
 }

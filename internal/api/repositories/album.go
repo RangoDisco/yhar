@@ -14,10 +14,10 @@ func FindActiveAlbumByTitle(title string) (*models.Album, error) {
 	return &a, nil
 }
 
-func PersistAlbum(album *models.Album) (*models.Album, error) {
+func PersistAlbum(album *models.Album) error {
 	res := database.GetDB().Create(&album)
 	if res.Error != nil {
-		return nil, res.Error
+		return res.Error
 	}
-	return album, nil
+	return nil
 }

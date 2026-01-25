@@ -15,17 +15,18 @@ func GetOrCreateAlbum(info scrobble.AlbumInfo, artists []models.Artist) (*models
 	if err == nil {
 		return existingAlbum, nil
 	}
+
 	img, _ := GetOrCreateImage(info.ImageUrl)
 	model, err := scrobbleInfoToAlbumModel(info, artists, img)
 	if err != nil {
 		return nil, err
 	}
 
-	newAlbum, err := repositories.PersistAlbum(model)
+	err = repositories.PersistAlbum(model)
 	if err != nil {
 		return nil, err
 	}
-	return newAlbum, nil
+	return model, nil
 }
 
 func parseAlbumType(at string) (*models.AlbumType, error) {

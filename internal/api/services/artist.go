@@ -29,12 +29,12 @@ func GetOrCreateArtist(info scrobble.ArtistInfo) (*models.Artist, error) {
 	// Build the model object from all the infos
 	model := scrobbleInfoToArtistModel(info, img, genres)
 
-	newArtist, err := repositories.PersistArtist(model)
+	err = repositories.PersistArtist(model)
 	if err != nil {
 		return nil, err
 	}
 
-	return newArtist, nil
+	return model, nil
 }
 
 // scrobbleInfoToArtistModel builds a new models.Artist based on a scrobble

@@ -14,16 +14,18 @@ type InfoResponse struct {
 type TrackInfo struct {
 	Title   string       `json:"title"`
 	Artists []ArtistInfo `json:"artists"`
-	Album   []AlbumInfo  `json:"album"`
+	Albums  []AlbumInfo  `json:"albums"`
 }
 
 type ArtistInfo struct {
-	Name     string `json:"title"`
-	ImageUrl string `json:"imageUrl"`
+	Name     string   `json:"title"`
+	ImageUrl string   `json:"imageUrl"`
+	Genres   []string `json:"genres"`
 }
 
 type AlbumInfo struct {
-	Title    string       `json:"title"`
-	ImageUrl string       `json:"imageUrl"`
-	Artists  []ArtistInfo `json:"artists"`
+	Title     string       `json:"title"`
+	ImageUrl  string       `json:"imageUrl"`
+	Artists   []ArtistInfo `json:"artists"`
+	AlbumType string       `json:"albumType"`
 }

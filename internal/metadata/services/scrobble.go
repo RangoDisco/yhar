@@ -42,7 +42,7 @@ func formatToInfoByScrobbleResponse(track *models.Track, albums *[]models.Album)
 	info.Track = scrobble.TrackInfo{
 		Title:   track.Name,
 		Artists: trackArtists,
-		Album:   trackAlbums,
+		Albums:  trackAlbums,
 	}
 
 	return &info, nil

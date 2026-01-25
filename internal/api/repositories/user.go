@@ -5,9 +5,9 @@ import (
 	"github.com/rangodisco/yhar/internal/api/models"
 )
 
-func FindActiveUserByExternalID(externalID string) (*models.User, error) {
+func FindActiveByUsername(username string) (*models.User, error) {
 	var u models.User
-	err := database.GetDB().Where("external_id = ?", externalID).First(&u).Error
+	err := database.GetDB().Where("username = ?", username).First(&u).Error
 	if err != nil {
 		return nil, err
 	}

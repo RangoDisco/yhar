@@ -15,11 +15,7 @@ func FindActiveArtistByName(name string) (*models.Artist, error) {
 	return &a, err
 }
 
-func PersistArtist(artist *models.Artist) (*models.Artist, error) {
-	res := database.GetDB().Create(&artist)
-	if res.Error != nil {
-		return nil, res.Error
-	}
-
-	return artist, nil
+func PersistArtist(a *models.Artist) error {
+	res := database.GetDB().Create(&a)
+	return res.Error
 }

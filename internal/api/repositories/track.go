@@ -18,10 +18,7 @@ func FindActiveTrackByTitle(title string) (*models.Track, error) {
 }
 
 func PersistTrack(track *models.Track) error {
-	err := database.GetDB().Create(&track).Error
-	if err != nil {
-		return err
-	}
+	res := database.GetDB().Create(&track)
 
-	return nil
+	return res.Error
 }

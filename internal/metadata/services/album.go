@@ -22,8 +22,9 @@ func FormatAlbumToScrobbleInfo(album *models.Album) *scrobble.AlbumInfo {
 	}
 
 	return &scrobble.AlbumInfo{
-		Title:    album.Name,
-		ImageUrl: imgUrl,
-		Artists:  albumArtists,
+		Title:     album.Name,
+		ImageUrl:  imgUrl,
+		Artists:   albumArtists,
+		AlbumType: album.AlbumType,
 	}
 }

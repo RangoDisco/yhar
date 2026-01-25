@@ -12,14 +12,7 @@ import (
 	"github.com/rangodisco/yhar/internal/utils"
 )
 
-var (
-	baseUrl = os.Getenv("subsonicBaseUrl")
-	version = os.Getenv("subsonicVersion")
-	pass    = os.Getenv("subsonicPassword")
-	user    = os.Getenv("subsonicUser")
-)
-
-// GetNowPlaying fetch current playing tracks from all sources (only subsonic for now)
+// GetNowPlaying fetches all tracks currently played, from all sources (only subsonic for now)
 func GetNowPlaying() (*subsonic.GetNowPlayingResponse, error) {
 	baseUrl := os.Getenv("subsonicBaseUrl")
 	version := os.Getenv("subsonicVersion")

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/rangodisco/yhar/internal/api/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -35,6 +36,19 @@ func InitDatabase() error {
 		host, user, password, name, port)
 
 	db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	if err != nil {
+		return err
+	}
+
+	err = db.AutoMigrate(
+		&models.Album{},
+		&models.Artist{},
+		&models.Genre{},
+		&models.Image{},
+		&models.Scrobble{},
+		&models.Track{},
+		&models.User{},
+	)
 
 	return err
 }

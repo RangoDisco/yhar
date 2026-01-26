@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/rangodisco/yhar/internal/api/models"
 	"github.com/rangodisco/yhar/internal/api/repositories"
 	"github.com/rangodisco/yhar/internal/api/types/auth"
 	"golang.org/x/crypto/bcrypt"
@@ -16,7 +17,7 @@ func EncryptPassword(password string) (string, error) {
 	return string(bytes), err
 }
 
-// ComparePassword ensures if the given plain password correspond to the given hash
+// ComparePassword checks if the given plain password correspond to the given hash
 func ComparePassword(password, hash string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 	return err == nil
@@ -57,4 +58,24 @@ func HandleUserLogin(request auth.LoginRequest) (string, error) {
 	}
 
 	return token, nil
+}
+
+func ParseToken(tokenString string) (*jwt.Token, error) {
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		return []byte(os.Getenv("JWT_SECRET")), nil
+	})
+
+	return token, err
+}
+
+// GetUserFromToken uses the username in the claims to find an user by its username
+func GetUserFromToken(token *jwt.Token) (*models.User, error) {
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		return nil, errors.New("invalid token")
+	}
+	username := claims["username"].(string)
+	user, err := repositories.FindActiveByUsername(username)
+
+	return user, err
 }

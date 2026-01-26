@@ -16,6 +16,12 @@ func SetupRouter() *gin.Engine {
 
 func loadRoutes(r *gin.Engine) {
 	api := r.Group("/api")
+
+	// THIRDPARTY
 	navidrome := api.Group("/navidrome")
 	navidrome.GET("/getNowPlaying", handlers.ManualNowPlayingPoll)
+
+	// AUTH
+	auth := api.Group("/auth")
+	auth.POST("/login", handlers.Login)
 }

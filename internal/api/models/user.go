@@ -9,5 +9,6 @@ type User struct {
 	Scrobbles  []Scrobble `json:"scrobbles" gorm:"foreignkey:UserID;"`
 	Password   string     `json:"password" gorm:"type:varchar(255);not null"`
 	RoleID     int64      `json:"role_id" gorm:"not null"`
+	IsPublic   bool       `json:"is_public" gorm:"not null;default:false"`
 	Role
 }

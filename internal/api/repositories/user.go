@@ -7,7 +7,7 @@ import (
 
 func FindActiveByUsername(username string) (*models.User, error) {
 	var u models.User
-	err := database.GetDB().Where("username = ?", username).First(&u).Error
+	err := database.GetDB().Preload("Role.Permissions").Where("username = ?", username).First(&u).Error
 	if err != nil {
 		return nil, err
 	}

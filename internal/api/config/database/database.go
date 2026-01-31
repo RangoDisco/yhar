@@ -48,6 +48,8 @@ func InitDatabase() error {
 		&models.Scrobble{},
 		&models.Track{},
 		&models.User{},
+		&models.Role{},
+		&models.Permission{},
 	)
 
 	return err

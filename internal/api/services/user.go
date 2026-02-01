@@ -3,10 +3,14 @@ package services
 import (
 	"github.com/rangodisco/yhar/internal/api/models"
 	"github.com/rangodisco/yhar/internal/api/repositories"
+	"github.com/rangodisco/yhar/internal/api/types/filters"
 )
 
 func GetOrCreateUser(username string) (*models.User, error) {
-	existingUser, err := repositories.FindActiveByUsername(username)
+	uFilters := []filters.QueryFilter{
+		{Key: "username", Value: username},
+	}
+	existingUser, err := repositories.FindActiveUserByFilters(uFilters)
 	if err == nil {
 		return existingUser, err
 	}

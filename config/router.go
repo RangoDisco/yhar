@@ -33,5 +33,9 @@ func loadRoutes(r *gin.Engine) {
 	user := protected.Group("/users/:userID")
 	user.Use(middlewares.CheckUserPrivacy())
 
-	// SCROBBLES INFOS
+	// USER'S STATS
+	userScrobbles := user.Group("/scrobbles")
+	userScrobbles.GET("/top/artists", handlers.GetUserTopArtists)
+	userScrobbles.GET("/top/albums", handlers.GetUserTopAlbums)
+	userScrobbles.GET("/top/tracks", handlers.GetUserTopTracks)
 }

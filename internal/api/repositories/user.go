@@ -3,11 +3,18 @@ package repositories
 import (
 	"github.com/rangodisco/yhar/internal/api/config/database"
 	"github.com/rangodisco/yhar/internal/api/models"
+	"github.com/rangodisco/yhar/internal/api/types/filters"
 )
 
-func FindActiveByUsername(username string) (*models.User, error) {
+func FindActiveUserByFilters(filters []filters.QueryFilter) (*models.User, error) {
 	var u models.User
-	err := database.GetDB().Preload("Role.Permissions").Where("username = ?", username).First(&u).Error
+	query := database.GetDB().Preload("Role.Permissions")
+
+	for _, filter := range filters {
+		query.Where(filter.Key+" = ?", filter.Value)
+	}
+
+	err := query.First(&u).Error
 	if err != nil {
 		return nil, err
 	}

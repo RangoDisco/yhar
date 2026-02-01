@@ -11,6 +11,21 @@ import (
 	"github.com/rangodisco/yhar/internal/api/utils/convert"
 )
 
+type IScrobbleHandler interface {
+	ManualNowPlayingPoll(c *gin.Context)
+	GetUserTopArtists(c *gin.Context)
+	GetUserTopAlbums(c *gin.Context)
+	GetUserTopTracks(c *gin.Context)
+}
+
+type ScrobbleHandler struct {
+	statService services.IScrobbleService
+}
+
+func NewScrobbleHandler(statService services.IScrobbleService) IScrobbleHandler {
+	return &ScrobbleHandler{statService: statService}
+}
+
 func parseStatsParams(c *gin.Context) (*stats.Params, error) {
 	page := convert.ParseInt(c.Query("page"), 1)
 	limit := convert.ParseInt(c.Query("limit"), 10)
@@ -28,7 +43,7 @@ func parseStatsParams(c *gin.Context) (*stats.Params, error) {
 }
 
 // TODO: handle polling and what is considered a real scrobble
-func ManualNowPlayingPoll(c *gin.Context) {
+func (h *ScrobbleHandler) ManualNowPlayingPoll(c *gin.Context) {
 	var scrobbles []*models.Scrobble
 	user, exists := c.Get("user")
 	if !exists {
@@ -63,20 +78,20 @@ func ManualNowPlayingPoll(c *gin.Context) {
 }
 
 // GetUserTopArtists fetches the most scrobbled artists in a given period for a given user
-func GetUserTopArtists(c *gin.Context) {
+func (h *ScrobbleHandler) GetUserTopArtists(c *gin.Context) {
 	params, err := parseStatsParams(c)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "invalid body"})
 		return
 	}
 
-	results, total, err := services.FetchUserTopArtists(params)
+	results, total, err := h.statService.FetchUserTopArtists(params)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
 
-	res := services.BuildResponseData(results, params.Pagination.Page, params.Pagination.Limit, total)
+	res := h.statService.BuildResponseData(results, params.Pagination.Page, params.Pagination.Limit, total)
 
 	c.JSON(http.StatusOK, gin.H{
 		"data": res,
@@ -84,40 +99,40 @@ func GetUserTopArtists(c *gin.Context) {
 }
 
 // GetUserTopAlbums fetches the most scrobbled albums in a given period for a given user
-func GetUserTopAlbums(c *gin.Context) {
+func (h *ScrobbleHandler) GetUserTopAlbums(c *gin.Context) {
 	params, err := parseStatsParams(c)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "invalid body"})
 		return
 	}
 
-	results, total, err := services.FetchUserTopAlbums(params)
+	results, total, err := h.statService.FetchUserTopAlbums(params)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
 
-	res := services.BuildResponseData(results, params.Pagination.Page, params.Pagination.Limit, total)
+	res := h.statService.BuildResponseData(results, params.Pagination.Page, params.Pagination.Limit, total)
 
 	c.JSON(http.StatusOK, gin.H{
 		"data": res,
 	})
 }
 
-func GetUserTopTracks(c *gin.Context) {
+func (h *ScrobbleHandler) GetUserTopTracks(c *gin.Context) {
 	params, err := parseStatsParams(c)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "invalid body"})
 		return
 	}
 
-	results, total, err := services.FetchUserTopTracks(params)
+	results, total, err := h.statService.FetchUserTopTracks(params)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
 
-	res := services.BuildResponseData(results, params.Pagination.Page, params.Pagination.Limit, total)
+	res := h.statService.BuildResponseData(results, params.Pagination.Page, params.Pagination.Limit, total)
 
 	c.JSON(http.StatusOK, gin.H{
 		"data": res,

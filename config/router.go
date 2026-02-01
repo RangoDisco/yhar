@@ -6,16 +6,16 @@ import (
 	"github.com/rangodisco/yhar/internal/api/middlewares"
 )
 
-func SetupRouter() *gin.Engine {
+func SetupRouter(h *Handlers) *gin.Engine {
 	SetupLogger()
 	r := gin.New()
-	loadRoutes(r)
+	loadRoutes(r, h)
 
 	// TOOD: middleware
 	return r
 }
 
-func loadRoutes(r *gin.Engine) {
+func loadRoutes(r *gin.Engine, h *Handlers) {
 	api := r.Group("/api")
 
 	// AUTH
@@ -27,7 +27,7 @@ func loadRoutes(r *gin.Engine) {
 
 	// THIRDPARTY
 	navidrome := protected.Group("/navidrome")
-	navidrome.GET("/getNowPlaying", middlewares.RequirePermissions([]string{"MANUAL_SCROBBLE"}), handlers.ManualNowPlayingPoll)
+	navidrome.GET("/getNowPlaying", middlewares.RequirePermissions([]string{"MANUAL_SCROBBLE"}), h.Scrobble.ManualNowPlayingPoll)
 
 	// USER DATA
 	user := protected.Group("/users/:userID")
@@ -35,7 +35,7 @@ func loadRoutes(r *gin.Engine) {
 
 	// USER'S STATS
 	userScrobbles := user.Group("/scrobbles")
-	userScrobbles.GET("/top/artists", handlers.GetUserTopArtists)
-	userScrobbles.GET("/top/albums", handlers.GetUserTopAlbums)
-	userScrobbles.GET("/top/tracks", handlers.GetUserTopTracks)
+	userScrobbles.GET("/top/artists", h.Scrobble.GetUserTopArtists)
+	userScrobbles.GET("/top/albums", h.Scrobble.GetUserTopAlbums)
+	userScrobbles.GET("/top/tracks", h.Scrobble.GetUserTopTracks)
 }

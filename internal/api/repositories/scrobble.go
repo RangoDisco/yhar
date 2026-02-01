@@ -6,14 +6,32 @@ import (
 	"github.com/rangodisco/yhar/internal/api/config/database"
 	"github.com/rangodisco/yhar/internal/api/models"
 	"github.com/rangodisco/yhar/internal/api/types/stats"
+	"gorm.io/gorm"
 )
 
-func PersistScrobble(s *models.Scrobble) error {
+type IScrobbleRepository interface {
+	PersistScrobble(s *models.Scrobble) error
+	FindTopArtistsForUser(userID string, sd, ed time.Time, page, limit int) ([]stats.TopArtistResult, int64, error)
+	FindTopAlbumsForUser(userID string, sd, ed time.Time, page, limit int) ([]stats.TopAlbumResult, int64, error)
+	FindTopTracksForUser(userID string, sd, ed time.Time, page, limit int) ([]stats.TopTrackResult, int64, error)
+}
+
+type ScrobbleRepository struct {
+	Db *gorm.DB
+}
+
+func NewScrobbleRepository(Db *gorm.DB) IScrobbleRepository {
+	return &ScrobbleRepository{
+		Db: Db,
+	}
+}
+
+func (r *ScrobbleRepository) PersistScrobble(s *models.Scrobble) error {
 	res := database.GetDB().Create(&s)
 	return res.Error
 }
 
-func FindTopArtistsForUser(userID string, sd, ed time.Time, page, limit int) ([]stats.TopArtistResult, int64, error) {
+func (r *ScrobbleRepository) FindTopArtistsForUser(userID string, sd, ed time.Time, page, limit int) ([]stats.TopArtistResult, int64, error) {
 	var res []stats.TopArtistResult
 	var totalCount int64
 
@@ -39,7 +57,7 @@ func FindTopArtistsForUser(userID string, sd, ed time.Time, page, limit int) ([]
 	return res, totalCount, err
 }
 
-func FindTopAlbumsForUser(userID string, sd, ed time.Time, page, limit int) ([]stats.TopAlbumResult, int64, error) {
+func (r *ScrobbleRepository) FindTopAlbumsForUser(userID string, sd, ed time.Time, page, limit int) ([]stats.TopAlbumResult, int64, error) {
 	var res []stats.TopAlbumResult
 	var totalCount int64
 
@@ -66,7 +84,7 @@ func FindTopAlbumsForUser(userID string, sd, ed time.Time, page, limit int) ([]s
 	return res, totalCount, err
 }
 
-func FindTopTracksForUser(userID string, sd, ed time.Time, page, limit int) ([]stats.TopTrackResult, int64, error) {
+func (r *ScrobbleRepository) FindTopTracksForUser(userID string, sd, ed time.Time, page, limit int) ([]stats.TopTrackResult, int64, error) {
 	var res []stats.TopTrackResult
 	var totalCount int64
 

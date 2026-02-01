@@ -24,7 +24,7 @@ func main() {
 		log.Fatalf("failed to init database: %v", err)
 	}
 
-	err = ydb.SetupDatabase()
+	db, err := ydb.SetupDatabase()
 	if err != nil {
 		log.Fatalf("failed to init database: %v", err)
 	}
@@ -33,7 +33,9 @@ func main() {
 		gin.SetMode(gin.ReleaseMode)
 	}
 
-	r := config.SetupRouter()
+	handlers := config.AutoWire(db)
+
+	r := config.SetupRouter(handlers)
 	err = r.Run()
 	if err != nil {
 		log.Fatalf("failed to run: %v", err)

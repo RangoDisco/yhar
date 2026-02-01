@@ -14,18 +14,18 @@ var (
 	err error
 )
 
-func SetupDatabase() error {
+func SetupDatabase() (*gorm.DB, error) {
 	var ginMode = os.Getenv("GIN_MODE")
 	switch ginMode {
 	case "release":
 	default:
-		err = InitDatabase()
+		db, err = InitDatabase()
 	}
 
-	return err
+	return db, err
 }
 
-func InitDatabase() error {
+func InitDatabase() (*gorm.DB, error) {
 	name := os.Getenv("YHAR_DB_NAME")
 	user := os.Getenv("YHAR_DB_USER")
 	password := os.Getenv("YHAR_DB_PASSWORD")
@@ -37,7 +37,7 @@ func InitDatabase() error {
 
 	db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	err = db.AutoMigrate(
@@ -52,7 +52,7 @@ func InitDatabase() error {
 		&models.Permission{},
 	)
 
-	return err
+	return db, err
 }
 
 func GetDB() *gorm.DB {

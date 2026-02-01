@@ -27,7 +27,7 @@ func loadRoutes(r *gin.Engine) {
 
 	// THIRDPARTY
 	navidrome := protected.Group("/navidrome")
-	navidrome.GET("/getNowPlaying", handlers.ManualNowPlayingPoll)
+	navidrome.GET("/getNowPlaying", middlewares.RequirePermissions([]string{"MANUAL_SCROBBLE"}), handlers.ManualNowPlayingPoll)
 
 	// USER DATA
 	user := protected.Group("/users/:userID")

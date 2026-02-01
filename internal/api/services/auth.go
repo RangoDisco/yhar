@@ -9,6 +9,7 @@ import (
 	"github.com/rangodisco/yhar/internal/api/models"
 	"github.com/rangodisco/yhar/internal/api/repositories"
 	"github.com/rangodisco/yhar/internal/api/types/auth"
+	"github.com/rangodisco/yhar/internal/api/types/filters"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -42,7 +43,10 @@ func CreateToken(username string) (string, error) {
 // tries to find user by its username
 // compares the passwords and creates a token
 func HandleUserLogin(request auth.LoginRequest) (string, error) {
-	user, err := repositories.FindActiveByUsername(request.Username)
+	uFilters := []filters.QueryFilter{
+		{Key: "username", Value: request.Username},
+	}
+	user, err := repositories.FindActiveUserByFilters(uFilters)
 	if err != nil {
 		return "", err
 	}
@@ -68,14 +72,18 @@ func ParseToken(tokenString string) (*jwt.Token, error) {
 	return token, err
 }
 
-// GetUserFromToken uses the username in the claims to find an user by its username
+// GetUserFromToken uses the username in the claims to find a user by its username
 func GetUserFromToken(token *jwt.Token) (*models.User, error) {
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok {
 		return nil, errors.New("invalid token")
 	}
 	username := claims["username"].(string)
-	user, err := repositories.FindActiveByUsername(username)
+
+	uFilters := []filters.QueryFilter{
+		{Key: "username", Value: username},
+	}
+	user, err := repositories.FindActiveUserByFilters(uFilters)
 
 	return user, err
 }

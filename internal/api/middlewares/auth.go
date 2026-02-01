@@ -21,16 +21,14 @@ func Authenticate() gin.HandlerFunc {
 		stringToken := authHeader[7:]
 		token, err := services.ParseToken(stringToken)
 		if err != nil {
-			c.JSON(401, gin.H{"error": "invalid token"})
-			c.Abort()
+			c.AbortWithStatusJSON(401, gin.H{"error": "invalid token"})
 			return
 		}
 
 		// Fetch whole user from token claims
 		user, err := services.GetUserFromToken(token)
 		if err != nil {
-			c.JSON(401, gin.H{"error": "invalid token"})
-			c.Abort()
+			c.AbortWithStatusJSON(401, gin.H{"error": "invalid token"})
 			return
 		}
 

@@ -3,10 +3,20 @@ package repositories
 import (
 	"database/sql"
 
-	"github.com/rangodisco/yhar/internal/metadata/config/database"
 	"github.com/rangodisco/yhar/internal/metadata/models"
 	"github.com/rangodisco/yhar/internal/metadata/types/scrobble"
+	"gorm.io/gorm"
 )
+
+type TrackRepository struct {
+	Db *gorm.DB
+}
+
+func NewTrackRepository(db *gorm.DB) *TrackRepository {
+	return &TrackRepository{
+		Db: db,
+	}
+}
 
 // rawSql is god awful, but it should do the job for now, even if a bit slow sometimes.
 var rawSql = `
@@ -37,10 +47,10 @@ INNER JOIN tracks t ON t.id = tar.t_id
 ORDER BY tr_rank + al_rank + ar_rank DESC LIMIT 1;
 `
 
-func FindTrackInfoByScrobble(scrobble scrobble.InfoRequest) (*models.Track, error) {
+func (r *TrackRepository) FindTrackInfoByScrobble(scrobble scrobble.InfoRequest) (*models.Track, error) {
 	var t models.Track
 
-	err := database.GetDB().Preload("Artists.Images").Preload("Artists.Genres").Raw(rawSql,
+	err := r.Db.Preload("Artists.Images").Preload("Artists.Genres").Raw(rawSql,
 		sql.Named("track_name", scrobble.Title),
 		sql.Named("album_name", scrobble.Album),
 		sql.Named("artist_name", scrobble.Artist),

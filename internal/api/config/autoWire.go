@@ -4,6 +4,7 @@ import (
 	"github.com/rangodisco/yhar/internal/api/handlers"
 	"github.com/rangodisco/yhar/internal/api/repositories"
 	"github.com/rangodisco/yhar/internal/api/services"
+	"github.com/rangodisco/yhar/internal/metadata/config"
 	"gorm.io/gorm"
 )
 
@@ -35,7 +36,7 @@ type Handlers struct {
 	Auth     *handlers.AuthHandler
 }
 
-func AutoWire(db *gorm.DB) (*Repositories, *Services, *Handlers) {
+func AutoWire(db *gorm.DB, metaServices *config.Services) (*Repositories, *Services, *Handlers) {
 	repos := &Repositories{
 		Scrobble: repositories.NewScrobbleRepository(db),
 		Album:    repositories.NewAlbumRepository(db),
@@ -54,7 +55,7 @@ func AutoWire(db *gorm.DB) (*Repositories, *Services, *Handlers) {
 	trackService := services.NewTrackService(repos.Track)
 	userService := services.NewUserService(repos.User)
 	scrobbleStatsService := services.NewScrobbleStatsService(repos.Scrobble)
-	scrobbleService := services.NewScrobbleService(repos.Scrobble, userService, trackService, artistService, albumService)
+	scrobbleService := services.NewScrobbleService(repos.Scrobble, userService, trackService, artistService, albumService, metaServices.Scrobble)
 
 	svs := &Services{
 		Album:         albumService,

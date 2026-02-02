@@ -6,7 +6,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/rangodisco/yhar/config"
+	serverConfig "github.com/rangodisco/yhar/internal/api/config"
 	ydb "github.com/rangodisco/yhar/internal/api/config/database"
+	metaConfig "github.com/rangodisco/yhar/internal/metadata/config"
 	mdb "github.com/rangodisco/yhar/internal/metadata/config/database"
 )
 
@@ -18,13 +20,12 @@ func init() {
 }
 
 func main() {
-
-	err := mdb.SetupDatabase()
+	mDb, err := mdb.SetupDatabase()
 	if err != nil {
 		log.Fatalf("failed to init database: %v", err)
 	}
 
-	db, err := ydb.SetupDatabase()
+	yDb, err := ydb.SetupDatabase()
 	if err != nil {
 		log.Fatalf("failed to init database: %v", err)
 	}
@@ -33,9 +34,11 @@ func main() {
 		gin.SetMode(gin.ReleaseMode)
 	}
 
-	repos, services, handlers := config.AutoWire(db)
+	// TODO: Pls split it in two different git repository
+	metaServices := metaConfig.AutoWire(mDb)
+	serverRepos, serverServices, handlers := serverConfig.AutoWire(yDb, metaServices)
 
-	r := config.SetupRouter(repos, services, handlers)
+	r := config.SetupRouter(serverRepos, serverServices, handlers)
 	err = r.Run()
 	if err != nil {
 		log.Fatalf("failed to run: %v", err)

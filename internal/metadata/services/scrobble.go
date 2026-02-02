@@ -6,36 +6,52 @@ import (
 	"github.com/rangodisco/yhar/internal/metadata/types/scrobble"
 )
 
-func GetInfoByScrobble(scrobble scrobble.InfoRequest) (*scrobble.InfoResponse, error) {
-	t, err := repositories.FindTrackInfoByScrobble(scrobble)
+type ScrobbleService struct {
+	tRepo     *repositories.TrackRepository
+	alRepo    *repositories.AlbumRepository
+	arService *ArtistService
+	alService *AlbumService
+}
+
+func NewScrobbleService(
+	tRepo *repositories.TrackRepository,
+	alRepo *repositories.AlbumRepository,
+	arService *ArtistService,
+	alService *AlbumService,
+) *ScrobbleService {
+	return &ScrobbleService{tRepo: tRepo, alRepo: alRepo, arService: arService, alService: alService}
+}
+
+func (s *ScrobbleService) GetInfoByScrobble(scrobble scrobble.InfoRequest) (*scrobble.InfoResponse, error) {
+	t, err := s.tRepo.FindTrackInfoByScrobble(scrobble)
 	if err != nil {
 		return nil, err
 	}
 
-	a, err := repositories.FindAlbumById(t.AlbumID)
+	a, err := s.alRepo.FindAlbumById(t.AlbumID)
 	if err != nil {
 		return nil, err
 	}
 
-	info, err := formatToInfoByScrobbleResponse(t, a)
+	info, err := s.formatToInfoByScrobbleResponse(t, a)
 	if err != nil {
 		return nil, err
 	}
 	return info, nil
 }
 
-func formatToInfoByScrobbleResponse(track *models.Track, albums *[]models.Album) (*scrobble.InfoResponse, error) {
+func (s *ScrobbleService) formatToInfoByScrobbleResponse(track *models.Track, albums *[]models.Album) (*scrobble.InfoResponse, error) {
 	var info scrobble.InfoResponse
 	var trackArtists []scrobble.ArtistInfo
 	var trackAlbums []scrobble.AlbumInfo
 
 	for _, artist := range track.Artists {
-		arInfo := FormatArtistToScrobbleInfo(&artist)
+		arInfo := s.arService.FormatArtistToScrobbleInfo(&artist)
 		trackArtists = append(trackArtists, *arInfo)
 	}
 
 	for _, a := range *albums {
-		alInfo := FormatAlbumToScrobbleInfo(&a)
+		alInfo := s.alService.FormatAlbumToScrobbleInfo(&a)
 		trackAlbums = append(trackAlbums, *alInfo)
 	}
 

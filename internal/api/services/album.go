@@ -9,27 +9,39 @@ import (
 	"github.com/rangodisco/yhar/internal/metadata/types/scrobble"
 )
 
+type AlbumService struct {
+	aRepo    *repositories.AlbumRepository
+	iService *ImageService
+}
+
+func NewAlbumService(aRepo *repositories.AlbumRepository, iService *ImageService) *AlbumService {
+	return &AlbumService{
+		aRepo:    aRepo,
+		iService: iService,
+	}
+}
+
 // GetOrCreateAlbum tries to fetch or create an album if it doesn't exist
-func GetOrCreateAlbum(info scrobble.AlbumInfo, artists []models.Artist) (*models.Album, error) {
-	existingAlbum, err := repositories.FindActiveAlbumByTitle(info.Title)
+func (s *AlbumService) GetOrCreateAlbum(info scrobble.AlbumInfo, artists []models.Artist) (*models.Album, error) {
+	existingAlbum, err := s.aRepo.FindActiveAlbumByTitle(info.Title)
 	if err == nil {
 		return existingAlbum, nil
 	}
 
-	img, _ := GetOrCreateImage(info.ImageUrl)
-	model, err := scrobbleInfoToAlbumModel(info, artists, img)
+	img, _ := s.iService.GetOrCreateImage(info.ImageUrl)
+	model, err := s.scrobbleInfoToAlbumModel(info, artists, img)
 	if err != nil {
 		return nil, err
 	}
 
-	err = repositories.PersistAlbum(model)
+	err = s.aRepo.PersistAlbum(model)
 	if err != nil {
 		return nil, err
 	}
 	return model, nil
 }
 
-func parseAlbumType(at string) (*models.AlbumType, error) {
+func (s *AlbumService) parseAlbumType(at string) (*models.AlbumType, error) {
 	m := map[models.AlbumType]struct{}{
 		models.ALBUM:       {},
 		models.EP:          {},
@@ -47,8 +59,8 @@ func parseAlbumType(at string) (*models.AlbumType, error) {
 }
 
 // scrobbleInfoToAlbumModel build a new models.Album based on a scrobble
-func scrobbleInfoToAlbumModel(info scrobble.AlbumInfo, artists []models.Artist, img *models.Image) (*models.Album, error) {
-	at, err := parseAlbumType(info.AlbumType)
+func (s *AlbumService) scrobbleInfoToAlbumModel(info scrobble.AlbumInfo, artists []models.Artist, img *models.Image) (*models.Album, error) {
+	at, err := s.parseAlbumType(info.AlbumType)
 
 	if err != nil {
 		return nil, err

@@ -5,16 +5,11 @@ import (
 	"gorm.io/gorm"
 )
 
-type IAlbumRepository interface {
-	FindActiveAlbumByTitle(title string) (album *models.Album, err error)
-	PersistAlbum(album *models.Album) error
-}
-
 type AlbumRepository struct {
 	Db *gorm.DB
 }
 
-func NewAlbumRepository(Db *gorm.DB) IAlbumRepository {
+func NewAlbumRepository(Db *gorm.DB) *AlbumRepository {
 	return &AlbumRepository{Db: Db}
 }
 

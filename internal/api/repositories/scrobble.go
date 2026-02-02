@@ -9,18 +9,11 @@ import (
 	"gorm.io/gorm"
 )
 
-type IScrobbleRepository interface {
-	PersistScrobble(s *models.Scrobble) error
-	FindTopArtistsForUser(userID string, sd, ed time.Time, page, limit int) ([]stats.TopArtistResult, int64, error)
-	FindTopAlbumsForUser(userID string, sd, ed time.Time, page, limit int) ([]stats.TopAlbumResult, int64, error)
-	FindTopTracksForUser(userID string, sd, ed time.Time, page, limit int) ([]stats.TopTrackResult, int64, error)
-}
-
 type ScrobbleRepository struct {
 	Db *gorm.DB
 }
 
-func NewScrobbleRepository(Db *gorm.DB) IScrobbleRepository {
+func NewScrobbleRepository(Db *gorm.DB) *ScrobbleRepository {
 	return &ScrobbleRepository{
 		Db: Db,
 	}

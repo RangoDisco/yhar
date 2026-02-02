@@ -7,9 +7,17 @@ import (
 	"github.com/rangodisco/yhar/internal/metadata/types/scrobble"
 )
 
+type TrackService struct {
+	tRepo *repositories.TrackRepository
+}
+
+func NewTrackService(tRepo *repositories.TrackRepository) *TrackService {
+	return &TrackService{tRepo: tRepo}
+}
+
 // GetTrackByScrobbleInfo tries to find an existing track from its database, based on a subsonic getNowPlaying's entry
-func GetTrackByScrobbleInfo(entry *subsonic.Entry) (*models.Track, error) {
-	track, err := repositories.FindActiveTrackByTitle(entry.Title)
+func (s *TrackService) GetTrackByScrobbleInfo(entry *subsonic.Entry) (*models.Track, error) {
+	track, err := s.tRepo.FindActiveTrackByTitle(entry.Title)
 	if err != nil {
 		return nil, err
 	}
@@ -17,9 +25,9 @@ func GetTrackByScrobbleInfo(entry *subsonic.Entry) (*models.Track, error) {
 }
 
 // CreateTrackFromMetadata creates a new Track from a scrobble
-func CreateTrackFromMetadata(info *scrobble.TrackInfo, musicBrainzID string, artists []models.Artist, album models.Album) (*models.Track, error) {
-	track := buildTrackModel(info, musicBrainzID, artists, album)
-	err := repositories.PersistTrack(track)
+func (s *TrackService) CreateTrackFromMetadata(info *scrobble.TrackInfo, musicBrainzID string, artists []models.Artist, album models.Album) (*models.Track, error) {
+	track := s.buildTrackModel(info, musicBrainzID, artists, album)
+	err := s.tRepo.PersistTrack(track)
 	if err != nil {
 		return nil, err
 	}
@@ -28,7 +36,7 @@ func CreateTrackFromMetadata(info *scrobble.TrackInfo, musicBrainzID string, art
 }
 
 // buildTrackModel builds a new models.Track based on a scrobble
-func buildTrackModel(info *scrobble.TrackInfo, musicBrainzID string, artists []models.Artist, album models.Album) *models.Track {
+func (s *TrackService) buildTrackModel(info *scrobble.TrackInfo, musicBrainzID string, artists []models.Artist, album models.Album) *models.Track {
 	return &models.Track{
 		Title:         info.Title,
 		MusicBrainzID: musicBrainzID,

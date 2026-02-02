@@ -13,19 +13,27 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func EncryptPassword(password string) (string, error) {
+type AuthService struct {
+	uRepo *repositories.UserRepository
+}
+
+func NewAuthService(u *repositories.UserRepository) *AuthService {
+	return &AuthService{uRepo: u}
+}
+
+func (s *AuthService) EncryptPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
 	return string(bytes), err
 }
 
 // ComparePassword checks if the given plain password correspond to the given hash
-func ComparePassword(password, hash string) bool {
+func (s *AuthService) ComparePassword(password, hash string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 	return err == nil
 }
 
 // CreateToken creates a JWT with user's name as claim
-func CreateToken(username string) (string, error) {
+func (s *AuthService) CreateToken(username string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"username": username,
 		"exp":      time.Now().Add(time.Hour * 72).Unix(),
@@ -42,21 +50,21 @@ func CreateToken(username string) (string, error) {
 // HandleUserLogin receives an auth.LoginRequest
 // tries to find user by its username
 // compares the passwords and creates a token
-func HandleUserLogin(request auth.LoginRequest) (string, error) {
+func (s *AuthService) HandleUserLogin(request auth.LoginRequest) (string, error) {
 	uFilters := []filters.QueryFilter{
 		{Key: "username", Value: request.Username},
 	}
-	user, err := repositories.FindActiveUserByFilters(uFilters)
+	user, err := s.uRepo.FindActiveUserByFilters(uFilters)
 	if err != nil {
 		return "", err
 	}
 
-	success := ComparePassword(request.Password, user.Password)
+	success := s.ComparePassword(request.Password, user.Password)
 	if !success {
 		return "", errors.New("invalid password")
 	}
 
-	token, err := CreateToken(user.Username)
+	token, err := s.CreateToken(user.Username)
 	if err != nil {
 		return "", err
 	}
@@ -73,7 +81,7 @@ func ParseToken(tokenString string) (*jwt.Token, error) {
 }
 
 // GetUserFromToken uses the username in the claims to find a user by its username
-func GetUserFromToken(token *jwt.Token) (*models.User, error) {
+func (s *AuthService) GetUserFromToken(token *jwt.Token) (*models.User, error) {
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok {
 		return nil, errors.New("invalid token")
@@ -83,7 +91,7 @@ func GetUserFromToken(token *jwt.Token) (*models.User, error) {
 	uFilters := []filters.QueryFilter{
 		{Key: "username", Value: username},
 	}
-	user, err := repositories.FindActiveUserByFilters(uFilters)
+	user, err := s.uRepo.FindActiveUserByFilters(uFilters)
 
 	return user, err
 }

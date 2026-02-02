@@ -6,19 +6,29 @@ import (
 	"github.com/rangodisco/yhar/internal/metadata/types/scrobble"
 )
 
+type ArtistService struct {
+	aRepo    *repositories.ArtistRepository
+	iService *ImageService
+	gService *GenreService
+}
+
+func NewArtistService(aRepo *repositories.ArtistRepository, iService *ImageService, gService *GenreService) *ArtistService {
+	return &ArtistService{aRepo: aRepo, iService: iService, gService: gService}
+}
+
 // GetOrCreateArtist tries to fetch or create an artist if it doesn't exist
-func GetOrCreateArtist(info scrobble.ArtistInfo) (*models.Artist, error) {
-	existingArtist, err := repositories.FindActiveArtistByName(info.Name)
+func (s *ArtistService) GetOrCreateArtist(info scrobble.ArtistInfo) (*models.Artist, error) {
+	existingArtist, err := s.aRepo.FindActiveArtistByName(info.Name)
 	if err == nil && existingArtist.Name != "" {
 		return existingArtist, err
 	}
 
-	img, _ := GetOrCreateImage(info.ImageUrl)
+	img, _ := s.iService.GetOrCreateImage(info.ImageUrl)
 
 	// Add all genres needed for the future model
 	var genres []models.Genre
 	for _, genreInfo := range info.Genres {
-		genre, err := GetOrCreateGenre(genreInfo)
+		genre, err := s.gService.GetOrCreateGenre(genreInfo)
 		if err != nil {
 			// We don't want to stop the whole request just for a missing genre
 			continue
@@ -29,7 +39,7 @@ func GetOrCreateArtist(info scrobble.ArtistInfo) (*models.Artist, error) {
 	// Build the model object from all the infos
 	model := scrobbleInfoToArtistModel(info, img, genres)
 
-	err = repositories.PersistArtist(model)
+	err = s.aRepo.PersistArtist(model)
 	if err != nil {
 		return nil, err
 	}

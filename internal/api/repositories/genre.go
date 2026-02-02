@@ -1,13 +1,23 @@
 package repositories
 
 import (
-	"github.com/rangodisco/yhar/internal/api/config/database"
 	"github.com/rangodisco/yhar/internal/api/models"
+	"gorm.io/gorm"
 )
 
-func FindActiveGenreByName(name string) (*models.Genre, error) {
+type GenreRepository struct {
+	Db *gorm.DB
+}
+
+func NewGenreRepository(Db *gorm.DB) *GenreRepository {
+	return &GenreRepository{
+		Db: Db,
+	}
+}
+
+func (r *GenreRepository) FindActiveGenreByName(name string) (*models.Genre, error) {
 	var g models.Genre
-	err := database.GetDB().First(&g, "name = ?", name).Error
+	err := r.Db.First(&g, "name = ?", name).Error
 	if err != nil {
 		return nil, err
 	}
@@ -15,7 +25,7 @@ func FindActiveGenreByName(name string) (*models.Genre, error) {
 	return &g, nil
 }
 
-func CreateGenre(g *models.Genre) error {
-	res := database.GetDB().Create(g)
+func (r *GenreRepository) CreateGenre(g *models.Genre) error {
+	res := r.Db.Create(g)
 	return res.Error
 }

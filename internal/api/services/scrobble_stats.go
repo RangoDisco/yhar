@@ -7,22 +7,15 @@ import (
 	"github.com/rangodisco/yhar/internal/api/types/stats"
 )
 
-type IScrobbleService interface {
-	FetchUserTopArtists(params *stats.Params) ([]stats.TopArtistResult, int64, error)
-	FetchUserTopAlbums(params *stats.Params) ([]stats.TopAlbumResult, int64, error)
-	FetchUserTopTracks(params *stats.Params) ([]stats.TopTrackResult, int64, error)
-	BuildResponseData(result interface{}, page, limit int, total int64) interface{}
+type ScrobbleStatsService struct {
+	sRepo *repositories.ScrobbleRepository
 }
 
-type ScrobbleService struct {
-	repository repositories.IScrobbleRepository
+func NewScrobbleStatsService(sRepo *repositories.ScrobbleRepository) *ScrobbleStatsService {
+	return &ScrobbleStatsService{sRepo: sRepo}
 }
 
-func NewScrobbleService(repository repositories.IScrobbleRepository) *ScrobbleService {
-	return &ScrobbleService{repository: repository}
-}
-
-func (s *ScrobbleService) BuildResponseData(result interface{}, page, limit int, total int64) interface{} {
+func (s *ScrobbleStatsService) BuildResponseData(result interface{}, page, limit int, total int64) interface{} {
 	var hasNextPage bool
 	if (int(total) / limit) >= page {
 		hasNextPage = true
@@ -56,19 +49,19 @@ func (s *ScrobbleService) BuildResponseData(result interface{}, page, limit int,
 	}
 }
 
-func (s *ScrobbleService) FetchUserTopArtists(params *stats.Params) ([]stats.TopArtistResult, int64, error) {
+func (s *ScrobbleStatsService) FetchUserTopArtists(params *stats.Params) ([]stats.TopArtistResult, int64, error) {
 	sd, ed := getDateRangeFromPeriod(params.Period)
-	return s.repository.FindTopArtistsForUser(params.UserID, sd, ed, params.Pagination.Page, params.Pagination.Limit)
+	return s.sRepo.FindTopArtistsForUser(params.UserID, sd, ed, params.Pagination.Page, params.Pagination.Limit)
 }
 
-func (s *ScrobbleService) FetchUserTopAlbums(params *stats.Params) ([]stats.TopAlbumResult, int64, error) {
+func (s *ScrobbleStatsService) FetchUserTopAlbums(params *stats.Params) ([]stats.TopAlbumResult, int64, error) {
 	sd, ed := getDateRangeFromPeriod(params.Period)
-	return s.repository.FindTopAlbumsForUser(params.UserID, sd, ed, params.Pagination.Page, params.Pagination.Limit)
+	return s.sRepo.FindTopAlbumsForUser(params.UserID, sd, ed, params.Pagination.Page, params.Pagination.Limit)
 }
 
-func (s *ScrobbleService) FetchUserTopTracks(params *stats.Params) ([]stats.TopTrackResult, int64, error) {
+func (s *ScrobbleStatsService) FetchUserTopTracks(params *stats.Params) ([]stats.TopTrackResult, int64, error) {
 	sd, ed := getDateRangeFromPeriod(params.Period)
-	return s.repository.FindTopTracksForUser(params.UserID, sd, ed, params.Pagination.Page, params.Pagination.Limit)
+	return s.sRepo.FindTopTracksForUser(params.UserID, sd, ed, params.Pagination.Page, params.Pagination.Limit)
 }
 
 func getDateRangeFromPeriod(p stats.Period) (time.Time, time.Time) {

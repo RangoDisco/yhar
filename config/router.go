@@ -5,16 +5,16 @@ import (
 	"github.com/rangodisco/yhar/internal/api/middlewares"
 )
 
-func SetupRouter(h *Handlers) *gin.Engine {
+func SetupRouter(repo *Repositories, s *Services, h *Handlers) *gin.Engine {
 	SetupLogger()
 	r := gin.New()
-	loadRoutes(r, h)
 
-	// TOOD: middleware
+	loadRoutes(r, repo, s, h)
+
 	return r
 }
 
-func loadRoutes(r *gin.Engine, h *Handlers) {
+func loadRoutes(r *gin.Engine, repo *Repositories, s *Services, h *Handlers) {
 	api := r.Group("/api")
 
 	// AUTH
@@ -22,7 +22,7 @@ func loadRoutes(r *gin.Engine, h *Handlers) {
 	auth.POST("/login", h.Auth.Login)
 
 	protected := api.Group("/")
-	protected.Use(middlewares.Authenticate())
+	protected.Use(middlewares.Authenticate(s.Auth))
 
 	// THIRDPARTY
 	navidrome := protected.Group("/navidrome")
@@ -30,7 +30,7 @@ func loadRoutes(r *gin.Engine, h *Handlers) {
 
 	// USER DATA
 	user := protected.Group("/users/:userID")
-	user.Use(middlewares.CheckUserPrivacy())
+	user.Use(middlewares.CheckUserPrivacy(repo.User))
 
 	// USER'S STATS
 	userScrobbles := user.Group("/scrobbles")

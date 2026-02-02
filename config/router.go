@@ -25,8 +25,8 @@ func loadRoutes(r *gin.Engine, repo *Repositories, s *Services, h *Handlers) {
 	protected.Use(middlewares.Authenticate(s.Auth))
 
 	// THIRDPARTY
-	navidrome := protected.Group("/navidrome")
-	navidrome.GET("/getNowPlaying", middlewares.RequirePermissions([]string{"MANUAL_SCROBBLE"}), h.Scrobble.ManualNowPlayingPoll)
+	subsonic := protected.Group("/subsonic")
+	subsonic.GET("/getNowPlaying", middlewares.RequirePermissions([]string{"MANUAL_SCROBBLE"}), h.Scrobble.ManualNowPlayingPoll)
 
 	// USER DATA
 	user := protected.Group("/users/:userID")

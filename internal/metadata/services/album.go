@@ -5,10 +5,18 @@ import (
 	"github.com/rangodisco/yhar/internal/metadata/types/scrobble"
 )
 
-func FormatAlbumToScrobbleInfo(album *models.Album) *scrobble.AlbumInfo {
+type AlbumService struct {
+	arService *ArtistService
+}
+
+func NewAlbumService(arService *ArtistService) *AlbumService {
+	return &AlbumService{arService: arService}
+}
+
+func (s *AlbumService) FormatAlbumToScrobbleInfo(album *models.Album) *scrobble.AlbumInfo {
 	var albumArtists []scrobble.ArtistInfo
 	for _, aa := range album.Artists {
-		artistInfo := FormatArtistToScrobbleInfo(&aa)
+		artistInfo := s.arService.FormatArtistToScrobbleInfo(&aa)
 		albumArtists = append(albumArtists, *artistInfo)
 	}
 

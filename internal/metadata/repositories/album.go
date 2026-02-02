@@ -1,13 +1,23 @@
 package repositories
 
 import (
-	"github.com/rangodisco/yhar/internal/metadata/config/database"
 	"github.com/rangodisco/yhar/internal/metadata/models"
+	"gorm.io/gorm"
 )
 
-func FindAlbumById(id int64) (*[]models.Album, error) {
+type AlbumRepository struct {
+	Db *gorm.DB
+}
+
+func NewAlbumRepository(db *gorm.DB) *AlbumRepository {
+	return &AlbumRepository{
+		Db: db,
+	}
+}
+
+func (r *AlbumRepository) FindAlbumById(id int64) (*[]models.Album, error) {
 	var a []models.Album
-	err := database.GetDB().Preload("Images").Preload("Artists.Images").Where("id = ?", id).Find(&a).Error
+	err := r.Db.Preload("Images").Preload("Artists.Images").Where("id = ?", id).Find(&a).Error
 	if err != nil {
 		return nil, err
 	}

@@ -6,16 +6,17 @@ import (
 	"github.com/rangodisco/yhar/internal/api/models"
 	"github.com/rangodisco/yhar/internal/api/repositories"
 	"github.com/rangodisco/yhar/internal/api/types/subsonic"
-	"github.com/rangodisco/yhar/internal/metadata/services"
+	metaServices "github.com/rangodisco/yhar/internal/metadata/services"
 	"github.com/rangodisco/yhar/internal/metadata/types/scrobble"
 )
 
 type ScrobbleService struct {
-	sRepo     *repositories.ScrobbleRepository
-	uService  *UserService
-	tService  *TrackService
-	arService *ArtistService
-	alService *AlbumService
+	sRepo       *repositories.ScrobbleRepository
+	uService    *UserService
+	tService    *TrackService
+	arService   *ArtistService
+	alService   *AlbumService
+	metaService *metaServices.ScrobbleService
 }
 
 func NewScrobbleService(
@@ -24,13 +25,15 @@ func NewScrobbleService(
 	t *TrackService,
 	ar *ArtistService,
 	al *AlbumService,
+	ms *metaServices.ScrobbleService,
 ) *ScrobbleService {
 	return &ScrobbleService{
-		sRepo:     s,
-		uService:  u,
-		tService:  t,
-		arService: ar,
-		alService: al,
+		sRepo:       s,
+		uService:    u,
+		tService:    t,
+		arService:   ar,
+		alService:   al,
+		metaService: ms,
 	}
 }
 
@@ -119,7 +122,7 @@ func (s *ScrobbleService) GetTrackMetadata(entry *subsonic.Entry) (*scrobble.Inf
 		Artist: entry.Artist,
 	}
 
-	aRes, err := services.GetInfoByScrobble(*scrobbleRequest)
+	aRes, err := s.metaService.GetInfoByScrobble(*scrobbleRequest)
 	if err != nil {
 		return nil, err
 	}

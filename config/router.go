@@ -2,10 +2,15 @@ package config
 
 import (
 	"github.com/gin-gonic/gin"
+	serverConfig "github.com/rangodisco/yhar/internal/api/config"
 	"github.com/rangodisco/yhar/internal/api/middlewares"
 )
 
-func SetupRouter(repo *Repositories, s *Services, h *Handlers) *gin.Engine {
+func SetupRouter(
+	repo *serverConfig.Repositories,
+	s *serverConfig.Services,
+	h *serverConfig.Handlers,
+) *gin.Engine {
 	SetupLogger()
 	r := gin.New()
 
@@ -14,7 +19,7 @@ func SetupRouter(repo *Repositories, s *Services, h *Handlers) *gin.Engine {
 	return r
 }
 
-func loadRoutes(r *gin.Engine, repo *Repositories, s *Services, h *Handlers) {
+func loadRoutes(r *gin.Engine, repo *serverConfig.Repositories, s *serverConfig.Services, h *serverConfig.Handlers) {
 	api := r.Group("/api")
 
 	// AUTH

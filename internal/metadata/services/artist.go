@@ -5,7 +5,14 @@ import (
 	"github.com/rangodisco/yhar/internal/metadata/types/scrobble"
 )
 
-func FormatArtistToScrobbleInfo(artist *models.Artist) *scrobble.ArtistInfo {
+type ArtistService struct {
+}
+
+func NewArtistService() *ArtistService {
+	return &ArtistService{}
+}
+
+func (s *ArtistService) FormatArtistToScrobbleInfo(artist *models.Artist) *scrobble.ArtistInfo {
 	imgUrl := ""
 	for _, image := range artist.Images {
 		if image.Url != "" {

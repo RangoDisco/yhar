@@ -13,18 +13,18 @@ var (
 	err error
 )
 
-func SetupDatabase() error {
+func SetupDatabase() (*gorm.DB, error) {
 	var err error
 	var ginMode = os.Getenv("APP_ENV")
 	switch ginMode {
 	default:
-		err = InitDatabase()
+		db, err = InitDatabase()
 	}
 
-	return err
+	return nil, err
 }
 
-func InitDatabase() error {
+func InitDatabase() (*gorm.DB, error) {
 	// Open a database connection
 	name := os.Getenv("META_DB_NAME")
 	user := os.Getenv("META_DB_USER")
@@ -37,9 +37,5 @@ func InitDatabase() error {
 
 	db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 
-	return err
-}
-
-func GetDB() *gorm.DB {
-	return db
+	return db, err
 }

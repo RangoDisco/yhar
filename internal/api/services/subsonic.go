@@ -12,8 +12,15 @@ import (
 	"github.com/rangodisco/yhar/internal/utils"
 )
 
+type SubsonicService struct {
+}
+
+func NewSubsonicService() *SubsonicService {
+	return &SubsonicService{}
+}
+
 // GetNowPlaying fetches all tracks currently played, from all sources (only subsonic for now)
-func GetNowPlaying() (*subsonic.GetNowPlayingResponse, error) {
+func (s *SubsonicService) GetNowPlaying() (*subsonic.GetNowPlayingResponse, error) {
 	baseUrl := os.Getenv("subsonicBaseUrl")
 	version := os.Getenv("subsonicVersion")
 	pass := os.Getenv("subsonicPassword")

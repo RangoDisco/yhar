@@ -14,6 +14,7 @@ import (
 type ScrobbleHandler struct {
 	scrobbleService *services.ScrobbleService
 	statService     *services.ScrobbleStatsService
+	subSonicService *services.SubsonicService
 }
 
 func NewScrobbleHandler(scrobbleService *services.ScrobbleService, statService *services.ScrobbleStatsService) *ScrobbleHandler {
@@ -46,7 +47,7 @@ func (h *ScrobbleHandler) ManualNowPlayingPoll(c *gin.Context) {
 	}
 	fmt.Println(user)
 
-	subRes, err := services.GetNowPlaying()
+	subRes, err := h.subSonicService.GetNowPlaying()
 	if err != nil {
 		c.JSON(500, gin.H{})
 		return

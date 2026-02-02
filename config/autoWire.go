@@ -25,6 +25,7 @@ type Services struct {
 	Image         *services.ImageService
 	Scrobble      *services.ScrobbleService
 	ScrobbleStats *services.ScrobbleStatsService
+	Subsonic      *services.SubsonicService
 	Track         *services.TrackService
 	User          *services.UserService
 }

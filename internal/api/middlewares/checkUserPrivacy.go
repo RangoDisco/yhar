@@ -9,7 +9,7 @@ import (
 	"github.com/rangodisco/yhar/internal/api/types/filters"
 )
 
-func CheckUserPrivacy() gin.HandlerFunc {
+func CheckUserPrivacy(repo *repositories.UserRepository) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		rawUser, exists := c.Get("user")
 		if !exists {
@@ -39,7 +39,7 @@ func CheckUserPrivacy() gin.HandlerFunc {
 			{Key: "id", Value: uID},
 		}
 
-		u, err := repositories.FindActiveUserByFilters(rFilters)
+		u, err := repo.FindActiveUserByFilters(rFilters)
 		if err != nil {
 			c.AbortWithStatusJSON(404, gin.H{"error": "user not found"})
 			return

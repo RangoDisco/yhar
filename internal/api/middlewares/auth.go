@@ -8,7 +8,7 @@ import (
 	"github.com/rangodisco/yhar/internal/api/services"
 )
 
-func Authenticate() gin.HandlerFunc {
+func Authenticate(auth *services.AuthService) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
 
@@ -26,7 +26,7 @@ func Authenticate() gin.HandlerFunc {
 		}
 
 		// Fetch whole user from token claims
-		user, err := services.GetUserFromToken(token)
+		user, err := auth.GetUserFromToken(token)
 		if err != nil {
 			c.AbortWithStatusJSON(401, gin.H{"error": "invalid token"})
 			return

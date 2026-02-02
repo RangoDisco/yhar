@@ -8,7 +8,15 @@ import (
 	"github.com/rangodisco/yhar/internal/api/types/auth"
 )
 
-func Login(c *gin.Context) {
+type AuthHandler struct {
+	service *services.AuthService
+}
+
+func NewAuthHandler(a *services.AuthService) *AuthHandler {
+	return &AuthHandler{service: a}
+}
+
+func (h *AuthHandler) Login(c *gin.Context) {
 	var body auth.LoginRequest
 	err := c.ShouldBindJSON(&body)
 	if err != nil {
@@ -16,7 +24,7 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	token, err := services.HandleUserLogin(body)
+	token, err := h.service.HandleUserLogin(body)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 	}

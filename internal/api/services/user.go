@@ -6,17 +6,25 @@ import (
 	"github.com/rangodisco/yhar/internal/api/types/filters"
 )
 
-func GetOrCreateUser(username string) (*models.User, error) {
+type UserService struct {
+	uRepo *repositories.UserRepository
+}
+
+func NewUserService(repository *repositories.UserRepository) *UserService {
+	return &UserService{uRepo: repository}
+}
+
+func (s *UserService) GetOrCreateUser(username string) (*models.User, error) {
 	uFilters := []filters.QueryFilter{
 		{Key: "username", Value: username},
 	}
-	existingUser, err := repositories.FindActiveUserByFilters(uFilters)
+	existingUser, err := s.uRepo.FindActiveUserByFilters(uFilters)
 	if err == nil {
 		return existingUser, err
 	}
 
-	model := scrobbleUserToUserModel(username)
-	err = repositories.PersistUser(model)
+	model := s.scrobbleUserToUserModel(username)
+	err = s.uRepo.PersistUser(model)
 	if err != nil {
 		return nil, err
 	}
@@ -24,7 +32,7 @@ func GetOrCreateUser(username string) (*models.User, error) {
 	return model, nil
 }
 
-func scrobbleUserToUserModel(username string) *models.User {
+func (s *UserService) scrobbleUserToUserModel(username string) *models.User {
 	return &models.User{
 		Username: username,
 		// TODO: handle enum

@@ -10,8 +10,32 @@ import (
 	"github.com/rangodisco/yhar/internal/metadata/types/scrobble"
 )
 
-func HandleNewScrobble(entry subsonic.Entry) (*models.Scrobble, error) {
-	user, err := GetOrCreateUser(entry.Username)
+type ScrobbleService struct {
+	sRepo     *repositories.ScrobbleRepository
+	uService  *UserService
+	tService  *TrackService
+	arService *ArtistService
+	alService *AlbumService
+}
+
+func NewScrobbleService(
+	s *repositories.ScrobbleRepository,
+	u *UserService,
+	t *TrackService,
+	ar *ArtistService,
+	al *AlbumService,
+) *ScrobbleService {
+	return &ScrobbleService{
+		sRepo:     s,
+		uService:  u,
+		tService:  t,
+		arService: ar,
+		alService: al,
+	}
+}
+
+func (s *ScrobbleService) HandleNewScrobble(entry subsonic.Entry) (*models.Scrobble, error) {
+	user, err := s.uService.GetOrCreateUser(entry.Username)
 	if err != nil {
 		return nil, err
 	}
@@ -19,19 +43,19 @@ func HandleNewScrobble(entry subsonic.Entry) (*models.Scrobble, error) {
 	var track *models.Track
 
 	// See if track already exist in database
-	track, _ = GetTrackByScrobbleInfo(&entry)
+	track, _ = s.tService.GetTrackByScrobbleInfo(&entry)
 
 	if track == nil {
-		track, err = getOrCreateScrobbleContents(&entry)
+		track, err = s.getOrCreateScrobbleContents(&entry)
 		if err != nil {
 			return nil, err
 		}
 	}
 
 	// Create and persist new scrobble
-	model := buildScrobbleModel(track.ID, user.ID)
+	model := s.buildScrobbleModel(track.ID, user.ID)
 
-	err = repositories.PersistScrobble(model)
+	err = s.sRepo.PersistScrobble(model)
 	if err != nil {
 		return nil, err
 	}
@@ -39,23 +63,23 @@ func HandleNewScrobble(entry subsonic.Entry) (*models.Scrobble, error) {
 }
 
 // getOrCreateScrobbleContents gets or create all content (track, album, artists) related to the scrobble
-func getOrCreateScrobbleContents(entry *subsonic.Entry) (*models.Track, error) {
+func (s *ScrobbleService) getOrCreateScrobbleContents(entry *subsonic.Entry) (*models.Track, error) {
 	// Otherwise fetch metadata and create it
-	data, err := GetTrackMetadata(entry)
+	data, err := s.GetTrackMetadata(entry)
 	if err != nil {
 		return nil, err
 	}
 
-	artists := ProcessScrobbleArtists(data.Track.Artists)
+	artists := s.ProcessScrobbleArtists(data.Track.Artists)
 	if len(artists) == 0 {
 		return nil, errors.New("no artists found")
 	}
 
 	// Get album
-	album := ProcessScrobbleAlbums(data.Track.Albums[0])
+	album := s.ProcessScrobbleAlbums(data.Track.Albums[0])
 
 	// Create track with everything
-	track, err := CreateTrackFromMetadata(&data.Track, entry.MusicBrainzID, artists, album)
+	track, err := s.tService.CreateTrackFromMetadata(&data.Track, entry.MusicBrainzID, artists, album)
 	if err != nil {
 		return nil, err
 	}
@@ -64,11 +88,11 @@ func getOrCreateScrobbleContents(entry *subsonic.Entry) (*models.Track, error) {
 }
 
 // ProcessScrobbleArtists takes all artists given, and find or create their picture and themselves
-func ProcessScrobbleArtists(sArtists []scrobble.ArtistInfo) []models.Artist {
+func (s *ScrobbleService) ProcessScrobbleArtists(sArtists []scrobble.ArtistInfo) []models.Artist {
 	// Create all artists related to the track
 	var artists []models.Artist
 	for _, artistInfo := range sArtists {
-		artist, err := GetOrCreateArtist(artistInfo)
+		artist, err := s.arService.GetOrCreateArtist(artistInfo)
 		if err != nil {
 			continue
 		}
@@ -79,16 +103,16 @@ func ProcessScrobbleArtists(sArtists []scrobble.ArtistInfo) []models.Artist {
 }
 
 // ProcessScrobbleAlbums takes all albums given, and find or create their artists, picture and themselves
-func ProcessScrobbleAlbums(sAlbum scrobble.AlbumInfo) models.Album {
-	artists := ProcessScrobbleArtists(sAlbum.Artists)
-	album, _ := GetOrCreateAlbum(sAlbum, artists)
+func (s *ScrobbleService) ProcessScrobbleAlbums(sAlbum scrobble.AlbumInfo) models.Album {
+	artists := s.ProcessScrobbleArtists(sAlbum.Artists)
+	album, _ := s.alService.GetOrCreateAlbum(sAlbum, artists)
 
 	return *album
 }
 
 // GetTrackMetadata Fetch the current playing track from all setup providers (only subsonic api for now)
 // then fetches associated metadata from providers (only local db for now)
-func GetTrackMetadata(entry *subsonic.Entry) (*scrobble.InfoResponse, error) {
+func (s *ScrobbleService) GetTrackMetadata(entry *subsonic.Entry) (*scrobble.InfoResponse, error) {
 	scrobbleRequest := &scrobble.InfoRequest{
 		Title:  entry.Title,
 		Album:  entry.Album,
@@ -103,7 +127,7 @@ func GetTrackMetadata(entry *subsonic.Entry) (*scrobble.InfoResponse, error) {
 	return aRes, nil
 }
 
-func buildScrobbleModel(trackID, userID int64) *models.Scrobble {
+func (s *ScrobbleService) buildScrobbleModel(trackID, userID int64) *models.Scrobble {
 	return &models.Scrobble{
 		Origin:  models.SUBSONIC,
 		TrackID: trackID,

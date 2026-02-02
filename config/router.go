@@ -2,7 +2,6 @@ package config
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/rangodisco/yhar/internal/api/handlers"
 	"github.com/rangodisco/yhar/internal/api/middlewares"
 )
 
@@ -20,7 +19,7 @@ func loadRoutes(r *gin.Engine, h *Handlers) {
 
 	// AUTH
 	auth := api.Group("/auth")
-	auth.POST("/login", handlers.Login)
+	auth.POST("/login", h.Auth.Login)
 
 	protected := api.Group("/")
 	protected.Use(middlewares.Authenticate())

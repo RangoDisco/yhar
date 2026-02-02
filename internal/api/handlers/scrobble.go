@@ -11,19 +11,13 @@ import (
 	"github.com/rangodisco/yhar/internal/api/utils/convert"
 )
 
-type IScrobbleHandler interface {
-	ManualNowPlayingPoll(c *gin.Context)
-	GetUserTopArtists(c *gin.Context)
-	GetUserTopAlbums(c *gin.Context)
-	GetUserTopTracks(c *gin.Context)
-}
-
 type ScrobbleHandler struct {
-	statService services.IScrobbleService
+	scrobbleService *services.ScrobbleService
+	statService     *services.ScrobbleStatsService
 }
 
-func NewScrobbleHandler(statService services.IScrobbleService) IScrobbleHandler {
-	return &ScrobbleHandler{statService: statService}
+func NewScrobbleHandler(scrobbleService *services.ScrobbleService, statService *services.ScrobbleStatsService) *ScrobbleHandler {
+	return &ScrobbleHandler{scrobbleService: scrobbleService, statService: statService}
 }
 
 func parseStatsParams(c *gin.Context) (*stats.Params, error) {
@@ -65,7 +59,7 @@ func (h *ScrobbleHandler) ManualNowPlayingPoll(c *gin.Context) {
 
 	for _, entry := range subRes.NowPlaying.Entry {
 		// Check if track already exists in service's db
-		res, err := services.HandleNewScrobble(entry)
+		res, err := h.scrobbleService.HandleNewScrobble(entry)
 		if err != nil {
 			continue
 		}

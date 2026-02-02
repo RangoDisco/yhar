@@ -8,28 +8,67 @@ import (
 )
 
 type Repositories struct {
-	Scrobble repositories.IScrobbleRepository
-	Album    repositories.IAlbumRepository
+	Album    *repositories.AlbumRepository
+	Artist   *repositories.ArtistRepository
+	Genre    *repositories.GenreRepository
+	Image    *repositories.ImageRepository
+	Scrobble *repositories.ScrobbleRepository
+	Track    *repositories.TrackRepository
+	User     *repositories.UserRepository
 }
 
 type Services struct {
-	Scrobble services.IScrobbleService
+	Album         *services.AlbumService
+	Artist        *services.ArtistService
+	Auth          *services.AuthService
+	Genre         *services.GenreService
+	Image         *services.ImageService
+	Scrobble      *services.ScrobbleService
+	ScrobbleStats *services.ScrobbleStatsService
+	Track         *services.TrackService
+	User          *services.UserService
 }
 
 type Handlers struct {
-	Scrobble handlers.IScrobbleHandler
+	Scrobble *handlers.ScrobbleHandler
+	Auth     *handlers.AuthHandler
 }
 
 func AutoWire(db *gorm.DB) *Handlers {
 	repos := &Repositories{
 		Scrobble: repositories.NewScrobbleRepository(db),
+		Album:    repositories.NewAlbumRepository(db),
+		Artist:   repositories.NewArtistRepository(db),
+		Genre:    repositories.NewGenreRepository(db),
+		Image:    repositories.NewImageRepository(db),
+		User:     repositories.NewUserRepository(db),
+		Track:    repositories.NewTrackRepository(db),
 	}
 
-	services := &Services{
-		Scrobble: services.NewScrobbleService(repos.Scrobble),
+	imageService := services.NewImageService(repos.Image)
+	genreService := services.NewGenreService(repos.Genre)
+	authService := services.NewAuthService(repos.User)
+	albumService := services.NewAlbumService(repos.Album, imageService)
+	artistService := services.NewArtistService(repos.Artist, imageService, genreService)
+	trackService := services.NewTrackService(repos.Track)
+	userService := services.NewUserService(repos.User)
+	scrobbleStatsService := services.NewScrobbleStatsService(repos.Scrobble)
+	scrobbleService := services.NewScrobbleService(repos.Scrobble, userService, trackService, artistService, albumService)
+
+	svs := &Services{
+		Album:         albumService,
+		Artist:        artistService,
+		Auth:          authService,
+		Genre:         genreService,
+		Image:         imageService,
+		Scrobble:      scrobbleService,
+		ScrobbleStats: scrobbleStatsService,
+		Track:         trackService,
+		User:          userService,
 	}
 
 	return &Handlers{
-		Scrobble: handlers.NewScrobbleHandler(services.Scrobble),
+		Scrobble: handlers.NewScrobbleHandler(svs.Scrobble, svs.ScrobbleStats),
+		Auth:     handlers.NewAuthHandler(svs.Auth),
 	}
 }

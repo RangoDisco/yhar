@@ -33,9 +33,9 @@ func main() {
 		gin.SetMode(gin.ReleaseMode)
 	}
 
-	handlers := config.AutoWire(db)
+	repos, services, handlers := config.AutoWire(db)
 
-	r := config.SetupRouter(handlers)
+	r := config.SetupRouter(repos, services, handlers)
 	err = r.Run()
 	if err != nil {
 		log.Fatalf("failed to run: %v", err)

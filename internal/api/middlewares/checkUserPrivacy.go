@@ -30,7 +30,7 @@ func CheckUserPrivacy(repo *repositories.UserRepository) gin.HandlerFunc {
 		}
 
 		// Skip if viewing own data
-		if uID == strconv.FormatInt(currentUser.ID, 10) {
+		if uID == "me" || uID == strconv.FormatInt(currentUser.ID, 10) {
 			c.Next()
 			return
 		}

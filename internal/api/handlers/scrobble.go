@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 
@@ -22,10 +23,21 @@ func NewScrobbleHandler(scrobbleService *services.ScrobbleService, statService *
 }
 
 func parseStatsParams(c *gin.Context) (*stats.Params, error) {
+	var userID string
 	page := convert.ParseInt(c.Query("page"), 1)
 	limit := convert.ParseInt(c.Query("limit"), 10)
 	period := stats.Period(c.DefaultQuery("period", "week"))
-	userID := c.Param("userID")
+	paramUserID := c.Param("userID")
+
+	if paramUserID == "me" {
+		currentUser, exists := c.Get("user")
+		if !exists {
+			return nil, errors.New("user not found")
+		}
+		userID = currentUser.(string)
+	} else {
+		userID = paramUserID
+	}
 
 	return &stats.Params{
 		UserID: userID,

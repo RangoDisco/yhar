@@ -34,6 +34,7 @@ type Services struct {
 type Handlers struct {
 	Scrobble *handlers.ScrobbleHandler
 	Auth     *handlers.AuthHandler
+	User     *handlers.UserHandler
 }
 
 func AutoWire(db *gorm.DB, metaServices *config.Services) (*Repositories, *Services, *Handlers) {
@@ -72,6 +73,7 @@ func AutoWire(db *gorm.DB, metaServices *config.Services) (*Repositories, *Servi
 	hdls := &Handlers{
 		Scrobble: handlers.NewScrobbleHandler(svs.Scrobble, svs.ScrobbleStats),
 		Auth:     handlers.NewAuthHandler(svs.Auth),
+		User:     handlers.NewUserHandler(svs.Auth),
 	}
 
 	return repos, svs, hdls

@@ -16,24 +16,25 @@ func Authenticate(auth *services.AuthService) gin.HandlerFunc {
 		if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
 			c.Set("user", nil)
 			c.Next()
-		}
+		} else {
 
-		stringToken := authHeader[7:]
-		token, err := services.ParseToken(stringToken)
-		if err != nil {
-			c.AbortWithStatusJSON(401, gin.H{"error": "invalid token"})
-			return
-		}
+			stringToken := authHeader[7:]
+			token, err := services.ParseToken(stringToken)
+			if err != nil {
+				c.AbortWithStatusJSON(401, gin.H{"error": "invalid token"})
+				return
+			}
 
-		// Fetch whole user from token claims
-		user, err := auth.GetUserFromToken(token)
-		if err != nil {
-			c.AbortWithStatusJSON(401, gin.H{"error": "invalid token"})
-			return
-		}
+			// Fetch whole user from token claims
+			user, err := auth.GetUserFromToken(token)
+			if err != nil {
+				c.AbortWithStatusJSON(401, gin.H{"error": "invalid token"})
+				return
+			}
 
-		// Set user to the context
-		c.Set("user", user)
-		c.Next()
+			// Set user to the context
+			c.Set("user", user)
+			c.Next()
+		}
 	}
 }

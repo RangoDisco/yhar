@@ -18,7 +18,7 @@ func CheckUserPrivacy(repo *repositories.UserRepository) gin.HandlerFunc {
 		}
 
 		currentUser, ok := rawUser.(*models.User)
-		if !ok {
+		if !ok && currentUser != nil {
 			c.AbortWithStatusJSON(500, gin.H{"error": "server error"})
 			return
 		}
@@ -30,7 +30,7 @@ func CheckUserPrivacy(repo *repositories.UserRepository) gin.HandlerFunc {
 		}
 
 		// Skip if viewing own data
-		if uID == "me" || uID == strconv.FormatInt(currentUser.ID, 10) {
+		if currentUser != nil && (uID == "me" || uID == strconv.FormatInt(currentUser.ID, 10)) {
 			c.Next()
 			return
 		}

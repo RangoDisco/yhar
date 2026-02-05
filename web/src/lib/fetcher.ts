@@ -1,15 +1,19 @@
-import { redirect } from '@sveltejs/kit';
+import { type Cookies, redirect } from '@sveltejs/kit';
 
-export const fetcher = async (url: string, method: string, body = null) => {
+export const fetcher = async (
+	url: string,
+	method: string,
+	body = null,
+	cookies: Cookies | null = null
+) => {
 	// Build query and fetch
 	const headers: Headers = new Headers();
 	headers.set('Accept', 'application/json');
 
-	// TODO: switch for cookies
-	// const token = localStorage.getItem('token');
-	// if (token) {
-	// 	headers.set('Authorization', `Bearer ${token}`);
-	// }
+	const token = cookies?.get('token');
+	if (token) {
+		headers.set('Authorization', `Bearer ${token}`);
+	}
 
 	const response = await fetch(url, { method, headers, body });
 
@@ -24,11 +28,10 @@ export const fetcher = async (url: string, method: string, body = null) => {
 	 * - If not redirect to the login screen
 	 */
 	if (response.status === 401) {
-		// // TODO: switch for cookies
-		// const refresh = localStorage.getItem('refresh_token');
-		// if (refresh !== null) {
-		// 	// TODO: Get token and try again
-		// }
+		const refresh = cookies?.get('refresh_token');
+		if (refresh) {
+			// TODO: Get token and try again
+		}
 
 		redirect(302, `/auth/login`);
 	}

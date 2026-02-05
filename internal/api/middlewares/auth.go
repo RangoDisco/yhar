@@ -1,6 +1,5 @@
 package middlewares
 
-import "C"
 import (
 	"strings"
 
@@ -17,7 +16,6 @@ func Authenticate(auth *services.AuthService) gin.HandlerFunc {
 			c.Set("user", nil)
 			c.Next()
 		} else {
-
 			stringToken := authHeader[7:]
 			token, err := services.ParseToken(stringToken)
 			if err != nil {

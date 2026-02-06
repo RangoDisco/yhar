@@ -9,7 +9,7 @@
 
 </script>
 
-<article class="flex flex-col items-center justify-center">
+<article class="flex flex-col items-center justify-center gap-1">
     <Avatar.Root class="{contentType !== 'artists' ? 'rounded-md' : ''} h-[80%] w-[80%] aspect-square">
         <Avatar.Image src={pictureUrl}
                       alt={`${title}'s picture`}/>

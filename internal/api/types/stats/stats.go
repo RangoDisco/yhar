@@ -45,6 +45,7 @@ type AlbumViewModel struct {
 }
 
 type TopAlbumResult struct {
+	AlbumViewModel
 	PictureURL    string `json:"picture_url"`
 	ScrobbleCount int    `json:"scrobble_count"`
 }

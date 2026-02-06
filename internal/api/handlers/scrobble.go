@@ -34,6 +34,7 @@ func parseStatsParams(c *gin.Context) (*stats.Params, error) {
 		if !exists {
 			return nil, errors.New("user not found")
 		}
+		// TODO: fix as its not using the id
 		userID = currentUser.(string)
 	} else {
 		userID = paramUserID
@@ -134,6 +135,26 @@ func (h *ScrobbleHandler) GetUserTopTracks(c *gin.Context) {
 	}
 
 	results, total, err := h.statService.FetchUserTopTracks(params)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+
+	res := h.statService.BuildResponseData(results, params.Pagination.Page, params.Pagination.Limit, total)
+
+	c.JSON(http.StatusOK, gin.H{
+		"data": res,
+	})
+}
+
+func (h *ScrobbleHandler) GetUserHistory(c *gin.Context) {
+	params, err := parseStatsParams(c)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "invalid body"})
+		return
+	}
+
+	results, total, err := h.statService.FetchUserHistory(params)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return

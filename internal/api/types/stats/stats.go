@@ -1,5 +1,7 @@
 package stats
 
+import "time"
+
 type RequestPagination struct {
 	Page  int
 	Limit int
@@ -60,11 +62,12 @@ type TopTrackResult struct {
 	ScrobbleCount int `json:"scrobble_count"`
 }
 
-type HistoryResult struct {
-	Tracks []TrackViewModel `json:"tracks"`
+type ScrobbleResult struct {
+	TrackViewModel
+	ScrobbledAt time.Time `json:"scrobbled_at"`
 }
 
-type TopResponse[T TopArtistResult | TopAlbumResult | TopTrackResult] struct {
+type TopResponse[T TopArtistResult | TopAlbumResult | TopTrackResult | ScrobbleResult] struct {
 	Result     []T                 `json:"result"`
 	Pagination *ResponsePagination `json:"pagination"`
 }

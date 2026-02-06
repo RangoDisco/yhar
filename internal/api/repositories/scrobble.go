@@ -103,3 +103,29 @@ func (r *ScrobbleRepository) FindTopTracksForUser(userID string, sd, ed time.Tim
 
 	return res, totalCount, err
 }
+
+func (r *ScrobbleRepository) FindScrobbleByUserID(userID string, page, limit int) ([]stats.ScrobbleResult, int64, error) {
+	var res []stats.ScrobbleResult
+	var totalCount int64
+
+	query := database.GetDB().Table("scrobbles").
+		Select("tr.id as id, tr.title as title, scrobbles.created_at as scrobbled_at, jsonb_build_object('id', al.id, 'title', al.title) as album, i.url AS picture_url, JSON_AGG(DISTINCT jsonb_build_object('id', ar.id, 'name', ar.name)) as artists").
+		Joins("JOIN tracks tr ON tr.id = scrobbles.track_id").
+		Joins("JOIN albums al ON al.id = tr.album_id").
+		Joins("JOIN images i ON i.id = al.picture_id").
+		Joins("JOIN track_artists trar ON trar.track_id = tr.id").
+		Joins("JOIN artists ar ON ar.id = trar.artist_id").
+		Where("scrobbles.user_id = ?", userID).
+		Group("tr.id, tr.title, al.id, i.url, scrobbles.created_at")
+
+	query.Count(&totalCount)
+
+	offset := (page - 1) * limit
+
+	err := query.Order("scrobbled_at ASC").
+		Limit(limit).
+		Offset(offset).
+		Find(&res).Error
+
+	return res, totalCount, err
+}

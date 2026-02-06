@@ -25,38 +25,43 @@ type Params struct {
 	Pagination RequestPagination
 }
 
+type ArtistViewModel struct {
+	ID         int64  `json:"id"`
+	Name       string `json:"name"`
+	PictureURL string `json:"picture_url"`
+}
+
 type TopArtistResult struct {
-	ID            int64  `json:"id"`
-	Name          string `json:"name"`
-	PictureURL    string `json:"picture_url"`
-	ScrobbleCount int    `json:"scrobble_count"`
+	ArtistViewModel
+	ScrobbleCount int `json:"scrobble_count"`
+}
+
+type AlbumViewModel struct {
+	ID      int64             `json:"id"`
+	Title   string            `json:"title"`
+	Artists []ArtistViewModel `json:"artists" gorm:"serializer:json"`
 }
 
 type TopAlbumResult struct {
-	ID      int64  `json:"id"`
-	Title   string `json:"title"`
-	Artists []struct {
-		ID   int64  `json:"id"`
-		Name string `json:"name"`
-	} `json:"artists" gorm:"serializer:json"`
-
 	PictureURL    string `json:"picture_url"`
 	ScrobbleCount int    `json:"scrobble_count"`
 }
 
+type TrackViewModel struct {
+	ID         int64             `json:"id"`
+	Title      string            `json:"title"`
+	Artists    []ArtistViewModel `json:"artists" gorm:"serializer:json"`
+	PictureURL string            `json:"picture_url"`
+	Album      AlbumViewModel    `json:"album" gorm:"serializer:json"`
+}
+
 type TopTrackResult struct {
-	ID      int64  `json:"id"`
-	Title   string `json:"title"`
-	Artists []struct {
-		ID   int64  `json:"id"`
-		Name string `json:"name"`
-	} `json:"artists" gorm:"serializer:json"`
-	PictureURL    string `json:"picture_url"`
-	ScrobbleCount int    `json:"scrobble_count"`
-	Album         struct {
-		ID    int64  `json:"id"`
-		Title string `json:"title"`
-	} `json:"album" gorm:"serializer:json"`
+	TrackViewModel
+	ScrobbleCount int `json:"scrobble_count"`
+}
+
+type HistoryResult struct {
+	Tracks []TrackViewModel `json:"tracks"`
 }
 
 type TopResponse[T TopArtistResult | TopAlbumResult | TopTrackResult] struct {

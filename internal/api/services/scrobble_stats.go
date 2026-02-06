@@ -44,6 +44,11 @@ func (s *ScrobbleStatsService) BuildResponseData(result interface{}, page, limit
 			Result:     v,
 			Pagination: pagination,
 		}
+	case []stats.ScrobbleResult:
+		return &stats.TopResponse[stats.ScrobbleResult]{
+			Result:     v,
+			Pagination: pagination,
+		}
 	default:
 		return nil
 	}
@@ -62,6 +67,10 @@ func (s *ScrobbleStatsService) FetchUserTopAlbums(params *stats.Params) ([]stats
 func (s *ScrobbleStatsService) FetchUserTopTracks(params *stats.Params) ([]stats.TopTrackResult, int64, error) {
 	sd, ed := getDateRangeFromPeriod(params.Period)
 	return s.sRepo.FindTopTracksForUser(params.UserID, sd, ed, params.Pagination.Page, params.Pagination.Limit)
+}
+
+func (s *ScrobbleStatsService) FetchUserHistory(params *stats.Params) ([]stats.ScrobbleResult, int64, error) {
+	return s.sRepo.FindScrobbleByUserID(params.UserID, params.Pagination.Page, params.Pagination.Limit)
 }
 
 func getDateRangeFromPeriod(p stats.Period) (time.Time, time.Time) {

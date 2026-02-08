@@ -4,6 +4,7 @@
     let {
         index,
         title,
+        mode,
         parents,
         pictureUrl,
         contentType,
@@ -22,9 +23,13 @@
             </Avatar.Root>
             <div class="flex flex-col">
                 <p>{title}</p>
-                <div>
-                    {#each parents as parent}
-                        <span class="text-sm text-muted-foreground">{parent.name}</span>
+                <div class="flex gap-1">
+                    {#each parents as parent, i}
+                        {#if i !== 0}
+                            ·
+                        {/if}
+                        <a class="text-sm text-muted-foreground hover:text-foreground"
+                           href="/{mode}/{parent.id}">{parent.name}</a>
                     {/each}
                 </div>
             </div>

@@ -9,11 +9,8 @@
 
 </script>
 
-<article class="flex flex-col items-center justify-center gap-1">
-    <Avatar.Root class="{contentType !== 'artists' ? 'rounded-md' : ''} h-[80%] w-[80%] aspect-square">
-        <Avatar.Image src={pictureUrl}
-                      alt={`${title}'s picture`}/>
-        <Avatar.Fallback>{title}</Avatar.Fallback>
-    </Avatar.Root>
-    <p>{title}</p>
+<article class="flex flex-col items-center justify-center gap-2 w-[30%]">
+    <img class="{contentType !== 'artists' ? 'rounded-md' : 'rounded-full'} w-full aspect-square" src={pictureUrl}
+         alt={`${title}'s picture`}/>
+    <p class="text-center mb-auto">{title}</p>
 </article>

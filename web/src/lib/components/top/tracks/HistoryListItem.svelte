@@ -31,11 +31,11 @@
                         {#if i !== 0}
                             ·
                         {/if}
-                        <a class="text-sm text-muted-foreground hover:text-foreground h-6"
+                        <a class="text-sm text-muted-foreground hover:underline h-6"
                            href="/artists/{artist.id}">{artist.name}</a>
                     {/each}
                 {:else}
-                    <a class="text-sm text-muted-foreground hover:text-foreground"
+                    <a class="text-sm text-muted-foreground hover:underline"
                        href="/albums/{track.album.id}">{track.album.name}</a>
                 {/if}
             </div>

@@ -122,7 +122,7 @@ func (r *ScrobbleRepository) FindScrobbleByUserID(userID string, page, limit int
 
 	offset := (page - 1) * limit
 
-	err := query.Order("scrobbled_at ASC").
+	err := query.Order("scrobbled_at DESC").
 		Limit(limit).
 		Offset(offset).
 		Find(&res).Error

@@ -47,5 +47,8 @@
 		"onlyBuiltDependencies": [
 			"esbuild"
 		]
+	},
+	"dependencies": {
+		"dayjs": "^1.11.19"
 	}
 }

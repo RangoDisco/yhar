@@ -21,7 +21,7 @@ func SetupDatabase() (*gorm.DB, error) {
 		db, err = InitDatabase()
 	}
 
-	return nil, err
+	return db, err
 }
 
 func InitDatabase() (*gorm.DB, error) {

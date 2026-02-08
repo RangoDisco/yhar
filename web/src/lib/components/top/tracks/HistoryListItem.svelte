@@ -2,6 +2,10 @@
     import * as Avatar from "$lib/components/ui/avatar/index";
     import {Button} from "$lib/components/ui/button/index";
     import {Trash} from "@lucide/svelte";
+    import dayjs from "dayjs";
+    import relativeTime from "dayjs/plugin/relativeTime";
+
+    dayjs.extend(relativeTime);
 
     let {
         track,
@@ -21,14 +25,13 @@
                 <p>{track.title}</p>
                 {#if mode === "artists"}
                     {#each track.artists as artist}
-                        <a href="/artists/{artist.id}">{artist.name}</a>
+                        <a class="text-sm text-muted-foreground" href="/artists/{artist.id}">{artist.name}</a>
                     {/each}
                 {:else}
-                    <a href="/albums/{track.album.id}">{track.album.name}</a>
+                    <a class="text-sm text-muted-foreground" href="/albums/{track.album.id}">{track.album.name}</a>
                 {/if}
-                <p class="text-sm text-muted-foreground"></p>
             </div>
-            <p class="text-sm text-muted-foreground">{track.scrobbled_at}</p>
+            <p class="text-sm text-muted-foreground">{dayjs(track.scrobbled_at).fromNow()}</p>
         </div>
     </div>
     <Button variant="outline" size="icon">

@@ -1,5 +1,6 @@
 <script lang="ts">
     import HistoryListItem from "$lib/components/top/tracks/HistoryListItem.svelte";
+    import ContentListWrapper from "$lib/components/top/ContentListWrapper.svelte";
 
     type Props = {
         tracks: [],
@@ -12,14 +13,10 @@
     }: Props = $props();
 </script>
 
-<section class="flex flex-col gap-2">
-    <div class="flex justify-between items-center">
-        <h1 class="text-2xl">History</h1>
-        <a class="text-sm text-muted-foreground" href="history">View all</a>
-    </div>
+<ContentListWrapper title="History" url="history">
     <div class="flex flex-col gap-2">
         {#each tracks as track}
             <HistoryListItem track={track} mode={mode}/>
         {/each}
     </div>
-</section>
+</ContentListWrapper>

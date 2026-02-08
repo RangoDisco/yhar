@@ -12,7 +12,7 @@
     }: Props = $props();
 </script>
 
-<section class="flex flex-col gap-2 md:w-1/2">
+<section class="flex flex-col gap-2">
     <div class="flex justify-between items-center">
         <h1 class="text-2xl">History</h1>
         <a class="text-sm text-muted-foreground" href="history">View all</a>

@@ -2,9 +2,9 @@ import { type Cookies, redirect } from '@sveltejs/kit';
 
 export const fetcher = async (
 	url: string,
-	method: string,
+	method: 'GET' | 'POST' | 'PUT' | 'DELETE',
 	body = null,
-	cookies: Cookies | null = null
+	cookies: Cookies
 ) => {
 	// Build query and fetch
 	const headers: Headers = new Headers();

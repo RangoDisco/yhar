@@ -4,26 +4,31 @@
     import {Trash} from "@lucide/svelte";
 
     let {
-        title,
-        album,
-        scrobbledAt,
-        pictureUrl,
+        track,
+        mode,
     } = $props();
 </script>
 
 <article class="flex items-center gap-4 justify-between">
     <div class="flex gap-2 items-center">
         <Avatar.Root class="rounded-md h-8 w-8 ">
-            <Avatar.Image src={pictureUrl}
-                          alt={`${title}'s picture`}/>
-            <Avatar.Fallback>{title}</Avatar.Fallback>
+            <Avatar.Image src={track.picture_url}
+                          alt={`${track.title}'s picture`}/>
+            <Avatar.Fallback>{track.title}</Avatar.Fallback>
         </Avatar.Root>
         <div class="flex flex-col">
             <div class="flex gap-2">
-                <p>{title}</p>
-                <p class="text-sm text-muted-foreground">{album}</p>
+                <p>{track.title}</p>
+                {#if mode === "artists"}
+                    {#each track.artists as artist}
+                        <a href="/artists/{artist.id}">{artist.name}</a>
+                    {/each}
+                {:else}
+                    <a href="/albums/{track.album.id}">{track.album.name}</a>
+                {/if}
+                <p class="text-sm text-muted-foreground"></p>
             </div>
-            <p class="text-sm text-muted-foreground">{scrobbledAt}</p>
+            <p class="text-sm text-muted-foreground">{track.scrobbled_at}</p>
         </div>
     </div>
     <Button variant="outline" size="icon">

@@ -10,6 +10,6 @@
     <meta name="description" content="Listening habits stats"/>
     <link rel="icon" href={favicon}/>
 </svelte:head>
-<section class="mx-auto p-6">
+<section class="min-h-screen md:max-w-300 mx-auto p-6">
     {@render children()}
 </section>

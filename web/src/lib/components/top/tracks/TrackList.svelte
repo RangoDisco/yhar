@@ -14,6 +14,7 @@
             <ContentListItem index={i} title={track.title} parents={track.artists}
                              pictureUrl={track.picture_url}
                              scrobbleCount={track.scrobble_count}
+                             mode="artists"
                              contentType="tracks"/>
         {/each}
     </div>

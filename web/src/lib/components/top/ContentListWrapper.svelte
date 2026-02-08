@@ -14,10 +14,10 @@
     }: Props = $props();
 </script>
 
-<section class="flex flex-col gap-4">
+<section class="flex flex-col gap-6">
     <div class="flex justify-between items-center">
-        <h1 class="text-2xl">{title}</h1>
-        <a class="text-sm text-muted-foreground" href={url}>View all</a>
+        <h1 class="text-2xl md:text-3xl">{title}</h1>
+        <a class="text-sm text-muted-foreground md:text-base" href={url}>View all</a>
     </div>
     {@render children()}
 </section>

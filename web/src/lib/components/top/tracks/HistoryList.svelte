@@ -12,12 +12,12 @@
     }: Props = $props();
 </script>
 
-<section class="flex flex-col gap-4">
+<section class="flex flex-col gap-2 md:w-1/2">
     <div class="flex justify-between items-center">
         <h1 class="text-2xl">History</h1>
         <a class="text-sm text-muted-foreground" href="history">View all</a>
     </div>
-    <div class="flex flex-col gap-4">
+    <div class="flex flex-col gap-2">
         {#each tracks as track}
             <HistoryListItem track={track} mode={mode}/>
         {/each}

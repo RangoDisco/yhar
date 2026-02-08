@@ -28,7 +28,7 @@
                         {#if i !== 0}
                             ·
                         {/if}
-                        <a class="text-sm text-muted-foreground hover:text-foreground"
+                        <a class="text-sm text-muted-foreground hover:underline"
                            href="/{mode}/{parent.id}">{parent.name}</a>
                     {/each}
                 </div>

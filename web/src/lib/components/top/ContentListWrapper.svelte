@@ -17,7 +17,7 @@
 <section class="flex flex-col gap-6">
     <div class="flex justify-between items-center">
         <h1 class="text-2xl md:text-3xl">{title}</h1>
-        <a class="text-sm text-muted-foreground md:text-base" href={url}>View all</a>
+        <a class="text-sm text-muted-foreground md:text-base hover:underline" href={url}>View all</a>
     </div>
     {@render children()}
 </section>

@@ -20,7 +20,7 @@
                     Loading...
                 {:then periodData}
                     <ContentGrid title="Top artists" items={periodData.artists.result} contentType="artists"
-                                 url="artists"/>
+                                 url="top/artists"/>
                     <ContentGrid title="Top albums" items={periodData.albums.result} contentType="albums" url="albums"/>
                     <TrackList tracks={periodData.tracks.result}/>
                 {/await}

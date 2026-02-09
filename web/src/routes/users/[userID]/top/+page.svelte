@@ -1,8 +1,5 @@
 <script>
-    import HistoryList from "$lib/components/top/tracks/HistoryList.svelte";
     import * as Tabs from "$lib/components/ui/tabs/index";
-    import TrackList from "$lib/components/top/tracks/TrackList.svelte";
-    import ContentGrid from "$lib/components/top/ContentGrid.svelte";
     import ContentListItem from "$lib/components/top/ContentListItem.svelte";
     import ContentListWrapper from "$lib/components/top/ContentListWrapper.svelte";
     import HistoryListItem from "$lib/components/top/tracks/HistoryListItem.svelte";
@@ -38,8 +35,7 @@
                         <div class="flex flex-wrap gap-4">
                             {#each periodData.albums.result as album, i (album.id)}
                                 <ContentCard title={album.title} pictureUrl={album.picture_url}
-                                             contentType="albums"
-                                             contentID={album.id}/>
+                                             contentType="albums"/>
                             {/each}
                         </div>
                     </ContentListWrapper>

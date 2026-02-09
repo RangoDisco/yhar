@@ -3,7 +3,6 @@ package repositories
 import (
 	"time"
 
-	"github.com/rangodisco/yhar/internal/api/config/database"
 	"github.com/rangodisco/yhar/internal/api/models"
 	"github.com/rangodisco/yhar/internal/api/types/stats"
 	"gorm.io/gorm"
@@ -20,7 +19,7 @@ func NewScrobbleRepository(Db *gorm.DB) *ScrobbleRepository {
 }
 
 func (r *ScrobbleRepository) PersistScrobble(s *models.Scrobble) error {
-	res := database.GetDB().Create(&s)
+	res := r.Db.Create(&s)
 	return res.Error
 }
 

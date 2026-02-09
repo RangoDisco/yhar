@@ -3,6 +3,10 @@
     import * as Tabs from "$lib/components/ui/tabs/index";
     import TrackList from "$lib/components/top/tracks/TrackList.svelte";
     import ContentGrid from "$lib/components/top/ContentGrid.svelte";
+    import ContentListItem from "$lib/components/top/ContentListItem.svelte";
+    import ContentListWrapper from "$lib/components/top/ContentListWrapper.svelte";
+    import HistoryListItem from "$lib/components/top/tracks/HistoryListItem.svelte";
+    import ContentCard from "$lib/components/top/ContentCard.svelte";
 
     const {data} = $props();
     const periods = ['week', 'month', 'year', 'overall'];
@@ -19,13 +23,51 @@
                 {#await data[period]}
                     Loading...
                 {:then periodData}
-                    <ContentGrid title="Top artists" items={periodData.artists.result} contentType="artists"
-                                 url="top/artists"/>
-                    <ContentGrid title="Top albums" items={periodData.albums.result} contentType="albums" url="albums"/>
-                    <TrackList tracks={periodData.tracks.result}/>
+                    <!--TOP ARTISTS-->
+                    <ContentListWrapper title="Top artists" url="artists">
+                        <div class="flex flex-wrap gap-4">
+                            {#each periodData.artists.result as artist, i (artist.id)}
+                                <ContentCard title={artist.name} pictureUrl={artist.picture_url} contentType="artists"
+                                             contentID={artist.id}/>
+                            {/each}
+                        </div>
+                    </ContentListWrapper>
+
+                    <!--TOP ALBUMS-->
+                    <ContentListWrapper title="Top albums" url="albums">
+                        <div class="flex flex-wrap gap-4">
+                            {#each periodData.albums.result as album, i (album.id)}
+                                <ContentCard title={album.title} pictureUrl={album.picture_url}
+                                             contentType="albums"
+                                             contentID={album.id}/>
+                            {/each}
+                        </div>
+                    </ContentListWrapper>
+
+                    <!--TOP TRACKS-->
+                    <ContentListWrapper title="Top tracks" url="tracks">
+                        <div class="flex flex-col gap-4">
+                            {#each periodData.tracks.result as track, i (track.id)}
+                                <ContentListItem index={i} title={track.title}
+                                                 pictureUrl={track.picture_url}
+                                                 scrobbleCount={track.scrobble_count}
+                                                 parentType="artists"
+                                                 parents={track.artists}
+                                                 contentType="tracks"/>
+                            {/each}
+                        </div>
+                    </ContentListWrapper>
                 {/await}
             </Tabs.Content>
         {/each}
     </Tabs.Root>
-    <HistoryList tracks={data.history.result} mode="artists"/>
+
+    <!--HISTORY-->
+    <ContentListWrapper title="History" url="history">
+        <div class="flex flex-col gap-2">
+            {#each data.history.result as track}
+                <HistoryListItem track={track} parentType="artists"/>
+            {/each}
+        </div>
+    </ContentListWrapper>
 </div>

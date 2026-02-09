@@ -5,15 +5,17 @@
     type Props = {
         tracks: [],
         mode: "artists" | "albums"
+        params: string | null
     }
 
     let {
         tracks,
-        mode
+        mode,
+        params = $bindable(""),
     }: Props = $props();
 </script>
 
-<ContentListWrapper title="History" url="history">
+<ContentListWrapper title="History" url={`history${params}`}>
     <div class="flex flex-col gap-2">
         {#each tracks as track}
             <HistoryListItem track={track} mode={mode}/>

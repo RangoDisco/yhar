@@ -1,20 +1,22 @@
-<script>
+<script lang="ts">
     import ContentListItem from "$lib/components/top/ContentListItem.svelte";
     import ContentListWrapper from "$lib/components/top/ContentListWrapper.svelte";
 
     let {
-        tracks
+        tracks,
+        params = $bindable(""),
     } = $props();
 </script>
 
 
-<ContentListWrapper title="Top tracks" url="/tracks">
+<ContentListWrapper title="Top tracks" url="tracks{params}">
     <div class="flex flex-col gap-4">
         {#each tracks as track, i (track.id)}
-            <ContentListItem index={i} title={track.title} parents={track.artists}
+            <ContentListItem index={i} title={track.title}
                              pictureUrl={track.picture_url}
                              scrobbleCount={track.scrobble_count}
-                             mode="artists"
+                             parentType="artists"
+                             parents={track.artists}
                              contentType="tracks"/>
         {/each}
     </div>

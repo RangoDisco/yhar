@@ -1,7 +1,6 @@
 package repositories
 
 import (
-	"github.com/rangodisco/yhar/internal/api/config/database"
 	"github.com/rangodisco/yhar/internal/api/models"
 	"gorm.io/gorm"
 )
@@ -17,7 +16,7 @@ func NewImageRepository(Db *gorm.DB) *ImageRepository {
 func (r *ImageRepository) FindActiveImageByUrl(url string) (*models.Image, error) {
 	var i models.Image
 
-	err := database.GetDB().Where("url = ?", url).First(&i).Error
+	err := r.Db.Where("url = ?", url).First(&i).Error
 	if err != nil {
 		return nil, err
 	}
@@ -26,6 +25,6 @@ func (r *ImageRepository) FindActiveImageByUrl(url string) (*models.Image, error
 
 func (r *ImageRepository) PersistImage(img *models.Image) error {
 
-	res := database.GetDB().Create(img)
+	res := r.Db.Create(img)
 	return res.Error
 }

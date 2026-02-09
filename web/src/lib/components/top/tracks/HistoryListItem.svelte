@@ -5,11 +5,13 @@
     import dayjs from "dayjs";
     import relativeTime from "dayjs/plugin/relativeTime";
 
+    import {page} from "$app/state"
+
     dayjs.extend(relativeTime);
 
     let {
         track,
-        mode,
+        parentType
     } = $props();
 </script>
 
@@ -26,17 +28,17 @@
                 <p class="text-sm text-muted-foreground whitespace-nowrap w-40">{dayjs(track.scrobbled_at).fromNow()}</p>
             </div>
             <div class="flex gap-1">
-                {#if mode === "artists"}
+                {#if parentType === "artists"}
                     {#each track.artists as artist, i}
                         {#if i !== 0}
                             ·
                         {/if}
                         <a class="text-sm text-muted-foreground hover:underline h-6"
-                           href="/artists/{artist.id}">{artist.name}</a>
+                           href="/users/{page.params.userID}/top/artists/{artist.id}">{artist.name}</a>
                     {/each}
                 {:else}
                     <a class="text-sm text-muted-foreground hover:underline"
-                       href="/albums/{track.album.id}">{track.album.name}</a>
+                       href="/users/{page.params.userID}/top/albums/{track.album.id}">{track.album.title}</a>
                 {/if}
             </div>
         </div>

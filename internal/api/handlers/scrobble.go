@@ -27,6 +27,7 @@ func parseStatsParams(c *gin.Context) (*stats.Params, error) {
 	page := convert.ParseInt(c.Query("page"), 1)
 	limit := convert.ParseInt(c.Query("limit"), 10)
 	period := stats.Period(c.DefaultQuery("period", "week"))
+	artistID := c.Query("artist")
 	paramUserID := c.Param("userID")
 
 	if paramUserID == "me" {
@@ -40,14 +41,20 @@ func parseStatsParams(c *gin.Context) (*stats.Params, error) {
 		userID = paramUserID
 	}
 
-	return &stats.Params{
+	params := &stats.Params{
 		UserID: userID,
 		Period: period,
 		Pagination: stats.RequestPagination{
 			Page:  page,
 			Limit: limit,
 		},
-	}, nil
+	}
+
+	if artistID != "" {
+		params.ArtistID = &artistID
+	}
+
+	return params, nil
 }
 
 // TODO: handle polling and what is considered a real scrobble

@@ -56,21 +56,21 @@ func (s *ScrobbleStatsService) BuildResponseData(result interface{}, page, limit
 
 func (s *ScrobbleStatsService) FetchUserTopArtists(params *stats.Params) ([]stats.TopArtistResult, int64, error) {
 	sd, ed := getDateRangeFromPeriod(params.Period)
-	return s.sRepo.FindTopArtistsForUser(params.UserID, sd, ed, params.Pagination.Page, params.Pagination.Limit)
+	return s.sRepo.FindTopArtistsForUser(params.UserID, sd, ed, params.Pagination.Page, params.Pagination.Limit, params.ArtistID)
 }
 
 func (s *ScrobbleStatsService) FetchUserTopAlbums(params *stats.Params) ([]stats.TopAlbumResult, int64, error) {
 	sd, ed := getDateRangeFromPeriod(params.Period)
-	return s.sRepo.FindTopAlbumsForUser(params.UserID, sd, ed, params.Pagination.Page, params.Pagination.Limit)
+	return s.sRepo.FindTopAlbumsForUser(params.UserID, sd, ed, params.Pagination.Page, params.Pagination.Limit, params.ArtistID)
 }
 
 func (s *ScrobbleStatsService) FetchUserTopTracks(params *stats.Params) ([]stats.TopTrackResult, int64, error) {
 	sd, ed := getDateRangeFromPeriod(params.Period)
-	return s.sRepo.FindTopTracksForUser(params.UserID, sd, ed, params.Pagination.Page, params.Pagination.Limit)
+	return s.sRepo.FindTopTracksForUser(params.UserID, sd, ed, params.Pagination.Page, params.Pagination.Limit, params.ArtistID)
 }
 
 func (s *ScrobbleStatsService) FetchUserHistory(params *stats.Params) ([]stats.ScrobbleResult, int64, error) {
-	return s.sRepo.FindScrobbleByUserID(params.UserID, params.Pagination.Page, params.Pagination.Limit)
+	return s.sRepo.FindScrobbleByUserID(params.UserID, params.Pagination.Page, params.Pagination.Limit, params.ArtistID)
 }
 
 func getDateRangeFromPeriod(p stats.Period) (time.Time, time.Time) {

@@ -24,7 +24,7 @@ func (r *ScrobbleRepository) PersistScrobble(s *models.Scrobble) error {
 	return res.Error
 }
 
-func (r *ScrobbleRepository) FindTopArtistsForUser(userID string, sd, ed time.Time, page, limit int) ([]stats.TopArtistResult, int64, error) {
+func (r *ScrobbleRepository) FindTopArtistsForUser(userID string, sd, ed time.Time, page, limit int, artistID *string) ([]stats.TopArtistResult, int64, error) {
 	var res []stats.TopArtistResult
 	var totalCount int64
 
@@ -38,6 +38,10 @@ func (r *ScrobbleRepository) FindTopArtistsForUser(userID string, sd, ed time.Ti
 		Where("scrobbles.created_at >= ? AND scrobbles.created_at <= ?", sd, ed).
 		Group("ar.id, i.url")
 
+	if artistID != nil {
+		query.Where("ar.id = ?", artistID)
+	}
+
 	query.Count(&totalCount)
 
 	offset := (page - 1) * limit
@@ -50,7 +54,7 @@ func (r *ScrobbleRepository) FindTopArtistsForUser(userID string, sd, ed time.Ti
 	return res, totalCount, err
 }
 
-func (r *ScrobbleRepository) FindTopAlbumsForUser(userID string, sd, ed time.Time, page, limit int) ([]stats.TopAlbumResult, int64, error) {
+func (r *ScrobbleRepository) FindTopAlbumsForUser(userID string, sd, ed time.Time, page, limit int, artistID *string) ([]stats.TopAlbumResult, int64, error) {
 	var res []stats.TopAlbumResult
 	var totalCount int64
 
@@ -65,6 +69,10 @@ func (r *ScrobbleRepository) FindTopAlbumsForUser(userID string, sd, ed time.Tim
 		Where("scrobbles.created_at >= ? AND scrobbles.created_at <= ?", sd, ed).
 		Group("al.id, al.title, i.url")
 
+	if artistID != nil {
+		query.Where("ar.id = ?", artistID)
+	}
+
 	query.Count(&totalCount)
 
 	offset := (page - 1) * limit
@@ -77,7 +85,7 @@ func (r *ScrobbleRepository) FindTopAlbumsForUser(userID string, sd, ed time.Tim
 	return res, totalCount, err
 }
 
-func (r *ScrobbleRepository) FindTopTracksForUser(userID string, sd, ed time.Time, page, limit int) ([]stats.TopTrackResult, int64, error) {
+func (r *ScrobbleRepository) FindTopTracksForUser(userID string, sd, ed time.Time, page, limit int, artistID *string) ([]stats.TopTrackResult, int64, error) {
 	var res []stats.TopTrackResult
 	var totalCount int64
 
@@ -92,6 +100,10 @@ func (r *ScrobbleRepository) FindTopTracksForUser(userID string, sd, ed time.Tim
 		Where("scrobbles.created_at >= ? AND scrobbles.created_at <= ?", sd, ed).
 		Group("tr.id, tr.title, al.id, i.url")
 
+	if artistID != nil {
+		query.Where("ar.id = ?", artistID)
+	}
+
 	query.Count(&totalCount)
 
 	offset := (page - 1) * limit
@@ -104,7 +116,7 @@ func (r *ScrobbleRepository) FindTopTracksForUser(userID string, sd, ed time.Tim
 	return res, totalCount, err
 }
 
-func (r *ScrobbleRepository) FindScrobbleByUserID(userID string, page, limit int) ([]stats.ScrobbleResult, int64, error) {
+func (r *ScrobbleRepository) FindScrobbleByUserID(userID string, page, limit int, artistID *string) ([]stats.ScrobbleResult, int64, error) {
 	var res []stats.ScrobbleResult
 	var totalCount int64
 
@@ -117,6 +129,10 @@ func (r *ScrobbleRepository) FindScrobbleByUserID(userID string, page, limit int
 		Joins("JOIN artists ar ON ar.id = trar.artist_id").
 		Where("scrobbles.user_id = ?", userID).
 		Group("tr.id, tr.title, al.id, i.url, scrobbles.created_at")
+
+	if artistID != nil {
+		query.Where("ar.id = ?", artistID)
+	}
 
 	query.Count(&totalCount)
 

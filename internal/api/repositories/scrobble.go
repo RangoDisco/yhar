@@ -28,7 +28,7 @@ func (r *ScrobbleRepository) FindTopArtistsForUser(userID string, sd, ed time.Ti
 	var res []stats.TopArtistResult
 	var totalCount int64
 
-	query := database.GetDB().Table("scrobbles").
+	query := r.Db.Table("scrobbles").
 		Select("ar.id AS id, ar.name AS name, i.url AS picture_url, COUNT(scrobbles.id) AS scrobble_count").
 		Joins("JOIN tracks tr ON tr.id = scrobbles.track_id").
 		Joins("JOIN track_artists trar ON trar.track_id = tr.id").
@@ -58,13 +58,14 @@ func (r *ScrobbleRepository) FindTopAlbumsForUser(userID string, sd, ed time.Tim
 	var res []stats.TopAlbumResult
 	var totalCount int64
 
-	query := database.GetDB().Table("scrobbles").
-		Select("al.id as id, al.title as title, i.url AS picture_url, COUNT(DISTINCT scrobbles.id) AS scrobble_count, JSON_AGG(DISTINCT jsonb_build_object('id', ar.id, 'name', ar.name)) as artists").
+	query := r.Db.Table("scrobbles").
+		Select("al.id as id, al.title as title, i.url AS picture_url, COUNT(DISTINCT scrobbles.id) AS scrobble_count, JSON_AGG(DISTINCT jsonb_build_object('id', ar.id, 'name', ar.name, 'picture_url', ari.url)) as artists").
 		Joins("JOIN tracks tr ON tr.id = scrobbles.track_id").
 		Joins("JOIN albums al ON al.id = tr.album_id").
 		Joins("JOIN images i ON i.id = al.picture_id").
 		Joins("JOIN artist_albums aral ON aral.album_id = al.id").
 		Joins("JOIN artists ar ON ar.id = aral.artist_id").
+		Joins("JOIN images ari ON ari.id = ar.picture_id").
 		Where("scrobbles.user_id = ?", userID).
 		Where("scrobbles.created_at >= ? AND scrobbles.created_at <= ?", sd, ed).
 		Group("al.id, al.title, i.url")
@@ -89,13 +90,14 @@ func (r *ScrobbleRepository) FindTopTracksForUser(userID string, sd, ed time.Tim
 	var res []stats.TopTrackResult
 	var totalCount int64
 
-	query := database.GetDB().Table("scrobbles").
-		Select("tr.id as id, tr.title as title, jsonb_build_object('id', al.id, 'title', al.title) as album, i.url AS picture_url, COUNT(DISTINCT scrobbles.id) AS scrobble_count, JSON_AGG(DISTINCT jsonb_build_object('id', ar.id, 'name', ar.name)) as artists").
+	query := r.Db.Table("scrobbles").
+		Select("tr.id as id, tr.title as title, jsonb_build_object('id', al.id, 'title', al.title) as album, i.url AS picture_url, COUNT(DISTINCT scrobbles.id) AS scrobble_count, JSON_AGG(DISTINCT jsonb_build_object('id', ar.id, 'name', ar.name, 'picture_url', ari.url)) as artists").
 		Joins("JOIN tracks tr ON tr.id = scrobbles.track_id").
 		Joins("JOIN albums al ON al.id = tr.album_id").
 		Joins("JOIN images i ON i.id = al.picture_id").
 		Joins("JOIN track_artists trar ON trar.track_id = tr.id").
 		Joins("JOIN artists ar ON ar.id = trar.artist_id").
+		Joins("JOIN images ari ON ari.id = ar.picture_id").
 		Where("scrobbles.user_id = ?", userID).
 		Where("scrobbles.created_at >= ? AND scrobbles.created_at <= ?", sd, ed).
 		Group("tr.id, tr.title, al.id, i.url")
@@ -120,7 +122,7 @@ func (r *ScrobbleRepository) FindScrobbleByUserID(userID string, page, limit int
 	var res []stats.ScrobbleResult
 	var totalCount int64
 
-	query := database.GetDB().Table("scrobbles").
+	query := r.Db.Table("scrobbles").
 		Select("tr.id as id, tr.title as title, scrobbles.created_at as scrobbled_at, jsonb_build_object('id', al.id, 'title', al.title) as album, i.url AS picture_url, JSON_AGG(DISTINCT jsonb_build_object('id', ar.id, 'name', ar.name)) as artists").
 		Joins("JOIN tracks tr ON tr.id = scrobbles.track_id").
 		Joins("JOIN albums al ON al.id = tr.album_id").

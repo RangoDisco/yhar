@@ -24,6 +24,7 @@ const (
 type Params struct {
 	UserID     string
 	Period     Period
+	ArtistID   *string
 	Pagination RequestPagination
 }
 

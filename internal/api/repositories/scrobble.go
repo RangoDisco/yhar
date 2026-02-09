@@ -70,7 +70,7 @@ func (r *ScrobbleRepository) FindTopAlbumsForUser(userID string, sd, ed time.Tim
 		Group("al.id, al.title, i.url")
 
 	if artistID != nil {
-		query.Where("ar.id = ?", artistID)
+		query.Where("EXISTS(SELECT 1 FROM artist_albums aral2 WHERE aral2.album_id = al.id AND aral2.artist_id = ?)", artistID)
 	}
 
 	query.Count(&totalCount)
@@ -101,7 +101,7 @@ func (r *ScrobbleRepository) FindTopTracksForUser(userID string, sd, ed time.Tim
 		Group("tr.id, tr.title, al.id, i.url")
 
 	if artistID != nil {
-		query.Where("ar.id = ?", artistID)
+		query.Where("EXISTS(SELECT 1 FROM track_artists trar2 WHERE trar2.track_id = tr.id AND trar2.artist_id = ?)", artistID)
 	}
 
 	query.Count(&totalCount)

@@ -11,6 +11,7 @@ import (
 
 func CheckUserPrivacy(repo *repositories.UserRepository) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		ctx := c.Request.Context()
 		rawUser, exists := c.Get("user")
 		if !exists {
 			c.AbortWithStatusJSON(401, gin.H{"error": "unauthorized"})
@@ -35,11 +36,9 @@ func CheckUserPrivacy(repo *repositories.UserRepository) gin.HandlerFunc {
 			return
 		}
 
-		rFilters := []filters.QueryFilter{
+		u, err := repo.FindActiveUserByFilters(ctx, []filters.QueryFilter{
 			{Key: "id", Value: uID},
-		}
-
-		u, err := repo.FindActiveUserByFilters(rFilters)
+		})
 		if err != nil {
 			c.AbortWithStatusJSON(404, gin.H{"error": "user not found"})
 			return

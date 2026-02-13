@@ -1,14 +1,11 @@
 package config
 
 import (
-	"io"
+	"log/slog"
 	"os"
-
-	"github.com/gin-gonic/gin"
 )
 
-func SetupLogger() {
-	f, _ := os.Create("logs/yhar.log")
-	gin.DefaultWriter = io.MultiWriter(f)
-	gin.DefaultWriter = io.MultiWriter(f, os.Stdout)
+func SetupLogger() *slog.Logger {
+	return slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
+		Level: slog.LevelInfo}))
 }

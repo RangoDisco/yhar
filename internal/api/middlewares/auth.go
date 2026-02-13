@@ -9,6 +9,7 @@ import (
 
 func Authenticate(auth *services.AuthService) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		ctx := c.Request.Context()
 		authHeader := c.GetHeader("Authorization")
 
 		// Proceed as anon if token was not provided
@@ -24,7 +25,7 @@ func Authenticate(auth *services.AuthService) gin.HandlerFunc {
 			}
 
 			// Fetch whole user from token claims
-			user, err := auth.GetUserFromToken(token)
+			user, err := auth.GetUserFromToken(ctx, token)
 			if err != nil {
 				c.AbortWithStatusJSON(401, gin.H{"error": "invalid token"})
 				return

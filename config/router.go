@@ -44,8 +44,8 @@ func loadRoutes(r *gin.Engine, repo *serverConfig.Repositories, s *serverConfig.
 
 	// USER'S STATS
 	userScrobbles := user.Group("/scrobbles")
-	userScrobbles.GET("/history", h.Scrobble.GetUserHistory)
-	userScrobbles.GET("/top/artists", h.Scrobble.GetUserTopArtists)
-	userScrobbles.GET("/top/albums", h.Scrobble.GetUserTopAlbums)
-	userScrobbles.GET("/top/tracks", h.Scrobble.GetUserTopTracks)
+	userScrobbles.GET("/history", h.ScrobbleStats.GetUserHistory)
+	userScrobbles.GET("/top/artists", h.ScrobbleStats.GetUserTopArtists)
+	userScrobbles.GET("/top/albums", h.ScrobbleStats.GetUserTopAlbums)
+	userScrobbles.GET("/top/tracks", h.ScrobbleStats.GetUserTopTracks)
 }

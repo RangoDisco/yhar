@@ -25,6 +25,7 @@ type Services struct {
 	Auth          *services.AuthService
 	Genre         *services.GenreService
 	Image         *services.ImageService
+	Metadata      *services.MetadataService
 	Scrobble      *services.ScrobbleService
 	ScrobbleStats *services.ScrobbleStatsService
 	Subsonic      *services.SubsonicService
@@ -33,9 +34,10 @@ type Services struct {
 }
 
 type Handlers struct {
-	Scrobble *handlers.ScrobbleHandler
-	Auth     *handlers.AuthHandler
-	User     *handlers.UserHandler
+	Scrobble      *handlers.ScrobbleHandler
+	ScrobbleStats *handlers.ScrobbleStatsHandler
+	Auth          *handlers.AuthHandler
+	User          *handlers.UserHandler
 }
 
 func AutoWire(db *gorm.DB) (*Repositories, *Services, *Handlers) {
@@ -71,6 +73,7 @@ func AutoWire(db *gorm.DB) (*Repositories, *Services, *Handlers) {
 		Auth:          authService,
 		Genre:         genreService,
 		Image:         imageService,
+		Metadata:      metaService,
 		Scrobble:      scrobbleService,
 		ScrobbleStats: scrobbleStatsService,
 		Track:         trackService,
@@ -78,9 +81,10 @@ func AutoWire(db *gorm.DB) (*Repositories, *Services, *Handlers) {
 	}
 
 	hdls := &Handlers{
-		Scrobble: handlers.NewScrobbleHandler(svs.Scrobble, svs.ScrobbleStats),
-		Auth:     handlers.NewAuthHandler(svs.Auth),
-		User:     handlers.NewUserHandler(svs.Auth),
+		Auth:          handlers.NewAuthHandler(svs.Auth),
+		User:          handlers.NewUserHandler(svs.Auth),
+		Scrobble:      handlers.NewScrobbleHandler(svs.Scrobble, svs.Subsonic),
+		ScrobbleStats: handlers.NewScrobbleStatsHandler(svs.ScrobbleStats),
 	}
 
 	return repos, svs, hdls

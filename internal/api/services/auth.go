@@ -1,6 +1,7 @@
 package services
 
 import (
+	"context"
 	"errors"
 	"os"
 	"time"
@@ -14,11 +15,11 @@ import (
 )
 
 type AuthService struct {
-	uRepo *repositories.UserRepository
+	repo *repositories.UserRepository
 }
 
 func NewAuthService(u *repositories.UserRepository) *AuthService {
-	return &AuthService{uRepo: u}
+	return &AuthService{repo: u}
 }
 
 func (s *AuthService) EncryptPassword(password string) (string, error) {
@@ -50,11 +51,11 @@ func (s *AuthService) CreateToken(username string) (string, error) {
 // HandleUserLogin receives an auth.LoginRequest
 // tries to find user by its username
 // compares the passwords and creates a token
-func (s *AuthService) HandleUserLogin(request auth.LoginRequest) (string, error) {
-	uFilters := []filters.QueryFilter{
+func (s *AuthService) HandleUserLogin(ctx context.Context, request auth.LoginRequest) (string, error) {
+
+	user, err := s.repo.FindActiveByFilters(ctx, []filters.QueryFilter{
 		{Key: "username", Value: request.Username},
-	}
-	user, err := s.uRepo.FindActiveUserByFilters(uFilters)
+	})
 	if err != nil {
 		return "", err
 	}
@@ -81,17 +82,16 @@ func ParseToken(tokenString string) (*jwt.Token, error) {
 }
 
 // GetUserFromToken uses the username in the claims to find a user by its username
-func (s *AuthService) GetUserFromToken(token *jwt.Token) (*models.User, error) {
+func (s *AuthService) GetUserFromToken(ctx context.Context, token *jwt.Token) (*models.User, error) {
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok {
 		return nil, errors.New("invalid token")
 	}
 	username := claims["username"].(string)
 
-	uFilters := []filters.QueryFilter{
+	user, err := s.repo.FindActiveByFilters(ctx, []filters.QueryFilter{
 		{Key: "username", Value: username},
-	}
-	user, err := s.uRepo.FindActiveUserByFilters(uFilters)
+	})
 
 	return user, err
 }

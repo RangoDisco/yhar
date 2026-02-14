@@ -1,6 +1,9 @@
 package models
 
-import "database/sql/driver"
+import (
+	"database/sql/driver"
+	"time"
+)
 
 type scrobbleOrigin string
 
@@ -19,10 +22,11 @@ func (so scrobbleOrigin) Value() (driver.Value, error) {
 
 type Scrobble struct {
 	Timestamps
-	ID      int64          `json:"id" gorm:"primary_key;autoIncrement"`
-	Origin  scrobbleOrigin `json:"origin" gorm:"type:scrobble_origin;not null"`
-	TrackID int64          `gorm:"index"`
-	Track   Track          `json:"track" gorm:"foreignKey:TrackID;references:ID;"`
-	UserID  int64          `gorm:"index"`
-	User    User           `json:"user" gorm:"foreignKey:UserID;references:ID;"`
+	ID          int64          `json:"id" gorm:"primary_key;autoIncrement"`
+	Origin      scrobbleOrigin `json:"origin" gorm:"type:scrobble_origin;not null"`
+	TrackID     int64          `gorm:"index"`
+	Track       Track          `json:"track" gorm:"foreignKey:TrackID;references:ID;"`
+	UserID      int64          `gorm:"index"`
+	User        User           `json:"user" gorm:"foreignKey:UserID;references:ID;"`
+	ScrobbledAt time.Time      `json:"scrobbled_at" gorm:"not null"`
 }

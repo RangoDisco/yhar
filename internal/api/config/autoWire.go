@@ -2,9 +2,9 @@ package config
 
 import (
 	"github.com/rangodisco/yhar/internal/api/handlers"
+	"github.com/rangodisco/yhar/internal/api/providers"
 	"github.com/rangodisco/yhar/internal/api/repositories"
 	"github.com/rangodisco/yhar/internal/api/services"
-	"github.com/rangodisco/yhar/internal/metadata/config"
 	"gorm.io/gorm"
 )
 
@@ -14,6 +14,7 @@ type Repositories struct {
 	Genre    *repositories.GenreRepository
 	Image    *repositories.ImageRepository
 	Scrobble *repositories.ScrobbleRepository
+	Stats    *repositories.StatsRepository
 	Track    *repositories.TrackRepository
 	User     *repositories.UserRepository
 }
@@ -37,7 +38,7 @@ type Handlers struct {
 	User     *handlers.UserHandler
 }
 
-func AutoWire(db *gorm.DB, metaServices *config.Services) (*Repositories, *Services, *Handlers) {
+func AutoWire(db *gorm.DB) (*Repositories, *Services, *Handlers) {
 	repos := &Repositories{
 		Scrobble: repositories.NewScrobbleRepository(db),
 		Album:    repositories.NewAlbumRepository(db),
@@ -46,6 +47,11 @@ func AutoWire(db *gorm.DB, metaServices *config.Services) (*Repositories, *Servi
 		Image:    repositories.NewImageRepository(db),
 		User:     repositories.NewUserRepository(db),
 		Track:    repositories.NewTrackRepository(db),
+		Stats:    repositories.NewStatsRepository(db),
+	}
+
+	pvds := []providers.MetadataProvider{
+		providers.NewMusicBrainzProvider(),
 	}
 
 	imageService := services.NewImageService(repos.Image)
@@ -53,10 +59,11 @@ func AutoWire(db *gorm.DB, metaServices *config.Services) (*Repositories, *Servi
 	authService := services.NewAuthService(repos.User)
 	albumService := services.NewAlbumService(repos.Album, imageService)
 	artistService := services.NewArtistService(repos.Artist, imageService, genreService)
+	metaService := services.NewMetadataService(pvds)
 	trackService := services.NewTrackService(repos.Track)
 	userService := services.NewUserService(repos.User)
-	scrobbleStatsService := services.NewScrobbleStatsService(repos.Scrobble)
-	scrobbleService := services.NewScrobbleService(repos.Scrobble, userService, trackService, artistService, albumService, metaServices.Scrobble)
+	scrobbleStatsService := services.NewScrobbleStatsService(repos.Stats)
+	scrobbleService := services.NewScrobbleService(repos.Scrobble, userService, trackService, artistService, albumService, metaService)
 
 	svs := &Services{
 		Album:         albumService,

@@ -24,7 +24,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		return
 	}
 
-	token, err := h.service.HandleUserLogin(body)
+	token, err := h.service.HandleUserLogin(c.Request.Context(), body)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 	}

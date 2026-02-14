@@ -26,6 +26,7 @@ func NewScrobbleStatsHandler(service *services.ScrobbleStatsService) *ScrobbleSt
 	return &ScrobbleStatsHandler{service: service}
 }
 
+// TODO: refacto whole param handling
 func (h *ScrobbleStatsHandler) parseStatsParams(c *gin.Context) (*services.StatsRequestParams, error) {
 	// Extract user ID
 	paramUserID := c.Param("userID")

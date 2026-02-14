@@ -36,7 +36,7 @@ func CheckUserPrivacy(repo *repositories.UserRepository) gin.HandlerFunc {
 			return
 		}
 
-		u, err := repo.FindActiveUserByFilters(ctx, []filters.QueryFilter{
+		u, err := repo.FindActiveByFilters(ctx, []filters.QueryFilter{
 			{Key: "id", Value: uID},
 		})
 		if err != nil {

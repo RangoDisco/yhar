@@ -1,36 +1,34 @@
 package services
 
 import (
+	"context"
+
 	"github.com/rangodisco/yhar/internal/api/models"
 	"github.com/rangodisco/yhar/internal/api/repositories"
 )
 
 type ImageService struct {
-	iRepo *repositories.ImageRepository
+	repo *repositories.ImageRepository
 }
 
-func NewImageService(iRepo *repositories.ImageRepository) *ImageService {
-	return &ImageService{iRepo: iRepo}
+func NewImageService(repo *repositories.ImageRepository) *ImageService {
+	return &ImageService{repo: repo}
 }
 
-// GetOrCreateImage looks for the url in database, if it doesn't exist, creates and returns it
-func (s *ImageService) GetOrCreateImage(url string) (*models.Image, error) {
-	existingImage, err := s.iRepo.FindActiveImageByUrl(url)
+// GetOrCreate looks for the url in database, if it doesn't exist, creates, persists and returns the image
+func (s *ImageService) GetOrCreate(ctx context.Context, url string) (*models.Image, error) {
+	existingImage, err := s.repo.FindActiveImageByUrl(ctx, url)
 	if err == nil && existingImage.Url != "" {
 		return existingImage, nil
 	}
 
-	model := buildImageModel(url)
+	model := &models.Image{
+		Url: url,
+	}
 
-	err = s.iRepo.PersistImage(model)
+	err = s.repo.PersistImage(ctx, model)
 	if err != nil {
 		return nil, err
 	}
 	return model, nil
-}
-
-func buildImageModel(url string) *models.Image {
-	return &models.Image{
-		Url: url,
-	}
 }

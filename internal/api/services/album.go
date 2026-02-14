@@ -1,40 +1,49 @@
 package services
 
 import (
+	"context"
 	"fmt"
 	"strings"
 
 	"github.com/rangodisco/yhar/internal/api/models"
+	"github.com/rangodisco/yhar/internal/api/providers"
 	"github.com/rangodisco/yhar/internal/api/repositories"
-	"github.com/rangodisco/yhar/internal/metadata/types/scrobble"
 )
 
 type AlbumService struct {
-	aRepo    *repositories.AlbumRepository
-	iService *ImageService
+	repo  *repositories.AlbumRepository
+	image *ImageService
 }
 
-func NewAlbumService(aRepo *repositories.AlbumRepository, iService *ImageService) *AlbumService {
+func NewAlbumService(repo *repositories.AlbumRepository, image *ImageService) *AlbumService {
 	return &AlbumService{
-		aRepo:    aRepo,
-		iService: iService,
+		repo:  repo,
+		image: image,
 	}
 }
 
 // GetOrCreateAlbum tries to fetch or create an album if it doesn't exist
-func (s *AlbumService) GetOrCreateAlbum(info scrobble.AlbumInfo, artists []models.Artist) (*models.Album, error) {
-	existingAlbum, err := s.aRepo.FindActiveAlbumByTitle(info.Title)
+func (s *AlbumService) GetOrCreateAlbum(ctx context.Context, info providers.AlbumMetadata, artists []models.Artist) (*models.Album, error) {
+	existingAlbum, err := s.repo.FindActiveAlbumByTitle(ctx, info.Title)
 	if err == nil {
 		return existingAlbum, nil
 	}
 
-	img, _ := s.iService.GetOrCreateImage(info.ImageUrl)
-	model, err := s.scrobbleInfoToAlbumModel(info, artists, img)
+	img, _ := s.image.GetOrCreate(ctx, info.ImageURL)
+	at, err := s.parseAlbumType(info.AlbumType)
+
 	if err != nil {
 		return nil, err
 	}
 
-	err = s.aRepo.PersistAlbum(model)
+	model := &models.Album{
+		Title:     info.Title,
+		Artists:   artists,
+		PictureID: img.ID,
+		Type:      *at,
+	}
+
+	err = s.repo.PersistAlbum(ctx, model)
 	if err != nil {
 		return nil, err
 	}
@@ -56,20 +65,4 @@ func (s *AlbumService) parseAlbumType(at string) (*models.AlbumType, error) {
 	}
 
 	return &albumType, nil
-}
-
-// scrobbleInfoToAlbumModel build a new models.Album based on a scrobble
-func (s *AlbumService) scrobbleInfoToAlbumModel(info scrobble.AlbumInfo, artists []models.Artist, img *models.Image) (*models.Album, error) {
-	at, err := s.parseAlbumType(info.AlbumType)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return &models.Album{
-		Title:     info.Title,
-		Artists:   artists,
-		PictureID: img.ID,
-		Type:      *at,
-	}, nil
 }

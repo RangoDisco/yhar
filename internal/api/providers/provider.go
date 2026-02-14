@@ -1,13 +1,17 @@
 package providers
 
-import "time"
+import (
+	"context"
+	"time"
+)
 
-// InfoRequest is the data received from scrobble services
-type InfoRequest struct {
+// ScrobbleData is the data received from scrobble services
+type ScrobbleData struct {
 	Title  string `json:"title" binding:"required,min=2,max=255"`
 	Album  string `json:"album" binding:"max=150"`
 	Artist string `json:"artist" binding:"max=150"`
 	Year   int64  `json:"year" binding:"gte=0,lte=9223372036854775807"`
+	MBID   string `json:"mbid"`
 }
 
 type InfoResponse struct {
@@ -17,7 +21,7 @@ type InfoResponse struct {
 type TrackMetadata struct {
 	Title    string           `json:"title"`
 	Artists  []ArtistMetadata `json:"artists"`
-	Albums   []AlbumMetadata  `json:"albums"`
+	Album    AlbumMetadata    `json:"album"`
 	Duration time.Duration    `json:"duration"`
 	ISRC     string           `json:"isrc"`
 	MBID     string           `json:"mbid"`
@@ -25,9 +29,10 @@ type TrackMetadata struct {
 
 type ArtistMetadata struct {
 	Name     string   `json:"title"`
+	SortName string   `json:"sort_name"`
 	ImageUrl string   `json:"image_url"`
 	Genres   []string `json:"genres"`
-	MDID     string   `json:"mdid"`
+	MBID     string   `json:"mbid"`
 }
 
 type AlbumMetadata struct {
@@ -39,10 +44,10 @@ type AlbumMetadata struct {
 }
 
 type MetadataProvider interface {
-	GetArtistInfos()
-	GetArtistImage(id string) (string, error)
-	GetAlbumInfos()
-	GetAlbumImage(id string) (string, error)
-	GetTrackInfos()
-	GetTrackImage(id string) (string, error)
+	Name() string
+	// GetTrackByInfos fetches a track from the scrobble data
+	GetTrackByInfos(ctx context.Context, infos ScrobbleData) (*TrackMetadata, error)
+
+	// GetArtistImage fetches an artist's image URL (not all providers supports it)
+	GetArtistImage(ctx context.Context, mbid, name string) (string, error)
 }

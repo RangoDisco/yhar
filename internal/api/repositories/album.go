@@ -2,8 +2,10 @@ package repositories
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/rangodisco/yhar/internal/api/models"
+	"github.com/rangodisco/yhar/internal/api/types/filters"
 	"gorm.io/gorm"
 )
 
@@ -15,9 +17,19 @@ func NewAlbumRepository(Db *gorm.DB) *AlbumRepository {
 	return &AlbumRepository{Db: Db}
 }
 
-func (r *AlbumRepository) FindActiveAlbumByTitle(ctx context.Context, title string) (*models.Album, error) {
+func (r *AlbumRepository) FindActiveByFilters(ctx context.Context, filters []filters.QueryFilter) (*models.Album, error) {
+	if len(filters) == 0 {
+		return nil, fmt.Errorf("no filters provided")
+	}
 	var a models.Album
-	err := r.Db.WithContext(ctx).Preload("Artists.Images").Preload("Images").First(&a, "title = ?", title).Error
+
+	query := r.Db.WithContext(ctx).Preload("Artists.Images").Preload("Images")
+
+	for _, f := range filters {
+		query.Where(fmt.Sprintf("%s = ?", f.Key), f.Value)
+	}
+
+	err := query.First(&a).Error
 	if err != nil {
 		return nil, err
 	}

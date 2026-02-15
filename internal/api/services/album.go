@@ -8,6 +8,7 @@ import (
 	"github.com/rangodisco/yhar/internal/api/models"
 	"github.com/rangodisco/yhar/internal/api/providers"
 	"github.com/rangodisco/yhar/internal/api/repositories"
+	"github.com/rangodisco/yhar/internal/api/types/filters"
 )
 
 type AlbumService struct {
@@ -24,7 +25,19 @@ func NewAlbumService(repo *repositories.AlbumRepository, image *ImageService) *A
 
 // GetOrCreateAlbum tries to fetch or create an album if it doesn't exist
 func (s *AlbumService) GetOrCreateAlbum(ctx context.Context, info providers.AlbumMetadata, artists []models.Artist) (*models.Album, error) {
-	existingAlbum, err := s.repo.FindActiveAlbumByTitle(ctx, info.Title)
+	var queryFilters []filters.QueryFilter
+
+	if info.MBID != "" {
+		queryFilters = append(queryFilters, filters.QueryFilter{
+			Key: "music_brainz_id", Value: info.MBID,
+		})
+	} else {
+		queryFilters = append(queryFilters, filters.QueryFilter{
+			Key: "title", Value: info.Title,
+		})
+	}
+
+	existingAlbum, err := s.repo.FindActiveByFilters(ctx, queryFilters)
 	if err == nil {
 		return existingAlbum, nil
 	}
@@ -37,10 +50,11 @@ func (s *AlbumService) GetOrCreateAlbum(ctx context.Context, info providers.Albu
 	}
 
 	model := &models.Album{
-		Title:     info.Title,
-		Artists:   artists,
-		PictureID: img.ID,
-		Type:      *at,
+		Title:         info.Title,
+		Artists:       artists,
+		PictureID:     img.ID,
+		Type:          *at,
+		MusicBrainzID: info.MBID,
 	}
 
 	err = s.repo.PersistAlbum(ctx, model)

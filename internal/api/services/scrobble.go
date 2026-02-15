@@ -60,6 +60,7 @@ func (s *ScrobbleService) HandleNewScrobble(ctx context.Context, entry subsonic.
 	// Create and persist new scrobble
 	scrobble := &models.Scrobble{
 		Origin:  models.SUBSONIC,
+		Track:   *t,
 		TrackID: t.ID,
 		UserID:  user.ID,
 	}

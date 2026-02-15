@@ -2,8 +2,10 @@ package repositories
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/rangodisco/yhar/internal/api/models"
+	"github.com/rangodisco/yhar/internal/api/types/filters"
 	"gorm.io/gorm"
 )
 
@@ -15,11 +17,20 @@ func NewTrackRepository(Db *gorm.DB) *TrackRepository {
 	return &TrackRepository{Db: Db}
 }
 
-func (r *TrackRepository) FindActiveByTitle(ctx context.Context, title string) (*models.Track, error) {
+func (r *TrackRepository) FindActiveByFilter(ctx context.Context, filters []filters.QueryFilter) (*models.Track, error) {
 	var t models.Track
 
-	// TODO: handle multiple track with same name (check for albums/artists)
-	err := r.Db.WithContext(ctx).Preload("Artists.Picture").Preload("Album.Picture").Where("title = ?", title).First(&t).Error
+	if len(filters) == 0 {
+		return nil, fmt.Errorf("filters are empty")
+	}
+
+	query := r.Db.WithContext(ctx).Preload("Artists.Picture").Preload("Album.Picture")
+
+	for _, f := range filters {
+		query = query.Where(fmt.Sprintf("%s = ?", f.Key), f.Value)
+	}
+
+	err := query.First(&t).Error
 	if err != nil {
 		return nil, err
 	}
@@ -27,7 +38,7 @@ func (r *TrackRepository) FindActiveByTitle(ctx context.Context, title string) (
 	return &t, nil
 }
 
-func (r *TrackRepository) PersistTrack(ctx context.Context, track *models.Track) error {
+func (r *TrackRepository) Persist(ctx context.Context, track *models.Track) error {
 	res := r.Db.WithContext(ctx).Create(&track)
 
 	return res.Error

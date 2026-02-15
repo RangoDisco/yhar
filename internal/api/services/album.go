@@ -57,7 +57,7 @@ func (s *AlbumService) GetOrCreateAlbum(ctx context.Context, info providers.Albu
 		MusicBrainzID: info.MBID,
 	}
 
-	err = s.repo.PersistAlbum(ctx, model)
+	err = s.repo.Persist(ctx, model)
 	if err != nil {
 		return nil, err
 	}

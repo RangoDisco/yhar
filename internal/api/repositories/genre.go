@@ -27,7 +27,7 @@ func (r *GenreRepository) FindActiveByName(ctx context.Context, name string) (*m
 	return &g, nil
 }
 
-func (r *GenreRepository) CreateGenre(ctx context.Context, g *models.Genre) error {
+func (r *GenreRepository) Persist(ctx context.Context, g *models.Genre) error {
 	res := r.Db.WithContext(ctx).Create(g)
 	return res.Error
 }

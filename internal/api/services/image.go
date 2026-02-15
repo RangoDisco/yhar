@@ -17,7 +17,7 @@ func NewImageService(repo *repositories.ImageRepository) *ImageService {
 
 // GetOrCreate looks for the url in database, if it doesn't exist, creates, persists and returns the image
 func (s *ImageService) GetOrCreate(ctx context.Context, url string) (*models.Image, error) {
-	existingImage, err := s.repo.FindActiveImageByUrl(ctx, url)
+	existingImage, err := s.repo.FindActiveByUrl(ctx, url)
 	if err == nil && existingImage.Url != "" {
 		return existingImage, nil
 	}
@@ -26,7 +26,7 @@ func (s *ImageService) GetOrCreate(ctx context.Context, url string) (*models.Ima
 		Url: url,
 	}
 
-	err = s.repo.PersistImage(ctx, model)
+	err = s.repo.Persist(ctx, model)
 	if err != nil {
 		return nil, err
 	}

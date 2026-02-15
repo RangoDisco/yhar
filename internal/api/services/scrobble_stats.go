@@ -70,7 +70,7 @@ func (s *ScrobbleStatsService) FetchUserHistory(ctx context.Context, params *Sta
 		TrackID:              params.TrackID,
 		TrackArtistID:        params.ArtistID,
 	}
-	return s.repo.FindScrobbleByUserID(ctx, queryParams)
+	return s.repo.FindByUserID(ctx, queryParams)
 }
 
 func getDateRangeFromPeriod(p dto.Period) (time.Time, time.Time) {

@@ -143,7 +143,7 @@ func (r *StatsRepository) FindTopTracksForUser(ctx context.Context, params *Stat
 }
 
 // TODO: MAYBE MERGE THOSE 2
-func (r *StatsRepository) FindScrobbleByUserID(ctx context.Context, params *StatsTrackQueryParams) ([]dto.TrackResult, int64, error) {
+func (r *StatsRepository) FindByUserID(ctx context.Context, params *StatsTrackQueryParams) ([]dto.TrackResult, int64, error) {
 	var res []dto.TrackResult
 	var totalCount int64
 

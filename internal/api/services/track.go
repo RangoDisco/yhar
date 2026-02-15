@@ -34,6 +34,7 @@ func (s *TrackService) CreateFromMetadata(ctx context.Context, info *providers.T
 		MusicBrainzID: info.MBID,
 		Artists:       artists,
 		Album:         album,
+		AlbumID:       album.ID,
 	}
 
 	err := s.repo.PersistTrack(ctx, track)

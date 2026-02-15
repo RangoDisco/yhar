@@ -32,7 +32,7 @@ func (s *GenreService) GetOrCreateGenre(ctx context.Context, name string) (*mode
 	model := &models.Genre{
 		Name: name,
 	}
-	err = s.repo.CreateGenre(ctx, model)
+	err = s.repo.Persist(ctx, model)
 	if err != nil {
 		return nil, err
 	}

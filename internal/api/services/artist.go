@@ -50,7 +50,7 @@ func (s *ArtistService) GetOrCreate(ctx context.Context, info providers.ArtistMe
 	// Build the model object from all the infos
 	model := scrobbleInfoToArtistModel(info, img)
 
-	err = s.repo.PersistArtist(ctx, model)
+	err = s.repo.Persist(ctx, model)
 	if err != nil {
 		return nil, err
 	}

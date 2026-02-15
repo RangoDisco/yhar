@@ -23,7 +23,7 @@ func (r *AlbumRepository) FindActiveByFilters(ctx context.Context, filters []fil
 	}
 	var a models.Album
 
-	query := r.Db.WithContext(ctx).Preload("Artists.Images").Preload("Images")
+	query := r.Db.WithContext(ctx).Preload("Artists.Picture").Preload("Picture")
 
 	for _, f := range filters {
 		query.Where(fmt.Sprintf("%s = ?", f.Key), f.Value)
@@ -36,7 +36,7 @@ func (r *AlbumRepository) FindActiveByFilters(ctx context.Context, filters []fil
 	return &a, nil
 }
 
-func (r *AlbumRepository) PersistAlbum(ctx context.Context, album *models.Album) error {
+func (r *AlbumRepository) Persist(ctx context.Context, album *models.Album) error {
 	res := r.Db.WithContext(ctx).Create(&album)
 	if res.Error != nil {
 		return res.Error

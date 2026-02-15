@@ -23,13 +23,13 @@ func (r *ArtistRepository) FindActiveByFilters(ctx context.Context, filters []fi
 	var a models.Artist
 
 	if len(filters) == 0 {
-		return nil, fmt.Errorf("filters is empty")
+		return nil, fmt.Errorf("filters are empty")
 	}
 
 	query := r.Db.WithContext(ctx)
 
 	for _, f := range filters {
-		query.Where(fmt.Sprintf("% = ?", f.Key), f.Value)
+		query = query.Where(fmt.Sprintf("%s = ?", f.Key), f.Value)
 	}
 
 	err := query.First(&a).Error
@@ -39,7 +39,7 @@ func (r *ArtistRepository) FindActiveByFilters(ctx context.Context, filters []fi
 	return &a, err
 }
 
-func (r *ArtistRepository) PersistArtist(ctx context.Context, a *models.Artist) error {
+func (r *ArtistRepository) Persist(ctx context.Context, a *models.Artist) error {
 	res := r.Db.WithContext(ctx).Create(&a)
 	return res.Error
 }

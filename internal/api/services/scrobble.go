@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/rangodisco/yhar/internal/api/models"
 	"github.com/rangodisco/yhar/internal/api/providers"
@@ -59,10 +60,11 @@ func (s *ScrobbleService) HandleNewScrobble(ctx context.Context, entry subsonic.
 
 	// Create and persist new scrobble
 	scrobble := &models.Scrobble{
-		Origin:  models.SUBSONIC,
-		Track:   *t,
-		TrackID: t.ID,
-		UserID:  user.ID,
+		Origin:      models.SUBSONIC,
+		Track:       *t,
+		TrackID:     t.ID,
+		UserID:      user.ID,
+		ScrobbledAt: time.Now(), // TODO: get real scrobble time
 	}
 
 	err = s.repo.PersistScrobble(ctx, scrobble)

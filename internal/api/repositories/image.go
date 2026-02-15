@@ -15,7 +15,7 @@ func NewImageRepository(Db *gorm.DB) *ImageRepository {
 	return &ImageRepository{Db: Db}
 }
 
-func (r *ImageRepository) FindActiveImageByUrl(ctx context.Context, url string) (*models.Image, error) {
+func (r *ImageRepository) FindActiveByUrl(ctx context.Context, url string) (*models.Image, error) {
 	var i models.Image
 
 	err := r.Db.WithContext(ctx).Where("url = ?", url).First(&i).Error
@@ -25,7 +25,7 @@ func (r *ImageRepository) FindActiveImageByUrl(ctx context.Context, url string) 
 	return &i, err
 }
 
-func (r *ImageRepository) PersistImage(ctx context.Context, img *models.Image) error {
+func (r *ImageRepository) Persist(ctx context.Context, img *models.Image) error {
 
 	res := r.Db.WithContext(ctx).Create(img)
 	return res.Error

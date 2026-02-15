@@ -6,6 +6,7 @@ import (
 	"github.com/rangodisco/yhar/internal/api/models"
 	"github.com/rangodisco/yhar/internal/api/providers"
 	"github.com/rangodisco/yhar/internal/api/repositories"
+	"github.com/rangodisco/yhar/internal/api/types/filters"
 	"github.com/rangodisco/yhar/internal/api/types/subsonic"
 )
 
@@ -19,8 +20,14 @@ func NewTrackService(repo *repositories.TrackRepository) *TrackService {
 
 // GetByScrobbleInfo tries to find an existing models.Track from the database, based on a subsonic.Entry
 func (s *TrackService) GetByScrobbleInfo(ctx context.Context, entry *subsonic.Entry) (*models.Track, error) {
-	// TODO: handle if mbid is present
-	track, err := s.repo.FindActiveByTitle(ctx, entry.Title)
+	var queryFilters []filters.QueryFilter
+	if entry.MusicBrainzID != "" {
+		queryFilters = append(queryFilters, filters.QueryFilter{Key: "music_brainz_id", Value: entry.MusicBrainzID})
+	} else {
+		queryFilters = append(queryFilters, filters.QueryFilter{Key: "name", Value: entry.Title})
+	}
+
+	track, err := s.repo.FindActiveByFilter(ctx, queryFilters)
 	if err != nil {
 		return nil, err
 	}
@@ -37,7 +44,7 @@ func (s *TrackService) CreateFromMetadata(ctx context.Context, info *providers.T
 		AlbumID:       album.ID,
 	}
 
-	err := s.repo.PersistTrack(ctx, track)
+	err := s.repo.Persist(ctx, track)
 	if err != nil {
 		return nil, err
 	}

@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/rangodisco/yhar/internal/api/common"
+	"github.com/rangodisco/yhar/internal/api/dto"
 	"github.com/rangodisco/yhar/internal/api/services"
 )
 
@@ -33,9 +34,14 @@ func Authenticate(auth *services.AuthService) gin.HandlerFunc {
 				return
 			}
 
-			// TODO: don't set the whole user
+			ctxUser := &dto.UserPassport{
+				ID:       user.ID,
+				Username: user.Username,
+				Role:     user.Role,
+			}
+
 			// Set user to the context
-			c.Set("user", user)
+			c.Set("user", ctxUser)
 			c.Next()
 		}
 	}

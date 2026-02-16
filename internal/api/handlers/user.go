@@ -6,7 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/rangodisco/yhar/internal/api/common"
-	"github.com/rangodisco/yhar/internal/api/models"
+	"github.com/rangodisco/yhar/internal/api/dto"
 	"github.com/rangodisco/yhar/internal/api/services"
 )
 
@@ -40,7 +40,7 @@ func (h *UserHandler) GetUser(c *gin.Context) {
 		return
 	}
 
-	user, ok := rawUser.(*models.User)
+	user, ok := rawUser.(*dto.UserPassport)
 	if !ok {
 		common.RespondWithError(c, http.StatusUnauthorized, errors.New("unable to convert context's to model"), "Unauthorized")
 		return

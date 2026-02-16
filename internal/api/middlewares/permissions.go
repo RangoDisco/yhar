@@ -6,7 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/rangodisco/yhar/internal/api/common"
-	"github.com/rangodisco/yhar/internal/api/models"
+	"github.com/rangodisco/yhar/internal/api/dto"
 )
 
 func RequirePermissions(perms []string) gin.HandlerFunc {
@@ -18,7 +18,7 @@ func RequirePermissions(perms []string) gin.HandlerFunc {
 			})
 		}
 
-		u := rawUser.(*models.User)
+		u := rawUser.(*dto.UserPassport)
 		uPerms := make(map[string]bool)
 		for _, p := range u.Role.Permissions {
 			uPerms[p.Name] = true

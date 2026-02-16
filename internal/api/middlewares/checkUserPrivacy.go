@@ -7,7 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/rangodisco/yhar/internal/api/common"
-	"github.com/rangodisco/yhar/internal/api/models"
+	"github.com/rangodisco/yhar/internal/api/dto"
 	"github.com/rangodisco/yhar/internal/api/repositories"
 	"github.com/rangodisco/yhar/internal/api/types/filters"
 )
@@ -21,7 +21,7 @@ func CheckUserPrivacy(repo *repositories.UserRepository) gin.HandlerFunc {
 			return
 		}
 
-		currentUser, ok := rawUser.(*models.User)
+		currentUser, ok := rawUser.(*dto.UserPassport)
 		if !ok && currentUser != nil {
 			common.RespondWithError(c, http.StatusInternalServerError, errors.New("unable to convert context user to model"), "Internal server error")
 			return

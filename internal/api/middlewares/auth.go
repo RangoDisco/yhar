@@ -1,9 +1,11 @@
 package middlewares
 
 import (
+	"net/http"
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/rangodisco/yhar/internal/api/common"
 	"github.com/rangodisco/yhar/internal/api/services"
 )
 
@@ -20,17 +22,18 @@ func Authenticate(auth *services.AuthService) gin.HandlerFunc {
 			stringToken := authHeader[7:]
 			token, err := services.ParseToken(stringToken)
 			if err != nil {
-				c.AbortWithStatusJSON(401, gin.H{"error": "invalid token"})
+				common.RespondWithError(c, http.StatusUnauthorized, err, "Unauthorized")
 				return
 			}
 
 			// Fetch whole user from token claims
 			user, err := auth.GetUserFromToken(ctx, token)
 			if err != nil {
-				c.AbortWithStatusJSON(401, gin.H{"error": "invalid token"})
+				common.RespondWithError(c, http.StatusUnauthorized, err, "Unauthorized")
 				return
 			}
 
+			// TODO: don't set the whole user
 			// Set user to the context
 			c.Set("user", user)
 			c.Next()

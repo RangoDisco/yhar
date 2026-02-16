@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/rangodisco/yhar/internal/api/models"
 	"github.com/rangodisco/yhar/internal/api/types/filters"
@@ -26,13 +27,16 @@ func (r *UserRepository) FindActiveByFilters(ctx context.Context, filters []filt
 
 	err := query.First(&u).Error
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("unable to find user: %w", err)
 	}
 
 	return &u, nil
 }
 
 func (r *UserRepository) Persist(ctx context.Context, user *models.User) error {
-	res := r.Db.WithContext(ctx).Create(user)
-	return res.Error
+	err := r.Db.WithContext(ctx).Create(user).Error
+	if err != nil {
+		return fmt.Errorf("unable to create new user: %w", err)
+	}
+	return nil
 }

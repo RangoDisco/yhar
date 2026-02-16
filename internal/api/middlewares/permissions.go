@@ -1,9 +1,11 @@
 package middlewares
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/rangodisco/yhar/internal/api/common"
 	"github.com/rangodisco/yhar/internal/api/models"
 )
 
@@ -31,7 +33,7 @@ func RequirePermissions(perms []string) gin.HandlerFunc {
 		}
 
 		if !authorized {
-			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "forbidden"})
+			common.RespondWithError(c, http.StatusForbidden, errors.New("user doesn't have the required permissions"), "Forbidden")
 			return
 		}
 		c.Next()

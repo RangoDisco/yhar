@@ -1,15 +1,25 @@
 package handlers
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/rangodisco/yhar/internal/api/common"
 	"github.com/rangodisco/yhar/internal/api/models"
 	"github.com/rangodisco/yhar/internal/api/services"
 )
 
 type UserHandler struct {
 	authService *services.AuthService
+}
+
+type GetUserResponse struct {
+	User UserWithID `json:"user"`
+}
+
+type UserWithID struct {
+	ID int64 `json:"id"`
 }
 
 func NewUserHandler(a *services.AuthService) *UserHandler {
@@ -20,20 +30,21 @@ func (h *UserHandler) GetUser(c *gin.Context) {
 	queriedID := c.Param("userID")
 	// TODO implement
 	if queriedID != "me" {
-		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"message": "user not found"})
+		common.RespondWithError(c, http.StatusNotFound, errors.New("route not implemented"), "User not found")
 		return
 	}
 
 	rawUser, exists := c.Get("user")
 	if !exists {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		common.RespondWithError(c, http.StatusUnauthorized, errors.New("context's user not found"), "Unauthorized")
 		return
 	}
 
 	user, ok := rawUser.(*models.User)
 	if !ok {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		common.RespondWithError(c, http.StatusUnauthorized, errors.New("unable to convert context's to model"), "Unauthorized")
+		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": gin.H{"user": gin.H{"id": user.ID}}})
+	common.RespondWithData(c, http.StatusOK, &GetUserResponse{User: UserWithID{user.ID}})
 }

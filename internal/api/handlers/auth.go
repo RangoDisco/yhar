@@ -20,14 +20,16 @@ func (h *AuthHandler) Login(c *gin.Context) {
 	var body auth.LoginRequest
 	err := c.ShouldBindJSON(&body)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		RespondWithError(c, 400, err, "Invalid body")
 		return
 	}
 
 	token, err := h.service.HandleUserLogin(c.Request.Context(), body)
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		RespondWithError(c, 401, err, "Invalid credentials")
 	}
+
+	RespondWithData(c, 200, token)
 
 	c.JSON(http.StatusOK, gin.H{
 		"data": gin.H{"token": token},

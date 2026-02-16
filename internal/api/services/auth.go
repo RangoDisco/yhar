@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"errors"
+	"fmt"
 	"os"
 	"time"
 
@@ -42,7 +43,7 @@ func (s *AuthService) CreateToken(username string) (string, error) {
 
 	tokenString, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("unable to creat token: %w", err)
 	}
 
 	return tokenString, nil
@@ -73,19 +74,24 @@ func (s *AuthService) HandleUserLogin(ctx context.Context, request auth.LoginReq
 	return token, nil
 }
 
+// ParseToken parses the given tokenString with
 func ParseToken(tokenString string) (*jwt.Token, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		return []byte(os.Getenv("JWT_SECRET")), nil
 	})
 
-	return token, err
+	if err != nil {
+		return nil, fmt.Errorf("unable to parse token: %w", err)
+	}
+
+	return token, nil
 }
 
 // GetUserFromToken uses the username in the claims to find a user by its username
 func (s *AuthService) GetUserFromToken(ctx context.Context, token *jwt.Token) (*models.User, error) {
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok {
-		return nil, errors.New("invalid token")
+		return nil, errors.New("token is invalid or expired")
 	}
 	username := claims["username"].(string)
 
@@ -93,5 +99,9 @@ func (s *AuthService) GetUserFromToken(ctx context.Context, token *jwt.Token) (*
 		{Key: "username", Value: username},
 	})
 
-	return user, err
+	if err != nil {
+		return nil, fmt.Errorf("unable to get user from token: %w", err)
+	}
+
+	return user, nil
 }

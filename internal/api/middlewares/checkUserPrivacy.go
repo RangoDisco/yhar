@@ -1,9 +1,12 @@
 package middlewares
 
 import (
+	"errors"
+	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/rangodisco/yhar/internal/api/common"
 	"github.com/rangodisco/yhar/internal/api/models"
 	"github.com/rangodisco/yhar/internal/api/repositories"
 	"github.com/rangodisco/yhar/internal/api/types/filters"
@@ -14,19 +17,19 @@ func CheckUserPrivacy(repo *repositories.UserRepository) gin.HandlerFunc {
 		ctx := c.Request.Context()
 		rawUser, exists := c.Get("user")
 		if !exists {
-			c.AbortWithStatusJSON(401, gin.H{"error": "unauthorized"})
+			common.RespondWithError(c, http.StatusUnauthorized, errors.New("user not found in context"), "Unauthorized")
 			return
 		}
 
 		currentUser, ok := rawUser.(*models.User)
 		if !ok && currentUser != nil {
-			c.AbortWithStatusJSON(500, gin.H{"error": "server error"})
+			common.RespondWithError(c, http.StatusInternalServerError, errors.New("unable to convert context user to model"), "Internal server error")
 			return
 		}
 
 		uID := c.Param("userID")
 		if uID == "" {
-			c.AbortWithStatusJSON(400, gin.H{"error": "userID param is missing"})
+			common.RespondWithError(c, http.StatusBadRequest, errors.New("userID missing"), "UserID is required")
 			return
 		}
 
@@ -39,14 +42,15 @@ func CheckUserPrivacy(repo *repositories.UserRepository) gin.HandlerFunc {
 		u, err := repo.FindActiveByFilters(ctx, []filters.QueryFilter{
 			{Key: "id", Value: uID},
 		})
+
 		if err != nil {
-			c.AbortWithStatusJSON(404, gin.H{"error": "user not found"})
+			common.RespondWithError(c, http.StatusNotFound, errors.New("user doesn't exist"), "User not found")
 			return
 		}
 
 		// Only allow public profiles to be seen by other users
 		if !u.IsPublic {
-			c.AbortWithStatusJSON(404, gin.H{"error": "not found"})
+			common.RespondWithError(c, http.StatusNotFound, errors.New("user is private"), "User not found")
 			return
 		}
 

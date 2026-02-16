@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/rangodisco/yhar/internal/api/common"
 	"github.com/rangodisco/yhar/internal/api/dto"
 	"github.com/rangodisco/yhar/internal/api/models"
 	"github.com/rangodisco/yhar/internal/api/services"
@@ -93,19 +94,19 @@ func (h *ScrobbleStatsHandler) GetUserTopArtists(c *gin.Context) {
 	ctx := c.Request.Context()
 	params, err := h.parseStatsParams(c)
 	if err != nil {
-		RespondWithError(c, http.StatusBadRequest, err, "Invalid body")
+		common.RespondWithError(c, http.StatusBadRequest, err, "Invalid body")
 		return
 	}
 
 	results, total, err := h.service.FetchUserTopArtists(ctx, params)
 	if err != nil {
-		RespondWithError(c, http.StatusInternalServerError, err, "Unable to fetch top artists")
+		common.RespondWithError(c, http.StatusInternalServerError, err, "Unable to fetch top artists")
 		return
 	}
 
-	res := BuildPaginatedResponse(results, params.Pagination.Page, params.Pagination.Limit, total)
+	res := common.BuildPaginatedResponse(results, params.Pagination.Page, params.Pagination.Limit, total)
 
-	RespondWithData(c, http.StatusOK, res)
+	common.RespondWithData(c, http.StatusOK, res)
 }
 
 // GetUserTopAlbums fetches the most scrobbled albums in a given period for a given user
@@ -113,38 +114,38 @@ func (h *ScrobbleStatsHandler) GetUserTopAlbums(c *gin.Context) {
 	ctx := c.Request.Context()
 	params, err := h.parseStatsParams(c)
 	if err != nil {
-		RespondWithError(c, http.StatusBadRequest, err, "Invalid body")
+		common.RespondWithError(c, http.StatusBadRequest, err, "Invalid body")
 		return
 	}
 
 	results, total, err := h.service.FetchUserTopAlbums(ctx, params)
 	if err != nil {
-		RespondWithError(c, http.StatusInternalServerError, err, "Unable to fetch top albums")
+		common.RespondWithError(c, http.StatusInternalServerError, err, "Unable to fetch top albums")
 		return
 	}
 
-	res := BuildPaginatedResponse(results, params.Pagination.Page, params.Pagination.Limit, total)
+	res := common.BuildPaginatedResponse(results, params.Pagination.Page, params.Pagination.Limit, total)
 
-	RespondWithData(c, http.StatusOK, res)
+	common.RespondWithData(c, http.StatusOK, res)
 }
 
 func (h *ScrobbleStatsHandler) GetUserTopTracks(c *gin.Context) {
 	ctx := c.Request.Context()
 	params, err := h.parseStatsParams(c)
 	if err != nil {
-		RespondWithError(c, http.StatusBadRequest, err, "Invalid body")
+		common.RespondWithError(c, http.StatusBadRequest, err, "Invalid body")
 		return
 	}
 
 	results, total, err := h.service.FetchUserTopTracks(ctx, params)
 	if err != nil {
-		RespondWithError(c, http.StatusInternalServerError, err, "Unable to fetch top tracks")
+		common.RespondWithError(c, http.StatusInternalServerError, err, "Unable to fetch top tracks")
 		return
 	}
 
-	res := BuildPaginatedResponse(results, params.Pagination.Page, params.Pagination.Limit, total)
+	res := common.BuildPaginatedResponse(results, params.Pagination.Page, params.Pagination.Limit, total)
 
-	RespondWithData(c, http.StatusOK, res)
+	common.RespondWithData(c, http.StatusOK, res)
 }
 
 func (h *ScrobbleStatsHandler) GetUserHistory(c *gin.Context) {
@@ -152,17 +153,17 @@ func (h *ScrobbleStatsHandler) GetUserHistory(c *gin.Context) {
 
 	params, err := h.parseStatsParams(c)
 	if err != nil {
-		RespondWithError(c, http.StatusBadRequest, err, "Invalid body")
+		common.RespondWithError(c, http.StatusBadRequest, err, "Invalid body")
 		return
 	}
 
 	results, total, err := h.service.FetchUserHistory(ctx, params)
 	if err != nil {
-		RespondWithError(c, http.StatusBadRequest, err, "Unable to fetch history")
+		common.RespondWithError(c, http.StatusBadRequest, err, "Unable to fetch history")
 		return
 	}
 
-	res := BuildPaginatedResponse(results, params.Pagination.Page, params.Pagination.Limit, total)
+	res := common.BuildPaginatedResponse(results, params.Pagination.Page, params.Pagination.Limit, total)
 
-	RespondWithData(c, http.StatusOK, res)
+	common.RespondWithData(c, http.StatusOK, res)
 }

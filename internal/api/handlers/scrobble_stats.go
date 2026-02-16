@@ -8,7 +8,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/rangodisco/yhar/internal/api/common"
 	"github.com/rangodisco/yhar/internal/api/dto"
-	"github.com/rangodisco/yhar/internal/api/models"
 	"github.com/rangodisco/yhar/internal/api/services"
 	"github.com/rangodisco/yhar/internal/api/utils/convert"
 )
@@ -38,7 +37,7 @@ func (h *ScrobbleStatsHandler) parseStatsParams(c *gin.Context) (*services.Stats
 		if !exists {
 			return nil, errors.New("user not authenticated")
 		}
-		currentUser, ok := rawUser.(*models.User)
+		currentUser, ok := rawUser.(*dto.UserPassport)
 		if !ok {
 			return nil, errors.New("invalid user")
 		}

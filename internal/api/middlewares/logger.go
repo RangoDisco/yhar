@@ -5,7 +5,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/rangodisco/yhar/internal/api/models"
+	"github.com/rangodisco/yhar/internal/api/dto"
 )
 
 func LoggerMiddleware(l *slog.Logger) gin.HandlerFunc {
@@ -18,7 +18,7 @@ func LoggerMiddleware(l *slog.Logger) gin.HandlerFunc {
 
 		rawUser, exists := c.Get("user")
 		if exists && rawUser != nil {
-			user := rawUser.(*models.User)
+			user := rawUser.(*dto.UserPassport)
 			id := strconv.FormatInt(user.ID, 10)
 			logger = logger.With(slog.String("user_id", id))
 		}

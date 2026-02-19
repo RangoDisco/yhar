@@ -90,7 +90,6 @@ func (s *MetadataService) findProviderByName(name string) providers.MetadataProv
 	return nil
 }
 
-// TODO: handle range over pointer ?
 func (s *MetadataService) addPicturesToArtists(ctx context.Context, trackInfo *providers.TrackMetadata) {
 	for _, trackArtists := range trackInfo.Artists {
 		if trackArtists.ImageUrl != "" {

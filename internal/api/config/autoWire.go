@@ -31,7 +31,6 @@ type Services struct {
 	Scrobble      *services.ScrobbleService
 	ScrobbleStats *services.ScrobbleStatsService
 	Session       *services.SessionService
-	Subsonic      *services.SubsonicService
 	Track         *services.TrackService
 	User          *services.UserService
 }

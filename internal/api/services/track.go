@@ -42,6 +42,7 @@ func (s *TrackService) CreateFromMetadata(ctx context.Context, info *providers.T
 		Artists:       artists,
 		Album:         album,
 		AlbumID:       album.ID,
+		Duration:      info.Duration,
 	}
 
 	err := s.repo.Persist(ctx, track)

@@ -2,6 +2,7 @@ package config
 
 import (
 	"github.com/rangodisco/yhar/internal/api/handlers"
+	"github.com/rangodisco/yhar/internal/api/pollers"
 	"github.com/rangodisco/yhar/internal/api/providers"
 	"github.com/rangodisco/yhar/internal/api/repositories"
 	"github.com/rangodisco/yhar/internal/api/services"
@@ -14,6 +15,7 @@ type Repositories struct {
 	Genre    *repositories.GenreRepository
 	Image    *repositories.ImageRepository
 	Scrobble *repositories.ScrobbleRepository
+	Session  *repositories.SessionRepository
 	Stats    *repositories.StatsRepository
 	Track    *repositories.TrackRepository
 	User     *repositories.UserRepository
@@ -28,6 +30,7 @@ type Services struct {
 	Metadata      *services.MetadataService
 	Scrobble      *services.ScrobbleService
 	ScrobbleStats *services.ScrobbleStatsService
+	Session       *services.SessionService
 	Subsonic      *services.SubsonicService
 	Track         *services.TrackService
 	User          *services.UserService
@@ -40,6 +43,10 @@ type Handlers struct {
 	User          *handlers.UserHandler
 }
 
+type Pollers struct {
+	Subsonic pollers.PlayerPoller
+}
+
 func AutoWire(db *gorm.DB) (*Repositories, *Services, *Handlers) {
 	repos := &Repositories{
 		Scrobble: repositories.NewScrobbleRepository(db),
@@ -50,6 +57,7 @@ func AutoWire(db *gorm.DB) (*Repositories, *Services, *Handlers) {
 		User:     repositories.NewUserRepository(db),
 		Track:    repositories.NewTrackRepository(db),
 		Stats:    repositories.NewStatsRepository(db),
+		Session:  repositories.NewSessionRepository(db),
 	}
 
 	pvds := []providers.MetadataProvider{
@@ -80,10 +88,14 @@ func AutoWire(db *gorm.DB) (*Repositories, *Services, *Handlers) {
 		User:          userService,
 	}
 
+	plrs := &Pollers{
+		Subsonic: pollers.NewSubsonicPoller(svs.Session),
+	}
+
 	hdls := &Handlers{
 		Auth:          handlers.NewAuthHandler(svs.Auth),
 		User:          handlers.NewUserHandler(svs.Auth),
-		Scrobble:      handlers.NewScrobbleHandler(svs.Scrobble, svs.Subsonic),
+		Scrobble:      handlers.NewScrobbleHandler(plrs.Subsonic),
 		ScrobbleStats: handlers.NewScrobbleStatsHandler(svs.ScrobbleStats),
 	}
 

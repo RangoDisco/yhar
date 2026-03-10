@@ -12,6 +12,6 @@ type Session struct {
 	Album       string        `json:"album" gorm:"varchar(150)"`
 	Duration    time.Duration `json:"duration" gorm:"not null"`
 	StartedAt   time.Time     `json:"started_at" gorm:"not null"`
-	LastSeenAt  time.Time     `json:"last_seen_at" gorm:"not null"`
-	CompletedAt time.Time     `json:"completed_at" gorm:"default"`
+	LastSeenAt  time.Time     `json:"last_seen_at" gorm:"not null default:CURRENT_TIMESTAMP()"`
+	CompletedAt time.Time     `json:"completed_at" gorm:"default null"`
 }

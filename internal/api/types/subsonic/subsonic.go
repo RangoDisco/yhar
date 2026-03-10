@@ -10,6 +10,12 @@ type GetNowPlayingResponse struct {
 	ServerVersion string     `xml:"serverVersion,attr"`
 	OpenSubsonic  string     `xml:"openSubsonic,attr"`
 	NowPlaying    NowPlaying `xml:"nowPlaying"`
+	Error         Error      `xml:"error"`
+}
+
+type Error struct {
+	Code    string `xml:"code,attr"`
+	Message string `xml:"message,attr"`
 }
 
 type NowPlaying struct {

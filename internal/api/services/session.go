@@ -26,8 +26,7 @@ func NewSessionService(repo *repositories.SessionRepository, scrobble *ScrobbleS
 func (s *SessionService) GetOrCreateSession(ctx context.Context, entry subsonic.Entry) (*models.Session, error) {
 	queryFilters := []filters.QueryFilter{
 		{Key: "username", Value: entry.Username},
-		{Key: "track", Value: entry.Track},
-		{Key: "player", Value: entry.PlayerID},
+		{Key: "player_id", Value: entry.PlayerID},
 		{Key: "title", Value: entry.Title},
 	}
 
@@ -51,7 +50,7 @@ func (s *SessionService) GetOrCreateSession(ctx context.Context, entry subsonic.
 		StartedAt: time.Now(),
 	}
 
-	duration, err := time.ParseDuration(entry.Duration)
+	duration, err := time.ParseDuration(fmt.Sprintf("%ss", entry.Duration))
 	if err != nil {
 		return nil, fmt.Errorf("unable to parse duration: %w", err)
 	}

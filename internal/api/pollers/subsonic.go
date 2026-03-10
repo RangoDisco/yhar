@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"math/rand"
 	"net/http"
 	"os"
 	"time"
@@ -21,25 +22,23 @@ type SubsonicPoller struct {
 	name           string
 	baseUrl        string
 	username       string
-	token          string
-	salt           string
+	password       string
 	sessionService *services.SessionService
 }
+
+// Used for salt generation
+var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
 func NewSubsonicPoller(sessionService *services.SessionService) PlayerPoller {
 	baseUrl := os.Getenv("SUBSONIC_BASE_URL")
 	username := os.Getenv("SUBSONIC_USER")
 	password := os.Getenv("SUBSONIC_PASSWORD")
-	salt := os.Getenv("SUBSONIC_SALT")
-	hash := md5.Sum([]byte(fmt.Sprintf("%s+%s", password, salt)))
-	token := hex.EncodeToString(hash[:])
 	return &SubsonicPoller{
 		name:           "subsonic",
 		baseUrl:        baseUrl,
 		username:       username,
-		token:          token,
-		salt:           salt,
 		sessionService: sessionService,
+		password:       password,
 	}
 }
 
@@ -65,7 +64,14 @@ func (p *SubsonicPoller) Start(ctx context.Context) {
 // PollPlaying calls the subsonic server, and for each entry being played, gets or creates the session from/in db, checks if the session is completed, and creates a new scrobble if so
 func (p *SubsonicPoller) PollPlaying(ctx context.Context) error {
 	var nowPlayingRes subsonic.GetNowPlayingResponse
-	pollUrl := fmt.Sprintf("%s/rest/getNowPlaying?u=%s&c=yhar&s=%s&t=%s", p.baseUrl, p.username, p.salt, p.token)
+
+	// As per Subsonic's docs, for each REST call, generate a random string called the salt. Send this as parameter s.
+	//Use a salt length of at least six characters.
+	salt := p.generateSalt()
+	hash := md5.Sum([]byte(fmt.Sprintf("%s%s", p.password, salt)))
+	token := hex.EncodeToString(hash[:])
+
+	pollUrl := fmt.Sprintf("%s/rest/getNowPlaying?u=%s&c=yhar&s=%s&t=%s&v=%s", p.baseUrl, p.username, salt, token, "1.16.1")
 	req, err := http.NewRequest(http.MethodGet, pollUrl, nil)
 	if err != nil {
 		return fmt.Errorf("unable to create request: %w", err)
@@ -86,6 +92,10 @@ func (p *SubsonicPoller) PollPlaying(ctx context.Context) error {
 	err = xml.NewDecoder(res.Body).Decode(&nowPlayingRes)
 	if err != nil {
 		return fmt.Errorf("unable to decode response: %w", err)
+	}
+
+	if nowPlayingRes.Status == "failed" {
+		return fmt.Errorf("subsonic auth error: %s", nowPlayingRes.Error.Message)
 	}
 
 	// No need to go further if nothing is being played
@@ -146,9 +156,17 @@ func (p *SubsonicPoller) handleEntry(ctx context.Context, entry subsonic.Entry, 
 	return
 }
 
+func (p *SubsonicPoller) generateSalt() string {
+	b := make([]rune, 10)
+	for i := range b {
+		b[i] = letters[rand.Intn(len(letters))]
+	}
+	return string(b)
+}
+
 // isCompleted checks if at least 70% of the track has been played
 func (p *SubsonicPoller) isCompleted(session *models.Session) bool {
-	elapsed := time.Now().Sub(session.StartedAt).Milliseconds()
-	threshold := float64(session.Duration) * 0.7
-	return float64(elapsed) >= threshold
+	elapsed := time.Since(session.StartedAt)
+	threshold := time.Duration(float64(session.Duration) * 0.8)
+	return elapsed >= threshold
 }

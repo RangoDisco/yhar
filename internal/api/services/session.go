@@ -66,8 +66,9 @@ func (s *SessionService) GetOrCreateSession(ctx context.Context, entry subsonic.
 
 // HandleCompletedSession updates the session timestamp fields and trigger a scrobble creation
 func (s *SessionService) HandleCompletedSession(ctx context.Context, session *models.Session, entry subsonic.Entry) error {
-	session.CompletedAt = time.Now()
-	session.LastSeenAt = time.Now()
+	now := time.Now()
+	session.CompletedAt = &now
+	session.LastSeenAt = now
 
 	_, err := s.scrobble.HandleNewScrobble(ctx, entry)
 	if err != nil {

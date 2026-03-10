@@ -50,6 +50,7 @@ func InitDatabase() (*gorm.DB, error) {
 		&models.User{},
 		&models.Role{},
 		&models.Permission{},
+		&models.Session{},
 	)
 
 	return db, err

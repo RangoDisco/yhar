@@ -73,6 +73,7 @@ func AutoWire(db *gorm.DB) (*Repositories, *Services, *Handlers) {
 	userService := services.NewUserService(repos.User)
 	scrobbleStatsService := services.NewScrobbleStatsService(repos.Stats)
 	scrobbleService := services.NewScrobbleService(repos.Scrobble, userService, trackService, artistService, albumService, metaService)
+	sessionService := services.NewSessionService(repos.Session, scrobbleService)
 
 	svs := &Services{
 		Album:         albumService,
@@ -83,6 +84,7 @@ func AutoWire(db *gorm.DB) (*Repositories, *Services, *Handlers) {
 		Metadata:      metaService,
 		Scrobble:      scrobbleService,
 		ScrobbleStats: scrobbleStatsService,
+		Session:       sessionService,
 		Track:         trackService,
 		User:          userService,
 	}

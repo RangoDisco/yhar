@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -9,6 +10,7 @@ import (
 	"github.com/rangodisco/yhar/internal/api/repositories"
 	"github.com/rangodisco/yhar/internal/api/types/filters"
 	"github.com/rangodisco/yhar/internal/api/types/subsonic"
+	"gorm.io/gorm"
 )
 
 type SessionService struct {
@@ -31,7 +33,12 @@ func (s *SessionService) GetOrCreateSession(ctx context.Context, entry subsonic.
 	}
 
 	session, err := s.repo.FindByFilters(ctx, queryFilters)
-	if err == nil && session != nil {
+	// In case an error occurred, and it's not a gorm not found, skip and return error
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, err
+	}
+
+	if session != nil {
 		return session, nil
 	}
 

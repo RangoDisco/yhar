@@ -46,7 +46,7 @@ type Pollers struct {
 	Subsonic pollers.PlayerPoller
 }
 
-func AutoWire(db *gorm.DB) (*Repositories, *Services, *Handlers) {
+func AutoWire(db *gorm.DB) (*Repositories, *Services, *Handlers, *Pollers) {
 	repos := &Repositories{
 		Scrobble: repositories.NewScrobbleRepository(db),
 		Album:    repositories.NewAlbumRepository(db),
@@ -100,5 +100,5 @@ func AutoWire(db *gorm.DB) (*Repositories, *Services, *Handlers) {
 		ScrobbleStats: handlers.NewScrobbleStatsHandler(svs.ScrobbleStats),
 	}
 
-	return repos, svs, hdls
+	return repos, svs, hdls, plrs
 }

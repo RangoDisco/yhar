@@ -1,8 +1,11 @@
 package main
 
 import (
+	"context"
 	"log"
 	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/gin-gonic/gin"
 	"github.com/rangodisco/yhar/config"
@@ -26,11 +29,28 @@ func main() {
 	if os.Getenv("GIN_MODE") == "release" {
 		gin.SetMode(gin.ReleaseMode)
 	}
-	serverRepos, serverServices, handlers := serverConfig.AutoWire(yDb)
 
-	r := config.SetupRouter(serverRepos, serverServices, handlers)
-	err = r.Run()
-	if err != nil {
-		log.Fatalf("failed to run: %v", err)
+	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer cancel()
+
+	serverRepos, serverServices, handlers, pollers := serverConfig.AutoWire(yDb)
+
+	// Start pollers (subsonic only for now)
+	if pollers.Subsonic != nil {
+		go pollers.Subsonic.Start(ctx)
+		log.Println("Started Subsonic poller")
 	}
+
+	// Start router
+	r := config.SetupRouter(serverRepos, serverServices, handlers)
+
+	go func() {
+		if err := r.Run(); err != nil {
+			log.Printf("Server error: %v", err)
+		}
+	}()
+
+	// Wait for interrupt signal
+	<-ctx.Done()
+	log.Println("Shutting down gracefully...")
 }

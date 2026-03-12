@@ -1,6 +1,8 @@
 package dto
 
-import "time"
+import (
+	"time"
+)
 
 type Period string
 
@@ -12,26 +14,38 @@ const (
 )
 
 type TopArtistResult struct {
-	ID            int64  `json:"id"`
-	Name          string `json:"name"`
-	PictureURL    string `json:"picture_url"`
-	ScrobbleCount *int   `json:"scrobble_count,omitempty"` // could sometimes be nil/0 when used in some queries
+	ID            int64   `json:"id"`
+	Name          string  `json:"name"`
+	PictureURL    *string `json:"picture_url"`
+	ScrobbleCount *int    `json:"scrobble_count,omitempty"` // could sometimes be nil/0 when used in some queries
+	// raw fields only used for building PictureURL (hidden in JSON response)
+	PicturePath   string `json:"-" gorm:"column:picture_path"`
+	PictureType   string `json:"-" gorm:"column:picture_type"`
+	PictureDomain string `json:"-" gorm:"column:picture_domain"`
 }
 
 type TopAlbumResult struct {
 	ID            int64             `json:"id"`
 	Title         string            `json:"title"`
 	Artists       []TopArtistResult `json:"artists" gorm:"serializer:json"`
-	PictureURL    string            `json:"picture_url"`
+	PictureURL    *string           `json:"picture_url"`
 	ScrobbleCount *int              `json:"scrobble_count,omitempty"` // could sometimes be nil/0 when used in some queries
+	// raw fields only used for building PictureURL (hidden in JSON response)
+	PicturePath   string `json:"-" gorm:"column:picture_path"`
+	PictureType   string `json:"-" gorm:"column:picture_type"`
+	PictureDomain string `json:"-" gorm:"column:picture_domain"`
 }
 
 type TrackResult struct {
 	ID            int64             `json:"id"`
 	Title         string            `json:"title"`
 	Artists       []TopArtistResult `json:"artists" gorm:"serializer:json"`
-	PictureURL    string            `json:"picture_url"`
+	PictureURL    *string           `json:"picture_url"`
 	Album         TopAlbumResult    `json:"album" gorm:"serializer:json"`
 	ScrobbleCount *int              `json:"scrobble_count,omitempty"` // could be nil in the history query
 	ScrobbledAt   *time.Time        `json:"scrobbled_at,omitempty"`   // could be nil in the top tracks query
+	// raw fields only used for building PictureURL (hidden in JSON response)
+	PicturePath   string `json:"-" gorm:"column:picture_path"`
+	PictureType   string `json:"-" gorm:"column:picture_type"`
+	PictureDomain string `json:"-" gorm:"column:picture_domain"`
 }

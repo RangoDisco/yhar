@@ -52,7 +52,7 @@ func (s *AlbumService) GetOrCreateAlbum(ctx context.Context, info providers.Albu
 	model := &models.Album{
 		Title:         info.Title,
 		Artists:       artists,
-		PictureID:     img.ID,
+		PictureID:     &img.ID,
 		Type:          *at,
 		MusicBrainzID: info.MBID,
 	}

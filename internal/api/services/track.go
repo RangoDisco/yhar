@@ -24,7 +24,7 @@ func (s *TrackService) GetByScrobbleInfo(ctx context.Context, entry *subsonic.En
 	if entry.MusicBrainzID != "" {
 		queryFilters = append(queryFilters, filters.QueryFilter{Key: "music_brainz_id", Value: entry.MusicBrainzID})
 	} else {
-		queryFilters = append(queryFilters, filters.QueryFilter{Key: "name", Value: entry.Title})
+		queryFilters = append(queryFilters, filters.QueryFilter{Key: "title", Value: entry.Title})
 	}
 
 	track, err := s.repo.FindActiveByFilter(ctx, queryFilters)

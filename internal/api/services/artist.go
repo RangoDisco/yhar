@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/rangodisco/yhar/internal/api/models"
 	"github.com/rangodisco/yhar/internal/api/providers"
@@ -34,7 +35,13 @@ func (s *ArtistService) GetOrCreate(ctx context.Context, info providers.ArtistMe
 		return existingArtist, err
 	}
 
-	img, _ := s.image.GetOrCreate(ctx, info.ImageUrl)
+	var img *models.Image
+	if info.ImageUrl != "" {
+		img, err = s.image.GetOrCreate(ctx, info.ImageUrl)
+		if err != nil {
+			return nil, fmt.Errorf("unable to get or create img: %w", err)
+		}
+	}
 
 	//// Add all genres needed for the future model
 	//var genres []models.Genre
@@ -60,9 +67,14 @@ func (s *ArtistService) GetOrCreate(ctx context.Context, info providers.ArtistMe
 
 // scrobbleInfoToArtistModel builds a new models.Artist based on a scrobble
 func scrobbleInfoToArtistModel(info providers.ArtistMetadata, img *models.Image) *models.Artist {
-	return &models.Artist{
+	model := models.Artist{
 		Name:          info.Name,
-		PictureID:     img.ID,
 		MusicBrainzID: info.MBID,
 	}
+
+	if img != nil {
+		model.PictureID = &img.ID
+	}
+
+	return &model
 }

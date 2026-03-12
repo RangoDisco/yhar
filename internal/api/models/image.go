@@ -22,7 +22,7 @@ func (i *Image) AfterFind(_ *gorm.DB) error {
 	case "distant":
 		i.ContentURL = fmt.Sprintf("%s/%s", i.Domain, i.Path)
 	default:
-		i.ContentURL = fmt.Sprintf("%s/public/img/%s", os.Getenv("BASE_URL"), i.Path)
+		i.ContentURL = fmt.Sprintf("%s/images/%s", os.Getenv("BASE_URL"), i.Path)
 	}
 	return nil
 }

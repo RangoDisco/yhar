@@ -49,7 +49,7 @@ func (s *ImageService) GetOrCreate(ctx context.Context, url string) (*models.Ima
 	return model, nil
 }
 
-// SaveLocally saves an distant image to our local public/img dir
+// SaveLocally saves a distant image to our local images dir
 func (s *ImageService) SaveLocally(ctx context.Context, url string) (string, error) {
 	res, err := http.Get(url)
 	if err != nil {
@@ -74,12 +74,12 @@ func (s *ImageService) SaveLocally(ctx context.Context, url string) (string, err
 	extension := s.getExtension(res.Header.Get("Content-Type"))
 	filename := fmt.Sprintf("%s.%s", hash, extension)
 
-	err = os.MkdirAll("public/img", 0755)
+	err = os.MkdirAll("images", 0755)
 	if err != nil {
 		return "", fmt.Errorf("unable to create dir: %w", err)
 	}
 
-	path := fmt.Sprintf("public/img/%s", filename)
+	path := fmt.Sprintf("images/%s", filename)
 
 	file, err := os.Create(path)
 	if err != nil {

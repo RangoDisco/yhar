@@ -25,7 +25,7 @@ func loadRoutes(r *gin.Engine, repo *serverConfig.Repositories, s *serverConfig.
 	api := r.Group("/api")
 	api.Use(middlewares.LoggerMiddleware(l))
 
-	r.Static("/public", "public")
+	r.Static("/images", "images")
 
 	// AUTH
 	auth := api.Group("/auth")

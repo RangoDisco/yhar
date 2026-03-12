@@ -259,7 +259,7 @@ func (r *StatsRepository) buildImageURL(imageType, domain, path string) *string 
 		contentURL := fmt.Sprintf("%s/%s", domain, path)
 		return &contentURL
 	default:
-		contentURL := fmt.Sprintf("%s/public/img/%s", baseURL, path)
+		contentURL := fmt.Sprintf("%s/images/%s", baseURL, path)
 		return &contentURL
 	}
 }

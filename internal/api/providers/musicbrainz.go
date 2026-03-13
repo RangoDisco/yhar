@@ -2,11 +2,8 @@ package providers
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
-	"log"
 	"net/http"
 	"net/url"
 	"os"
@@ -48,15 +45,18 @@ type release struct {
 	ID           string         `json:"id"`
 	ArtistCredit []artistCredit `json:"artist-credit"`
 	Status       string         `json:"status"`
+	ReleaseGroup releaseGroup   `json:"release-group"`
+}
+
+type releaseGroup struct {
+	ID          string `json:"id"`
+	PrimaryType string `json:"primary-type"`
 }
 
 type releaseWithDetails struct {
 	release
-	ReleaseGroup struct {
-		ID          string `json:"id"`
-		PrimaryType string `json:"primary-type"`
-	} `json:"release-group"`
-	CoverURL string `json:"cover-url"`
+	ReleaseGroup releaseGroup `json:"release-group"`
+	CoverURL     string       `json:"cover-url"`
 }
 
 type coverArtResponse struct {
@@ -86,10 +86,7 @@ func NewMusicBrainzProvider() MetadataProvider {
 		coverBaseURL: coverBaseURL,
 		// TODO: change
 		userAgent: "yhar/" + version,
-		client: &http.Client{
-			Timeout: 10 * time.Second,
-		},
-		limiter: rate.NewLimiter(rate.Every(requestsPerSecond*time.Second), burstSize),
+		limiter:   rate.NewLimiter(rate.Every(requestsPerSecond*time.Second), burstSize),
 	}
 }
 
@@ -135,10 +132,10 @@ func (p *MusicBrainzProvider) getTrackByMBID(ctx context.Context, mbid string) (
 	params := url.Values{
 		"fmt": {"json"},
 	}
-	params.Set("inc", strings.Join([]string{"artist-credits", "releases"}, "+"))
+	params.Set("inc", strings.Join([]string{"artist-credits", "releases", "release-groups"}, "+"))
 
 	var recordingRes recording
-	err := p.sendRequest(ctx, endpoint, params, &recordingRes)
+	err := sendRequest(ctx, endpoint, nil, &p.userAgent, params, &recordingRes)
 	if err != nil {
 		return nil, fmt.Errorf("unable to fetch recording by ID : %w", err)
 	}
@@ -161,7 +158,7 @@ func (p *MusicBrainzProvider) searchTrack(ctx context.Context, title, artist str
 	}
 
 	var recordingRes []recording
-	err := p.sendRequest(ctx, endpoint, params, &recordingRes)
+	err := sendRequest(ctx, endpoint, p.limiter, &p.userAgent, params, &recordingRes)
 	if err != nil {
 		return nil, fmt.Errorf("unable to fetch recording by name : %w", err)
 	}
@@ -230,7 +227,7 @@ func (p *MusicBrainzProvider) findBestRelease(ctx context.Context, releases []re
 	// I have no fucking clue on how to determine the best release, so I just take the first official + dated one
 	var bestRelease *release
 	for _, r := range releases {
-		if r.Date != "" && r.Status == "Official" {
+		if r.Date != "" && r.Status == "Official" && r.ReleaseGroup.PrimaryType == "Album" {
 			bestRelease = &r
 			break
 		}
@@ -241,7 +238,7 @@ func (p *MusicBrainzProvider) findBestRelease(ctx context.Context, releases []re
 		bestRelease = &releases[0]
 	}
 
-	// Including release doesn't include its cover and type for some reason ? So we have to fetch it
+	// Including release doesn't include its cover so we have to fetch it
 	details, err := p.getReleaseDetails(ctx, bestRelease.ID)
 	if err != nil {
 		return nil, fmt.Errorf("unable to get album's cover: %w", err)
@@ -261,7 +258,7 @@ func (p *MusicBrainzProvider) getReleaseDetails(ctx context.Context, releaseID s
 	params.Set("inc", strings.Join([]string{"artists", "artist-credits", "release-groups"}, "+"))
 
 	var details releaseWithDetails
-	err := p.sendRequest(ctx, endpoint, params, &details)
+	err := sendRequest(ctx, endpoint, p.limiter, &p.userAgent, params, &details)
 	if err != nil {
 		return nil, fmt.Errorf("fetch release details: %w", err)
 	}
@@ -288,7 +285,7 @@ func (p *MusicBrainzProvider) getAlbumCover(ctx context.Context, releaseID strin
 	endpoint := fmt.Sprintf("%s/release/%s", p.coverBaseURL, releaseID)
 
 	var coverResp coverArtResponse
-	err := p.sendRequest(ctx, endpoint, nil, &coverResp)
+	err := sendRequest(ctx, endpoint, p.limiter, &p.userAgent, nil, &coverResp)
 	if err != nil {
 		return "", nil // No cover art available, not an error
 	}
@@ -307,52 +304,4 @@ func (p *MusicBrainzProvider) getAlbumCover(ctx context.Context, releaseID strin
 	}
 
 	return "", nil
-}
-
-// sendRequest ensure to not exceed MusicBrainz's rate limit (1 req/s), execute the request and unmarshal the body into the given interface
-func (p *MusicBrainzProvider) sendRequest(ctx context.Context, url string, params url.Values, result interface{}) error {
-	err := p.limiter.Wait(ctx)
-	if err != nil {
-		return fmt.Errorf("waiting for limiter failed: %w", err)
-	}
-
-	if params != nil {
-		url = fmt.Sprintf("%s?%s", url, params.Encode())
-	}
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-	if err != nil {
-		return fmt.Errorf("unable to create request: %w", err)
-	}
-
-	req.Header.Set("User-Agent", p.userAgent)
-	req.Header.Set("Accept", "application/json")
-
-	resp, err := p.client.Do(req)
-	if err != nil {
-		return fmt.Errorf("unable to perform request: %w", err)
-	}
-
-	defer func(Body io.ReadCloser) {
-		err := Body.Close()
-		if err != nil {
-			log.Printf("unable to close body : %v", err)
-		}
-	}(resp.Body)
-
-	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("unable execute request :%s", resp.Status)
-	}
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return fmt.Errorf("unable to read response body: %w", err)
-	}
-
-	err = json.Unmarshal(body, result)
-	if err != nil {
-		return fmt.Errorf("unable to parse JSON response: %w", err)
-	}
-
-	return nil
 }

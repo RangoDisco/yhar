@@ -61,6 +61,7 @@ func AutoWire(db *gorm.DB) (*Repositories, *Services, *Handlers, *Pollers) {
 
 	pvds := []providers.MetadataProvider{
 		providers.NewMusicBrainzProvider(),
+		providers.NewDeezerProvider(),
 	}
 
 	imageService := services.NewImageService(repos.Image)

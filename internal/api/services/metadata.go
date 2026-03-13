@@ -91,12 +91,21 @@ func (s *MetadataService) findProviderByName(name string) providers.MetadataProv
 }
 
 func (s *MetadataService) addPicturesToArtists(ctx context.Context, trackInfo *providers.TrackMetadata) {
-	for _, trackArtists := range trackInfo.Artists {
-		if trackArtists.ImageUrl != "" {
+	for _, trackArtist := range trackInfo.Artists {
+		if trackArtist.ImageUrl != "" {
 			continue
 		}
+		dProvider := s.findProviderByName("deezer")
+		if dProvider == nil {
+			return
+		}
 
-		// FETCH artist image URL
+		img, err := dProvider.GetArtistImage(ctx, "", trackArtist.Name)
+		if err != nil {
+			return
+		}
+
+		trackArtist.ImageUrl = img
 	}
 
 	for _, albumArtists := range trackInfo.Album.Artists {

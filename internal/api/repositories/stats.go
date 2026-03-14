@@ -57,7 +57,7 @@ func (r *StatsRepository) FindTopArtistsForUser(ctx context.Context, params *Sta
 	query := r.buildBaseStatQuery(ctx, params.BaseStatsQueryParams).
 		Select("ar.id AS id, ar.name AS name, COUNT(scrobbles.id) AS scrobble_count, " +
 			"i.path AS picture_path, i.type AS picture_type, i.domain AS picture_domain").
-		Joins("JOIN images i ON i.id = ar.picture_id").
+		Joins("LEFT JOIN images i ON i.id = ar.picture_id").
 		Group("ar.id, ar.name, i.path, i.type, i.domain")
 
 	err := query.Count(&totalCount).Error
@@ -92,10 +92,10 @@ func (r *StatsRepository) FindTopAlbumsForUser(ctx context.Context, params *Stat
 			"JSON_AGG(DISTINCT jsonb_build_object('id', ar_al.id, 'name', ar_al.name, " +
 			"'picture_path', ari.path, 'picture_type', ari.type, 'picture_domain', ari.domain)) as artists").
 		Joins("JOIN albums al ON al.id = tr.album_id").
-		Joins("JOIN images i ON i.id = al.picture_id").
+		Joins("LEFT JOIN images i ON i.id = al.picture_id").
 		Joins("JOIN artist_albums aral ON aral.album_id = al.id").
 		Joins("JOIN artists ar_al ON ar_al.id = aral.artist_id").
-		Joins("JOIN images ari ON ari.id = ar_al.picture_id").
+		Joins("LEFT JOIN images ari ON ari.id = ar_al.picture_id").
 		Group("al.id, al.title, i.path, i.type, i.domain")
 
 	if params.AlbumArtistID != nil {
@@ -140,8 +140,8 @@ func (r *StatsRepository) FindTopTracksForUser(ctx context.Context, params *Stat
 			"JSON_AGG(DISTINCT jsonb_build_object('id', ar.id, 'name', ar.name, " +
 			"'picture_path', ari.path, 'picture_type', ari.type, 'picture_domain', ari.domain)) as artists").
 		Joins("JOIN albums al ON al.id = tr.album_id").
-		Joins("JOIN images i ON i.id = al.picture_id").
-		Joins("JOIN images ari ON ari.id = ar.picture_id").
+		Joins("LEFT JOIN images i ON i.id = al.picture_id").
+		Joins("LEFT JOIN images ari ON ari.id = ar.picture_id").
 		Group("tr.id, tr.title, al.id, i.path, i.type, i.domain")
 
 	if params.TrackArtistID != nil {
@@ -185,7 +185,7 @@ func (r *StatsRepository) FindByUserID(ctx context.Context, params *StatsTrackQu
 			"JSON_AGG(DISTINCT jsonb_build_object('id', ar.id, 'name', ar.name, " +
 			"'picture_path', ari.path, 'picture_type', ari.type, 'picture_domain', ari.domain)) as artists").
 		Joins("JOIN albums al ON al.id = tr.album_id").
-		Joins("JOIN images i ON i.id = al.picture_id").
+		Joins("LEFT JOIN images i ON i.id = al.picture_id").
 		Joins("LEFT JOIN images ari ON ari.id = ar.picture_id").
 		Group("tr.id, tr.title, al.id, scrobbles.scrobbled_at, i.path, i.type, i.domain")
 
@@ -219,7 +219,7 @@ func (r *StatsRepository) FindByUserID(ctx context.Context, params *StatsTrackQu
 }
 
 func (r *StatsRepository) buildBaseStatQuery(ctx context.Context, params BaseStatsQueryParams) *gorm.DB {
-	query := r.Db.WithContext(ctx).
+	query := r.Db.WithContext(ctx).Debug().
 		Table("scrobbles").
 		Joins("JOIN tracks tr ON tr.id = scrobbles.track_id").
 		Joins("JOIN track_artists trar ON trar.track_id = tr.id").

@@ -34,7 +34,7 @@ export const load: PageServerLoad = async ({ url, params, cookies }) => {
 	);
 
 	return {
-		artist: artists.result[0],
+		artist: artists.results[0],
 		albums,
 		tracks,
 		history

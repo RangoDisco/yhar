@@ -27,7 +27,7 @@
     </Tabs.List>
     {#each periods as period}
         <Tabs.Content value={period} class="flex flex-col gap-8">
-            {#each data.albums.result as album, i}
+            {#each data.albums.results as album, i}
                 <ContentListItem index={i} contentID={album.id} title={album.title}
                                  pictureUrl={album.picture_url}
                                  scrobbleCount={album.scrobble_count}

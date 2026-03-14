@@ -16,9 +16,7 @@ type ArtistRes struct {
 }
 
 type Artist struct {
-	ID           string `json:"id"`
-	Name         string `json:"name"`
-	PictureSmall string `json:"picture_small"`
+	Picture string `json:"picture_medium"`
 }
 
 func NewDeezerProvider() MetadataProvider {
@@ -56,5 +54,5 @@ func (d *DeezerProvider) GetArtistImage(ctx context.Context, _, name string) (st
 
 	artist := artistRes.Data[0]
 
-	return artist.PictureSmall, nil
+	return artist.Picture, nil
 }

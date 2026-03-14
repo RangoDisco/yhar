@@ -91,13 +91,14 @@ func (s *MetadataService) findProviderByName(name string) providers.MetadataProv
 }
 
 func (s *MetadataService) addPicturesToArtists(ctx context.Context, trackInfo *providers.TrackMetadata) {
-	for _, trackArtist := range trackInfo.Artists {
+	dProvider := s.findProviderByName("deezer")
+	if dProvider == nil {
+		return
+	}
+
+	for i, trackArtist := range trackInfo.Artists {
 		if trackArtist.ImageUrl != "" {
 			continue
-		}
-		dProvider := s.findProviderByName("deezer")
-		if dProvider == nil {
-			return
 		}
 
 		img, err := dProvider.GetArtistImage(ctx, "", trackArtist.Name)
@@ -105,16 +106,22 @@ func (s *MetadataService) addPicturesToArtists(ctx context.Context, trackInfo *p
 			return
 		}
 
-		trackArtist.ImageUrl = img
+		trackInfo.Artists[i].ImageUrl = img
 	}
 
-	for _, albumArtists := range trackInfo.Album.Artists {
+	for i, albumArtists := range trackInfo.Album.Artists {
 		// No need to fetch the image if the artists also appears on the track, as it will be found when trying to GetOrCreate
 		for _, tAr := range trackInfo.Artists {
 			if albumArtists.MBID == tAr.MBID {
 				continue
 			}
 			// Fetch artist image URL
+			img, err := dProvider.GetArtistImage(ctx, "", albumArtists.Name)
+			if err != nil {
+				return
+			}
+
+			trackInfo.Album.Artists[i].ImageUrl = img
 		}
 	}
 }

@@ -6,6 +6,7 @@
     import ContentCard from "$lib/components/top/ContentCard.svelte";
 
     const {data} = $props();
+    console.log(data)
     const periods = ['week', 'month', 'year', 'overall'];
 </script>
 <div class="flex flex-col gap-8">
@@ -23,7 +24,7 @@
                     <!--TOP ARTISTS-->
                     <ContentListWrapper title="Top artists" url="artists">
                         <div class="flex flex-wrap gap-4">
-                            {#each periodData.artists.result as artist, i (artist.id)}
+                            {#each periodData.artists.results as artist, i (artist.id)}
                                 <ContentCard title={artist.name} pictureUrl={artist.picture_url} contentType="artists"
                                              contentID={artist.id}/>
                             {/each}
@@ -33,7 +34,7 @@
                     <!--TOP ALBUMS-->
                     <ContentListWrapper title="Top albums" url="albums">
                         <div class="flex flex-wrap gap-4">
-                            {#each periodData.albums.result as album, i (album.id)}
+                            {#each periodData.albums.results as album, i (album.id)}
                                 <ContentCard title={album.title} pictureUrl={album.picture_url}
                                              contentType="albums"/>
                             {/each}
@@ -43,7 +44,7 @@
                     <!--TOP TRACKS-->
                     <ContentListWrapper title="Top tracks" url="tracks">
                         <div class="flex flex-col gap-4">
-                            {#each periodData.tracks.result as track, i (track.id)}
+                            {#each periodData.tracks.results as track, i (track.id)}
                                 <ContentListItem index={i} title={track.title}
                                                  pictureUrl={track.picture_url}
                                                  scrobbleCount={track.scrobble_count}
@@ -61,7 +62,7 @@
     <!--HISTORY-->
     <ContentListWrapper title="History" url="history">
         <div class="flex flex-col gap-2">
-            {#each data.history.result as track}
+            {#each data.history.results as track}
                 <HistoryListItem track={track} parentType="artists"/>
             {/each}
         </div>

@@ -20,7 +20,7 @@
         <!--TOP ALBUMS-->
         <ContentListWrapper title="Top albums" url="albums?artist={data.artist.id}">
             <div class="flex flex-wrap gap-4">
-                {#each data.albums.result as album, i (album.id)}
+                {#each data.albums.results as album, i (album.id)}
                     <ContentCard title={album.title ?? album.name} pictureUrl={album.picture_url} contentType="albums"
                                  contentID={album.id}/>
                 {/each}
@@ -30,7 +30,7 @@
         <!--TOP TRACKS-->
         <ContentListWrapper title="Top tracks" url="tracks?artist={data.artist.id}">
             <div class="flex flex-col gap-4">
-                {#each data.tracks.result as track, i (track.id)}
+                {#each data.tracks.results as track, i (track.id)}
                     <ContentListItem index={i} title={track.title}
                                      pictureUrl={track.picture_url}
                                      scrobbleCount={track.scrobble_count}
@@ -44,7 +44,7 @@
         <!--HISTORY-->
         <ContentListWrapper title="History" url="history?artist={data.artist.id}">
             <div class="flex flex-col gap-2">
-                {#each data.history.result as track}
+                {#each data.history.results as track}
                     <HistoryListItem track={track} parentType="albums"/>
                 {/each}
             </div>

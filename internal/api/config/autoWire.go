@@ -2,6 +2,7 @@ package config
 
 import (
 	"github.com/rangodisco/yhar/internal/api/handlers"
+	"github.com/rangodisco/yhar/internal/api/importers"
 	"github.com/rangodisco/yhar/internal/api/pollers"
 	"github.com/rangodisco/yhar/internal/api/providers"
 	"github.com/rangodisco/yhar/internal/api/repositories"
@@ -46,7 +47,11 @@ type Pollers struct {
 	Subsonic pollers.PlayerPoller
 }
 
-func AutoWire(db *gorm.DB) (*Repositories, *Services, *Handlers, *Pollers) {
+type Importers struct {
+	Maloja importers.Importer
+}
+
+func AutoWire(db *gorm.DB) (*Repositories, *Services, *Handlers, *Pollers, *Importers) {
 	repos := &Repositories{
 		Scrobble: repositories.NewScrobbleRepository(db),
 		Album:    repositories.NewAlbumRepository(db),
@@ -101,5 +106,9 @@ func AutoWire(db *gorm.DB) (*Repositories, *Services, *Handlers, *Pollers) {
 		ScrobbleStats: handlers.NewScrobbleStatsHandler(svs.ScrobbleStats),
 	}
 
-	return repos, svs, hdls, plrs
+	impts := &Importers{
+		Maloja: importers.NewMalojaImporter(svs.Scrobble),
+	}
+
+	return repos, svs, hdls, plrs, impts
 }

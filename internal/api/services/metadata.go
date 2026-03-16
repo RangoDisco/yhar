@@ -24,14 +24,16 @@ func NewMetadataService(
 }
 
 // GetInfoByScrobble fetches metadata from multiple providers and formats it into a standardized providers.InfoResponse
-func (s *MetadataService) GetInfoByScrobble(ctx context.Context, MBID, title string) (*providers.InfoResponse, error) {
+func (s *MetadataService) GetInfoByScrobble(ctx context.Context, MBID, title, artist, album string) (*providers.InfoResponse, error) {
 	if MBID == "" && title == "" {
 		return nil, fmt.Errorf("%w: at least one MBID or title is required", ErrInvalidScrobble)
 	}
 
 	info, err := s.enrichMetadata(ctx, &providers.ScrobbleData{
-		Title: title,
-		MBID:  MBID,
+		Title:  title,
+		MBID:   MBID,
+		Album:  album,
+		Artist: artist,
 	})
 
 	if err != nil {

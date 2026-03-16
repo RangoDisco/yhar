@@ -9,7 +9,6 @@ import (
 	"github.com/rangodisco/yhar/internal/api/models"
 	"github.com/rangodisco/yhar/internal/api/providers"
 	"github.com/rangodisco/yhar/internal/api/repositories"
-	"github.com/rangodisco/yhar/internal/api/types/subsonic"
 )
 
 type ScrobbleService struct {
@@ -39,8 +38,17 @@ func NewScrobbleService(
 	}
 }
 
+type UnifiedScrobbleEntry struct {
+	Username      string    `json:"username"`
+	Title         string    `json:"title"`
+	Artist        string    `json:"artist"`
+	Album         string    `json:"album"`
+	MusicBrainzID string    `json:"musicbrainz_id"`
+	ListenedAt    time.Time `json:"listened_at"`
+}
+
 // HandleNewScrobble takes a subsonic getNowPlaying entry, fetches/creates associated content and persists a new Scrobble
-func (s *ScrobbleService) HandleNewScrobble(ctx context.Context, entry subsonic.Entry) (*models.Scrobble, error) {
+func (s *ScrobbleService) HandleNewScrobble(ctx context.Context, entry *UnifiedScrobbleEntry) (*models.Scrobble, error) {
 	// TODO: validate entry
 	// err := validateEntry(&entry)
 
@@ -53,9 +61,16 @@ func (s *ScrobbleService) HandleNewScrobble(ctx context.Context, entry subsonic.
 	var t *models.Track
 
 	// See if track already exists in database
-	t, err = s.getOrCreateTrack(ctx, &entry)
+	t, err = s.getOrCreateTrack(ctx, entry)
 	if err != nil {
 		return nil, err
+	}
+
+	var listenedAt time.Time
+	if !entry.ListenedAt.IsZero() {
+		listenedAt = entry.ListenedAt
+	} else {
+		listenedAt = time.Now()
 	}
 
 	// Create and persist new scrobble
@@ -64,7 +79,7 @@ func (s *ScrobbleService) HandleNewScrobble(ctx context.Context, entry subsonic.
 		Track:       *t,
 		TrackID:     t.ID,
 		UserID:      user.ID,
-		ScrobbledAt: time.Now(), // TODO: get real scrobble time
+		ScrobbledAt: listenedAt,
 	}
 
 	err = s.repo.PersistScrobble(ctx, scrobble)
@@ -75,7 +90,7 @@ func (s *ScrobbleService) HandleNewScrobble(ctx context.Context, entry subsonic.
 }
 
 // getOrCreateTrack finds or create all content (track, album, artists) related to the scrobble
-func (s *ScrobbleService) getOrCreateTrack(ctx context.Context, entry *subsonic.Entry) (*models.Track, error) {
+func (s *ScrobbleService) getOrCreateTrack(ctx context.Context, entry *UnifiedScrobbleEntry) (*models.Track, error) {
 	// First, try to find existing track
 	existingTrack, err := s.track.GetByScrobbleInfo(ctx, entry)
 
@@ -84,7 +99,7 @@ func (s *ScrobbleService) getOrCreateTrack(ctx context.Context, entry *subsonic.
 		return existingTrack, nil
 	}
 
-	metadata, err := s.metadata.GetInfoByScrobble(ctx, entry.MusicBrainzID, entry.Title)
+	metadata, err := s.metadata.GetInfoByScrobble(ctx, entry.MusicBrainzID, entry.Title, entry.Artist, entry.Album)
 	if err != nil {
 		return nil, err
 	}

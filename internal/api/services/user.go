@@ -16,7 +16,15 @@ func NewUserService(repo *repositories.UserRepository) *UserService {
 	return &UserService{repo: repo}
 }
 
-func (s *UserService) GetOrCreateUser(ctx context.Context, username string) (*models.User, error) {
+func (s *UserService) GetOrCreateUser(ctx context.Context, rawUsername string) (*models.User, error) {
+	var username string
+	if rawUsername != "" {
+		username = rawUsername
+	} else {
+		// TODO: Default to first user
+		username = "rango"
+	}
+
 	existingUser, err := s.repo.FindActiveByFilters(ctx, []filters.QueryFilter{
 		{Key: "username", Value: username},
 	})

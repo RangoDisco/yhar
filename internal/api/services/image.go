@@ -1,13 +1,20 @@
 package services
 
 import (
+	"bytes"
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
+	"image"
+	"image/jpeg"
 	"io"
 	"net/http"
 	"os"
+
+	_ "image/jpeg"
+
+	"golang.org/x/image/draw"
 
 	"github.com/rangodisco/yhar/internal/api/models"
 	"github.com/rangodisco/yhar/internal/api/repositories"
@@ -31,7 +38,8 @@ func (s *ImageService) GetOrCreate(ctx context.Context, url string) (*models.Ima
 	if err == nil && existingImage.Path != "" {
 		return existingImage, nil
 	}
-	filename, err := s.SaveLocally(ctx, url)
+
+	filename, err := s.saveLocally(ctx, url)
 	if err != nil {
 		return nil, fmt.Errorf("unable to save image locally: %w", err)
 	}
@@ -49,8 +57,8 @@ func (s *ImageService) GetOrCreate(ctx context.Context, url string) (*models.Ima
 	return model, nil
 }
 
-// SaveLocally saves a distant image to our local images dir
-func (s *ImageService) SaveLocally(ctx context.Context, url string) (string, error) {
+// saveLocally saves a distant image to our local images dir
+func (s *ImageService) saveLocally(ctx context.Context, url string) (string, error) {
 	res, err := http.Get(url)
 	if err != nil {
 		return "", fmt.Errorf("unable to fetch image : %w", err)
@@ -65,14 +73,13 @@ func (s *ImageService) SaveLocally(ctx context.Context, url string) (string, err
 
 	data, err := io.ReadAll(res.Body)
 	if err != nil {
-		return "", fmt.Errorf("unable to read image : %w", err)
+		return "", fmt.Errorf("unable to read image: %w", err)
 	}
 
 	// Probably overkill, just needed a random string
 	rawHash := sha256.Sum256(data)
 	hash := hex.EncodeToString(rawHash[:])[:16]
-	extension := s.getExtension(res.Header.Get("Content-Type"))
-	filename := fmt.Sprintf("%s.%s", hash, extension)
+	filename := fmt.Sprintf("%s.%s", hash, "jpg")
 
 	err = os.MkdirAll("images", 0755)
 	if err != nil {
@@ -93,7 +100,12 @@ func (s *ImageService) SaveLocally(ctx context.Context, url string) (string, err
 		}
 	}(file)
 
-	_, err = file.Write(data)
+	img, err := s.resizeImg(data)
+	if err != nil {
+		return "", fmt.Errorf("unable to resize img: %w", err)
+	}
+
+	err = jpeg.Encode(file, img, nil)
 	if err != nil {
 		return "", fmt.Errorf("unable to write file: %w", err)
 	}
@@ -101,16 +113,15 @@ func (s *ImageService) SaveLocally(ctx context.Context, url string) (string, err
 	return filename, nil
 }
 
-// getExtension returns the file extension based on the content type
-func (s *ImageService) getExtension(contentType string) string {
-	switch contentType {
-	case "image/jpg", "image/jpeg":
-		return "jpg"
-	case "image/png":
-		return "png"
-	case "image/webp":
-		return "webp"
-	default:
-		return "jpg"
+// resizeImg resizes img to 500/500 (which is later encoded in jpeg)
+func (s *ImageService) resizeImg(data []byte) (*image.RGBA, error) {
+	img, _, err := image.Decode(bytes.NewReader(data))
+	if err != nil {
+		return nil, fmt.Errorf("unable to decode data into image: %w", err)
 	}
+
+	dst := image.NewRGBA(image.Rect(0, 0, 500, 500))
+	draw.NearestNeighbor.Scale(dst, dst.Rect, img, img.Bounds(), draw.Over, nil)
+
+	return dst, nil
 }

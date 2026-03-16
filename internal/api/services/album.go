@@ -42,7 +42,6 @@ func (s *AlbumService) GetOrCreateAlbum(ctx context.Context, info providers.Albu
 		return existingAlbum, nil
 	}
 
-	img, _ := s.image.GetOrCreate(ctx, info.ImageURL)
 	at, err := s.parseAlbumType(info.AlbumType)
 
 	if err != nil {
@@ -52,9 +51,13 @@ func (s *AlbumService) GetOrCreateAlbum(ctx context.Context, info providers.Albu
 	model := &models.Album{
 		Title:         info.Title,
 		Artists:       artists,
-		PictureID:     &img.ID,
 		Type:          *at,
 		MusicBrainzID: info.MBID,
+	}
+
+	img, err := s.image.GetOrCreate(ctx, info.ImageURL)
+	if err == nil {
+		model.PictureID = &img.ID
 	}
 
 	err = s.repo.Persist(ctx, model)

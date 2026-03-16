@@ -7,7 +7,6 @@ import (
 	"github.com/rangodisco/yhar/internal/api/providers"
 	"github.com/rangodisco/yhar/internal/api/repositories"
 	"github.com/rangodisco/yhar/internal/api/types/filters"
-	"github.com/rangodisco/yhar/internal/api/types/subsonic"
 )
 
 type TrackService struct {
@@ -19,7 +18,7 @@ func NewTrackService(repo *repositories.TrackRepository) *TrackService {
 }
 
 // GetByScrobbleInfo tries to find an existing models.Track from the database, based on a subsonic.Entry
-func (s *TrackService) GetByScrobbleInfo(ctx context.Context, entry *subsonic.Entry) (*models.Track, error) {
+func (s *TrackService) GetByScrobbleInfo(ctx context.Context, entry *UnifiedScrobbleEntry) (*models.Track, error) {
 	var queryFilters []filters.QueryFilter
 	if entry.MusicBrainzID != "" {
 		queryFilters = append(queryFilters, filters.QueryFilter{Key: "music_brainz_id", Value: entry.MusicBrainzID})

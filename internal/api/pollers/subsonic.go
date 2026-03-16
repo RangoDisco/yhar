@@ -53,7 +53,7 @@ func (p *SubsonicPoller) Start(ctx context.Context) {
 	for {
 		select {
 		case <-ticker.C:
-			// TODO: handle chan
+			// TODO: handle err
 			p.PollPlaying(ctx)
 		case <-ctx.Done():
 			return
@@ -104,56 +104,67 @@ func (p *SubsonicPoller) PollPlaying(ctx context.Context) error {
 	}
 
 	errChan := make(chan error, len(nowPlayingRes.NowPlaying.Entry))
-	for _, entry := range nowPlayingRes.NowPlaying.Entry {
-		go p.handleEntry(ctx, entry, errChan)
+	for _, e := range nowPlayingRes.NowPlaying.Entry {
+		go func() {
+			errChan <- p.handleEntry(ctx, e)
+		}()
 	}
 
 	var errs []error
 	for range nowPlayingRes.NowPlaying.Entry {
-		err = <-errChan
+		err := <-errChan
 		if err != nil {
 			errs = append(errs, err)
 		}
 	}
 
-	if len(errs) > 0 {
-		return errors.Join(errs...)
-	}
-
-	return nil
+	return errors.Join(errs...)
 }
 
 // handleEntry gets or create the session from/in db, checks if the session is completed, and creates a new scrobble if so
-func (p *SubsonicPoller) handleEntry(ctx context.Context, entry subsonic.Entry, errChan chan<- error) {
+func (p *SubsonicPoller) handleEntry(ctx context.Context, entry subsonic.Entry) error {
 	session, err := p.sessionService.GetOrCreateSession(ctx, entry)
 	if err != nil {
-		errChan <- fmt.Errorf("unable to get session for entry: %s : %w", entry.Title, err)
-		return
+		return fmt.Errorf("unable to get session for entry: %s : %w", entry.Title, err)
 	}
 
 	// The session could be nil in case we're in its last 30% of the track, which we consider as "completed" and don't want to start a new session for it
 	if session == nil {
-		errChan <- nil
-		return
+		return nil
 	}
 
 	if p.isCompleted(session) {
-		err = p.sessionService.HandleCompletedSession(ctx, session, entry)
+		scrobble, err := p.parseToUnifiedScrobble(entry)
 		if err != nil {
-			errChan <- fmt.Errorf("unable to complete session for entry: %s : %w", entry.Title, err)
-			return
+			return fmt.Errorf("unable to parse into unified scrobble: %w", err)
+		}
+		err = p.sessionService.HandleCompletedSession(ctx, session, scrobble)
+		if err != nil {
+			return fmt.Errorf("unable to complete session for entry: %s : %w", entry.Title, err)
 		}
 	} else {
 		session.LastSeenAt = time.Now()
 		err = p.sessionService.UpdateSession(ctx, session)
 		if err != nil {
-			errChan <- fmt.Errorf("unable to update session for entry: %s : %w", entry.Title, err)
-			return
+			return fmt.Errorf("unable to update session for entry: %s : %w", entry.Title, err)
 		}
 	}
 
-	errChan <- nil
-	return
+	return nil
+}
+
+func (p *SubsonicPoller) parseToUnifiedScrobble(entry interface{}) (*services.UnifiedScrobbleEntry, error) {
+	scrobble, ok := entry.(subsonic.Entry)
+	if !ok {
+		return nil, fmt.Errorf("unable to parse entry to original type: %s", entry)
+	}
+
+	return &services.UnifiedScrobbleEntry{
+		Username:      scrobble.Username,
+		Title:         scrobble.Title,
+		MusicBrainzID: scrobble.MusicBrainzID,
+	}, nil
+
 }
 
 func (p *SubsonicPoller) generateSalt() string {

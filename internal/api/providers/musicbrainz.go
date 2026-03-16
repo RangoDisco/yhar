@@ -107,7 +107,7 @@ func (p *MusicBrainzProvider) GetTrackByInfos(ctx context.Context, data Scrobble
 		rec, err = p.getTrackByMBID(ctx, data.MBID)
 	} else {
 		// Otherwise, search by title and artist
-		rec, err = p.searchTrack(ctx, data.Title, data.Artist)
+		rec, err = p.searchTrack(ctx, data.Title, data.Artist, data.Album)
 	}
 
 	if err != nil {
@@ -143,28 +143,40 @@ func (p *MusicBrainzProvider) getTrackByMBID(ctx context.Context, mbid string) (
 	return &recordingRes, nil
 }
 
-func (p *MusicBrainzProvider) searchTrack(ctx context.Context, title, artist string) (*recording, error) {
+func (p *MusicBrainzProvider) searchTrack(ctx context.Context, title, artist, album string) (*recording, error) {
 	endpoint := fmt.Sprintf("%s/recording", p.baseURL)
 	query := fmt.Sprintf("recording:%s", title)
 
 	if artist != "" {
-		query = query + fmt.Sprintf(" AND artistname=%s", artist)
+		query = query + fmt.Sprintf(" AND artistname:%s", artist)
+	}
+
+	if album != "" {
+		query = query + fmt.Sprintf(" AND release:%s", album)
 	}
 
 	// Artist-credits and releases are already inc for some reason
 	params := url.Values{
 		"fmt":   {"json"},
-		"query": {url.QueryEscape(title)},
+		"query": {query},
 	}
 
-	var recordingRes []recording
+	params.Set("inc", strings.Join([]string{"artist-credits", "releases", "release-groups"}, "+"))
+
+	var recordingRes struct {
+		Recordings []recording `json:"recordings"`
+	}
 	err := sendRequest(ctx, endpoint, p.limiter, &p.userAgent, params, &recordingRes)
 	if err != nil {
 		return nil, fmt.Errorf("unable to fetch recording by name : %w", err)
 	}
 
+	if len(recordingRes.Recordings) == 0 {
+		return nil, errors.New("no recording found")
+	}
+
 	// TODO: determine best recording in case multiple were returned
-	return &recordingRes[0], nil
+	return &recordingRes.Recordings[0], nil
 }
 
 // GetArtistImage is not implemented by this provider as MusicBrainz doesn't provide images for artists

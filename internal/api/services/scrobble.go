@@ -9,6 +9,7 @@ import (
 	"github.com/rangodisco/yhar/internal/api/models"
 	"github.com/rangodisco/yhar/internal/api/providers"
 	"github.com/rangodisco/yhar/internal/api/repositories"
+	"gorm.io/gorm"
 )
 
 type ScrobbleService struct {
@@ -80,6 +81,16 @@ func (s *ScrobbleService) HandleNewScrobble(ctx context.Context, entry *UnifiedS
 		TrackID:     t.ID,
 		UserID:      user.ID,
 		ScrobbledAt: listenedAt,
+	}
+
+	// Ensure scrobble wasn't already created
+	existingScrobble, err := s.repo.FindByTrackAndTimestamp(ctx, t.ID, user.ID, listenedAt)
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, fmt.Errorf("unable to query db: %w", err)
+	}
+
+	if existingScrobble != nil {
+		return nil, fmt.Errorf("scrobble already exists")
 	}
 
 	err = s.repo.PersistScrobble(ctx, scrobble)

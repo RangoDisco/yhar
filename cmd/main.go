@@ -33,12 +33,22 @@ func main() {
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer cancel()
 
-	serverRepos, serverServices, handlers, pollers := serverConfig.AutoWire(yDb)
+	serverRepos, serverServices, handlers, pollers, importers := serverConfig.AutoWire(yDb)
 
 	// Start pollers (subsonic only for now)
 	if pollers.Subsonic != nil {
 		go pollers.Subsonic.Start(ctx)
 		log.Println("Started Subsonic poller")
+	}
+
+	// Import historic data
+	if importers.Maloja != nil {
+		go func() {
+			err := importers.Maloja.Import(ctx)
+			if err != nil {
+				log.Printf("Failed to import Maloja's data :%v", err)
+			}
+		}()
 	}
 
 	// Start router
@@ -53,4 +63,5 @@ func main() {
 	// Wait for interrupt signal
 	<-ctx.Done()
 	log.Println("Shutting down gracefully...")
+	log.Println("Shut down")
 }

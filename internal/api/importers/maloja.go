@@ -6,9 +6,11 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"sync"
 	"time"
 
 	"github.com/rangodisco/yhar/internal/api/services"
+	"golang.org/x/sync/semaphore"
 )
 
 type MalojaImporter struct {
@@ -44,6 +46,8 @@ func NewMalojaImporter(scrobbleService *services.ScrobbleService) Importer {
 	}
 }
 
+var maxConcurrentImports = 20
+
 func (i *MalojaImporter) Name() string {
 	return i.name
 }
@@ -64,26 +68,30 @@ func (i *MalojaImporter) Import(ctx context.Context) error {
 		return fmt.Errorf("no scrobbles found in export file")
 	}
 
-	//errChan := make(chan error, len(data.Scrobbles))
+	var wg sync.WaitGroup
+	sem := semaphore.NewWeighted(int64(maxConcurrentImports))
 	var errs []error
+
 	for _, scrobble := range data.Scrobbles {
-		//go func() {
-		//errChan <- i.importScrobble(ctx, scrobble)
-		err = i.importScrobble(ctx, scrobble)
+		err := sem.Acquire(ctx, 1)
 		if err != nil {
-			fmt.Printf("unable to import scrobble: %s - %s : %s \n", scrobble.Track.Artists, scrobble.Track.Title, err)
-			errs = append(errs, err)
+			break
 		}
-		//}()
+
+		wg.Add(1)
+
+		go func() {
+			defer wg.Done()
+			defer sem.Release(1)
+			err = i.importScrobble(ctx, scrobble)
+			if err != nil {
+				errs = append(errs, err)
+				fmt.Printf("unable to import scrobble: %s - %s : %s \n", scrobble.Track.Artists, scrobble.Track.Title, err)
+			}
+		}()
 	}
 
-	//var errs []error
-	//for range data.Scrobbles {
-	//	err := <-errChan
-	//	if err != nil {
-	//		errs = append(errs, err)
-	//	}
-	//}
+	wg.Wait()
 
 	return errors.Join(errs...)
 }

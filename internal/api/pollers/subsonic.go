@@ -56,6 +56,7 @@ func (p *SubsonicPoller) Start(ctx context.Context) {
 			// TODO: handle err
 			p.PollPlaying(ctx)
 		case <-ctx.Done():
+			fmt.Printf("Subsonic poller stopped")
 			return
 		}
 	}

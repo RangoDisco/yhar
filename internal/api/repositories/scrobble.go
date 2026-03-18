@@ -22,8 +22,8 @@ func NewScrobbleRepository(Db *gorm.DB) *ScrobbleRepository {
 func (r *ScrobbleRepository) FindByTrackAndTimestamp(ctx context.Context, trackID, userID int64, timestamp time.Time) (*models.Scrobble, error) {
 	var existingScrobble *models.Scrobble
 	err := r.Db.WithContext(ctx).
-		Where("track_id = ? AND user_id = ? AND timestamp = ?", trackID, userID, timestamp).
-		Find(existingScrobble).Error
+		Where("track_id = ? AND user_id = ? AND scrobbled_at = ?", trackID, userID, timestamp).
+		First(&existingScrobble).Error
 	if err != nil {
 		return nil, err
 	}

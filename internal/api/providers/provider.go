@@ -51,6 +51,8 @@ type AlbumMetadata struct {
 	MBID      string           `json:"mbid"`
 }
 
+var httpClient = &http.Client{Timeout: 10 * time.Second}
+
 type MetadataProvider interface {
 	Name() string
 	// GetTrackByInfos fetches a track from the scrobble data
@@ -69,10 +71,6 @@ func sendRequest(ctx context.Context, url string, limiter *rate.Limiter, userAge
 		}
 	}
 
-	client := &http.Client{
-		Timeout: 10 * time.Second,
-	}
-
 	if params != nil {
 		url = fmt.Sprintf("%s?%s", url, params.Encode())
 	}
@@ -87,7 +85,7 @@ func sendRequest(ctx context.Context, url string, limiter *rate.Limiter, userAge
 	}
 	req.Header.Set("Accept", "application/json")
 
-	resp, err := client.Do(req)
+	resp, err := httpClient.Do(req)
 	if err != nil {
 		return fmt.Errorf("unable to perform request: %w", err)
 	}

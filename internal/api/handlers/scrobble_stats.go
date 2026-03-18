@@ -158,7 +158,7 @@ func (h *ScrobbleStatsHandler) GetUserHistory(c *gin.Context) {
 
 	results, total, err := h.service.FetchUserHistory(ctx, params)
 	if err != nil {
-		common.RespondWithError(c, http.StatusBadRequest, err, "Unable to fetch history")
+		common.RespondWithError(c, http.StatusInternalServerError, err, "Unable to fetch history")
 		return
 	}
 

@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/rangodisco/yhar/internal/api/common"
 	"github.com/rangodisco/yhar/internal/api/pollers"
@@ -19,7 +21,7 @@ func (h *ScrobbleHandler) ManualNowPlayingPoll(c *gin.Context) {
 
 	err := h.subsonic.PollPlaying(ctx)
 	if err != nil {
-		common.RespondWithError(c, 500, err, "Unable to poll")
+		common.RespondWithError(c, http.StatusInternalServerError, err, "Unable to poll")
 		return
 	}
 

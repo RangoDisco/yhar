@@ -63,7 +63,7 @@ func (s *MetadataService) enrichMetadata(ctx context.Context, infos *providers.S
 		// TODO:
 		for _, p := range s.providers {
 			// Skip MusicBrainz as it was already used
-			if p.Name() == "muscibrainz" {
+			if p.Name() == "musicbrainz" {
 				continue
 			}
 		}

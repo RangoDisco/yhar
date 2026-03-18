@@ -4,25 +4,30 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/gin-gonic/gin"
 	"github.com/rangodisco/yhar/internal/api/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
-var (
-	db  *gorm.DB
-	err error
-)
+var logLevel logger.LogLevel
 
 func SetupDatabase() (*gorm.DB, error) {
 	var ginMode = os.Getenv("GIN_MODE")
 	switch ginMode {
-	case "release":
+	case gin.DebugMode:
+		logLevel = logger.Info
+		return InitDatabase()
+	case gin.TestMode:
+		logLevel = logger.Info
+		panic("not implemented yet")
+	case gin.ReleaseMode:
 	default:
-		db, err = InitDatabase()
+		logLevel = logger.Silent
+		return InitDatabase()
 	}
-
-	return db, err
+	return nil, nil
 }
 
 func InitDatabase() (*gorm.DB, error) {
@@ -35,7 +40,9 @@ func InitDatabase() (*gorm.DB, error) {
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable",
 		host, user, password, name, port)
 
-	db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
+		Logger: logger.Default.LogMode(logLevel),
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -54,8 +61,4 @@ func InitDatabase() (*gorm.DB, error) {
 	)
 
 	return db, err
-}
-
-func GetDB() *gorm.DB {
-	return db
 }

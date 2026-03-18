@@ -2,10 +2,13 @@ package main
 
 import (
 	"context"
+	"errors"
 	"log"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/rangodisco/yhar/config"
@@ -18,6 +21,10 @@ func init() {
 	if err != nil {
 		log.Fatalf("failed to load environment variables: %v", err)
 	}
+
+	if os.Getenv("JWT_SECRET") == "" {
+		log.Fatalf("JWT_SECRET environment variable not set")
+	}
 }
 
 func main() {
@@ -26,8 +33,17 @@ func main() {
 		log.Fatalf("failed to init database: %v", err)
 	}
 
-	if os.Getenv("GIN_MODE") == "release" {
+	switch os.Getenv("GIN_MODE") {
+	case gin.DebugMode:
+		gin.SetMode(gin.DebugMode)
+		break
+	case gin.TestMode:
+		gin.SetMode(gin.TestMode)
+		break
+	case gin.ReleaseMode:
+	default:
 		gin.SetMode(gin.ReleaseMode)
+		break
 	}
 
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
@@ -54,14 +70,27 @@ func main() {
 	// Start router
 	r := config.SetupRouter(serverRepos, serverServices, handlers)
 
+	srv := &http.Server{
+		Addr:    ":8080",
+		Handler: r,
+	}
+
 	go func() {
-		if err := r.Run(); err != nil {
-			log.Printf("Server error: %v", err)
+		err := srv.ListenAndServe()
+		if err != nil && !errors.Is(err, http.ErrServerClosed) {
+			log.Printf("an error occurred: %v", err)
 		}
 	}()
 
 	// Wait for interrupt signal
 	<-ctx.Done()
 	log.Println("Shutting down gracefully...")
+
+	shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer shutdownCancel()
+	if err := srv.Shutdown(shutdownCtx); err != nil {
+		log.Printf("Forced shutdown: %v", err)
+	}
+
 	log.Println("Shut down")
 }

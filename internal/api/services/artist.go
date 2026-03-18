@@ -2,12 +2,14 @@ package services
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/rangodisco/yhar/internal/api/models"
 	"github.com/rangodisco/yhar/internal/api/providers"
 	"github.com/rangodisco/yhar/internal/api/repositories"
 	filters "github.com/rangodisco/yhar/internal/api/types/filters"
+	"gorm.io/gorm"
 )
 
 type ArtistService struct {
@@ -59,6 +61,10 @@ func (s *ArtistService) GetOrCreate(ctx context.Context, info providers.ArtistMe
 
 	err = s.repo.Persist(ctx, model)
 	if err != nil {
+		// could happen if another routine inserted the same artist first
+		if errors.Is(err, gorm.ErrDuplicatedKey) {
+			return s.repo.FindActiveByFilters(ctx, queryFilters)
+		}
 		return nil, err
 	}
 

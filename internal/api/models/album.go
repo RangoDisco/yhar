@@ -45,5 +45,5 @@ type Album struct {
 	Genres        []Genre   `json:"genres" gorm:"many2many:album_genres;"`
 	PictureID     *int64
 	Picture       Image  `json:"picture" gorm:"foreignkey:PictureID"`
-	MusicBrainzID string `json:"music_brainz_id"`
+	MusicBrainzID string `json:"music_brainz_id" gorm:"uniqueIndex"`
 }

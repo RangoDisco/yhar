@@ -9,5 +9,5 @@ type Artist struct {
 	Tracks        []Track `json:"tracks" gorm:"many2many:track_artists;"`
 	PictureID     *int64
 	Picture       Image  `json:"picture" gorm:"foreignkey:PictureID"`
-	MusicBrainzID string `json:"music_brainz_id"`
+	MusicBrainzID string `json:"music_brainz_id" gorm:"uniqueIndex"`
 }

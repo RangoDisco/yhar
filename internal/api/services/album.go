@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -9,6 +10,7 @@ import (
 	"github.com/rangodisco/yhar/internal/api/providers"
 	"github.com/rangodisco/yhar/internal/api/repositories"
 	"github.com/rangodisco/yhar/internal/api/types/filters"
+	"gorm.io/gorm"
 )
 
 type AlbumService struct {
@@ -62,8 +64,13 @@ func (s *AlbumService) GetOrCreateAlbum(ctx context.Context, info providers.Albu
 
 	err = s.repo.Persist(ctx, model)
 	if err != nil {
+		// could happen if another routine inserted the same album first
+		if errors.Is(err, gorm.ErrDuplicatedKey) {
+			return s.repo.FindActiveByFilters(ctx, queryFilters)
+		}
 		return nil, err
 	}
+
 	return model, nil
 }
 

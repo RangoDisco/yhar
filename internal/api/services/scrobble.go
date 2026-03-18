@@ -130,6 +130,10 @@ func (s *ScrobbleService) getOrCreateTrack(ctx context.Context, entry *UnifiedSc
 	// Create track with everything
 	track, err := s.track.CreateFromMetadata(ctx, &metadata.Track, artists, *album)
 	if err != nil {
+		// could happen if another routine inserted the same track first
+		if errors.Is(err, gorm.ErrDuplicatedKey) {
+			return s.track.GetByScrobbleInfo(ctx, entry)
+		}
 		return nil, err
 	}
 

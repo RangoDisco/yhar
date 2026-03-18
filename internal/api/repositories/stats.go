@@ -219,7 +219,7 @@ func (r *StatsRepository) FindByUserID(ctx context.Context, params *StatsTrackQu
 }
 
 func (r *StatsRepository) buildBaseStatQuery(ctx context.Context, params BaseStatsQueryParams) *gorm.DB {
-	query := r.Db.WithContext(ctx).Debug().
+	query := r.Db.WithContext(ctx).
 		Table("scrobbles").
 		Joins("JOIN tracks tr ON tr.id = scrobbles.track_id").
 		Joins("JOIN track_artists trar ON trar.track_id = tr.id").
@@ -227,11 +227,11 @@ func (r *StatsRepository) buildBaseStatQuery(ctx context.Context, params BaseSta
 		Where("scrobbles.user_id = ?", params.UserID)
 
 	if !params.Start.IsZero() {
-		query.Where("scrobbles.scrobbled_at >= ?", params.Start)
+		query = query.Where("scrobbles.scrobbled_at >= ?", params.Start)
 	}
 
 	if !params.End.IsZero() {
-		query.Where("scrobbles.scrobbled_at <= ?", params.End)
+		query = query.Where("scrobbles.scrobbled_at <= ?", params.End)
 	}
 
 	return query

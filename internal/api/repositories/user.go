@@ -22,7 +22,7 @@ func (r *UserRepository) FindActiveByFilters(ctx context.Context, filters []filt
 	query := r.Db.WithContext(ctx).Preload("Role.Permissions")
 
 	for _, filter := range filters {
-		query.Where(filter.Key+" = ?", filter.Value)
+		query = query.Where(filter.Key+" = ?", filter.Value)
 	}
 
 	err := query.First(&u).Error

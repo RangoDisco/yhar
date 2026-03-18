@@ -25,7 +25,7 @@ func (r *SessionRepository) FindByFilters(ctx context.Context, filters []filters
 		Where("completed_at IS null")
 
 	for _, filter := range filters {
-		query.Where(filter.Key+" = ?", filter.Value)
+		query = query.Where(filter.Key+" = ?", filter.Value)
 	}
 
 	err := query.First(&s).Error

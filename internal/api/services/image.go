@@ -54,15 +54,20 @@ func (s *ImageService) GetOrCreate(ctx context.Context, url string) (*models.Ima
 
 // saveLocally saves a distant image to our local images dir
 func (s *ImageService) saveLocally(ctx context.Context, url string) (string, error) {
-	res, err := http.Get(url)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
-		return "", fmt.Errorf("unable to fetch image : %w", err)
+		return "", fmt.Errorf("unable to build req: %w", err)
+	}
+
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return "", fmt.Errorf("unable to fetch img")
 	}
 
 	defer func(Body io.ReadCloser) {
 		err := Body.Close()
 		if err != nil {
-			fmt.Println("unable to close body: %w", err)
+			fmt.Println("unable to close body: %v", err)
 		}
 	}(res.Body)
 
@@ -91,7 +96,7 @@ func (s *ImageService) saveLocally(ctx context.Context, url string) (string, err
 	defer func(file *os.File) {
 		err := file.Close()
 		if err != nil {
-			fmt.Println("unable to close file: %w", err)
+			fmt.Println("unable to close file: %v", err)
 		}
 	}(file)
 

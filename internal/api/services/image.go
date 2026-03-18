@@ -34,11 +34,6 @@ func (s *ImageService) GetOrCreate(ctx context.Context, url string) (*models.Ima
 		return nil, fmt.Errorf("url is empty")
 	}
 
-	existingImage, err := s.repo.FindActiveByUrl(ctx, url)
-	if err == nil && existingImage.Path != "" {
-		return existingImage, nil
-	}
-
 	filename, err := s.saveLocally(ctx, url)
 	if err != nil {
 		return nil, fmt.Errorf("unable to save image locally: %w", err)

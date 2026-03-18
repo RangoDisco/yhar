@@ -93,7 +93,15 @@ func (s *AuthService) GetUserFromToken(ctx context.Context, token *jwt.Token) (*
 	if !ok {
 		return nil, errors.New("token is invalid or expired")
 	}
-	username := claims["username"].(string)
+
+	rawUsername, ok := claims["username"]
+	if !ok {
+		return nil, errors.New("token missing username claim")
+	}
+	username, ok := rawUsername.(string)
+	if !ok || username == "" {
+		return nil, errors.New("username claim is not a valid string")
+	}
 
 	user, err := s.repo.FindActiveByFilters(ctx, []filters.QueryFilter{
 		{Key: "username", Value: username},

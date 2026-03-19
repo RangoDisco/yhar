@@ -22,7 +22,7 @@ func CheckUserPrivacy(repo *repositories.UserRepository) gin.HandlerFunc {
 		}
 
 		currentUser, ok := rawUser.(*dto.UserPassport)
-		if !ok && currentUser != nil {
+		if rawUser != nil && !ok {
 			common.RespondWithError(c, http.StatusInternalServerError, errors.New("unable to convert context user to model"), "Internal server error")
 			return
 		}

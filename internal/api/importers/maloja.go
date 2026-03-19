@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"os"
 	"sync"
 	"time"
@@ -83,7 +84,7 @@ func (i *MalojaImporter) Import(ctx context.Context) error {
 			defer sem.Release(1)
 			err = i.importScrobble(ctx, scrobble)
 			if err != nil {
-				fmt.Printf("unable to import scrobble: %s - %s : %s \n", scrobble.Track.Artists, scrobble.Track.Title, err)
+				log.Printf("unable to import scrobble: %s - %s : %s \n", scrobble.Track.Artists, scrobble.Track.Title, err)
 			}
 		}()
 	}
@@ -107,10 +108,9 @@ func (i *MalojaImporter) importScrobble(ctx context.Context, scrobble malojaScro
 	return nil
 }
 
-func (i *MalojaImporter) parseToUnifiedScrobble(ctx context.Context, entry interface{}) (*services.UnifiedScrobbleEntry, error) {
-	scrobble, ok := entry.(malojaScrobble)
-	if !ok {
-		return nil, fmt.Errorf("unable to parse into unified scrobble")
+func (i *MalojaImporter) parseToUnifiedScrobble(ctx context.Context, scrobble malojaScrobble) (*services.UnifiedScrobbleEntry, error) {
+	if len(scrobble.Track.Artists) == 0 {
+		return nil, fmt.Errorf("no artist linked to scrobble: %q", scrobble.Track.Title)
 	}
 
 	return &services.UnifiedScrobbleEntry{

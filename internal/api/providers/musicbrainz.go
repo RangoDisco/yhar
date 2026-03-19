@@ -135,7 +135,7 @@ func (p *MusicBrainzProvider) getTrackByMBID(ctx context.Context, mbid string) (
 	params.Set("inc", strings.Join([]string{"artist-credits", "releases", "release-groups"}, "+"))
 
 	var recordingRes recording
-	err := sendRequest(ctx, endpoint, nil, &p.userAgent, params, &recordingRes)
+	err := sendRequest(ctx, endpoint, p.limiter, &p.userAgent, params, &recordingRes)
 	if err != nil {
 		return nil, fmt.Errorf("unable to fetch recording by ID : %w", err)
 	}

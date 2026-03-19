@@ -25,6 +25,11 @@ func init() {
 	if os.Getenv("JWT_SECRET") == "" {
 		log.Fatalf("JWT_SECRET environment variable not set")
 	}
+
+	if os.Getenv("BASE_URL") == "" {
+		log.Fatalf("BASE_URL environment variable not set")
+	}
+
 }
 
 func main() {
@@ -36,14 +41,11 @@ func main() {
 	switch os.Getenv("GIN_MODE") {
 	case gin.DebugMode:
 		gin.SetMode(gin.DebugMode)
-		break
 	case gin.TestMode:
 		gin.SetMode(gin.TestMode)
-		break
 	case gin.ReleaseMode:
 	default:
 		gin.SetMode(gin.ReleaseMode)
-		break
 	}
 
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)

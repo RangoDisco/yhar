@@ -36,7 +36,7 @@ type TrackMetadata struct {
 }
 
 type ArtistMetadata struct {
-	Name     string   `json:"title"`
+	Name     string   `json:"name"`
 	SortName string   `json:"sort_name"`
 	ImageUrl string   `json:"image_url"`
 	Genres   []string `json:"genres"`

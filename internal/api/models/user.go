@@ -7,7 +7,7 @@ type User struct {
 	Origin     string     `json:"origin" gorm:"type:varchar(255);not null"`
 	ExternalID string     `json:"external_id" gorm:"type:varchar(255);default: null;uniqueIndex"`
 	Scrobbles  []Scrobble `json:"scrobbles" gorm:"foreignKey:UserID;"`
-	Password   string     `json:"password" gorm:"type:varchar(255)"`
+	Password   string     `json:"-" gorm:"type:varchar(255)"`
 	RoleID     int64      `json:"role_id"`
 	Role       Role       `json:"role" gorm:"foreignKey:RoleID;"`
 	IsPublic   bool       `json:"is_public" gorm:"not null;default:false"`

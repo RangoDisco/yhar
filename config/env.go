@@ -27,6 +27,8 @@ func LoadEnv() error {
 	switch mode {
 	case "test":
 		envFile = ".env.test"
+	case "debug":
+		envFile = ".env.prod"
 	case "release":
 		envFile = ".env.prod"
 	default:

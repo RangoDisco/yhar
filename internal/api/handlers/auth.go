@@ -32,6 +32,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 	token, err := h.service.HandleUserLogin(c.Request.Context(), body)
 	if err != nil {
 		common.RespondWithError(c, http.StatusUnauthorized, err, "Invalid credentials")
+		return
 	}
 
 	common.RespondWithData(c, http.StatusOK, &LoginResponse{Token: token})

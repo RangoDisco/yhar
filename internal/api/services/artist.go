@@ -33,7 +33,7 @@ func (s *ArtistService) GetOrCreate(ctx context.Context, info providers.ArtistMe
 	}
 
 	existingArtist, err := s.repo.FindActiveByFilters(ctx, queryFilters)
-	if err == nil && existingArtist.Name != "" {
+	if err == nil && existingArtist != nil {
 		return existingArtist, err
 	}
 

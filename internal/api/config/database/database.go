@@ -27,7 +27,6 @@ func SetupDatabase() (*gorm.DB, error) {
 		logLevel = logger.Silent
 		return InitDatabase()
 	}
-	return nil, nil
 }
 
 func InitDatabase() (*gorm.DB, error) {

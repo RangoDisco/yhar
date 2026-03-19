@@ -3,7 +3,6 @@ package importers
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"os"
 	"sync"
@@ -70,7 +69,6 @@ func (i *MalojaImporter) Import(ctx context.Context) error {
 
 	var wg sync.WaitGroup
 	sem := semaphore.NewWeighted(int64(maxConcurrentImports))
-	var errs []error
 
 	for _, scrobble := range data.Scrobbles {
 		err := sem.Acquire(ctx, 1)
@@ -85,7 +83,6 @@ func (i *MalojaImporter) Import(ctx context.Context) error {
 			defer sem.Release(1)
 			err = i.importScrobble(ctx, scrobble)
 			if err != nil {
-				errs = append(errs, err)
 				fmt.Printf("unable to import scrobble: %s - %s : %s \n", scrobble.Track.Artists, scrobble.Track.Title, err)
 			}
 		}()
@@ -93,7 +90,7 @@ func (i *MalojaImporter) Import(ctx context.Context) error {
 
 	wg.Wait()
 
-	return errors.Join(errs...)
+	return nil
 }
 
 func (i *MalojaImporter) importScrobble(ctx context.Context, scrobble malojaScrobble) error {

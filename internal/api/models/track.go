@@ -10,6 +10,6 @@ type Track struct {
 	AlbumID       int64
 	Album         Album         `json:"album" gorm:"foreignkey:AlbumID;references:ID;default:null"`
 	MusicBrainzID string        `json:"music_brainz_id" gorm:"type:varchar(255);default:null;uniqueIndex"`
-	Scrobbles     []Scrobble    `json:"scrobbles" gorm:"foreignkey:UserID;"`
+	Scrobbles     []Scrobble    `json:"scrobbles" gorm:"foreignkey:TrackID;"`
 	Duration      time.Duration `json:"duration" gorm:"int"`
 }

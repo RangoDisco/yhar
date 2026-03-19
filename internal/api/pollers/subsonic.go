@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"math/rand"
 	"net/http"
 	"os"
@@ -53,10 +54,12 @@ func (p *SubsonicPoller) Start(ctx context.Context) {
 	for {
 		select {
 		case <-ticker.C:
-			// TODO: handle err
-			p.PollPlaying(ctx)
+			err := p.PollPlaying(ctx)
+			if err != nil {
+				log.Printf("unable to poll subsonic : %v", err)
+			}
 		case <-ctx.Done():
-			fmt.Printf("Subsonic poller stopped")
+			log.Printf("Subsonic poller stopped")
 			return
 		}
 	}
@@ -73,7 +76,7 @@ func (p *SubsonicPoller) PollPlaying(ctx context.Context) error {
 	token := hex.EncodeToString(hash[:])
 
 	pollUrl := fmt.Sprintf("%s/rest/getNowPlaying?u=%s&c=yhar&s=%s&t=%s&v=%s", p.baseUrl, p.username, salt, token, "1.16.1")
-	req, err := http.NewRequest(http.MethodGet, pollUrl, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, pollUrl, nil)
 	if err != nil {
 		return fmt.Errorf("unable to create request: %w", err)
 	}
@@ -86,7 +89,7 @@ func (p *SubsonicPoller) PollPlaying(ctx context.Context) error {
 	defer func(Body io.ReadCloser) {
 		err = Body.Close()
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 	}(res.Body)
 
@@ -154,16 +157,12 @@ func (p *SubsonicPoller) handleEntry(ctx context.Context, entry subsonic.Entry) 
 	return nil
 }
 
-func (p *SubsonicPoller) parseToUnifiedScrobble(entry interface{}) (*services.UnifiedScrobbleEntry, error) {
-	scrobble, ok := entry.(subsonic.Entry)
-	if !ok {
-		return nil, fmt.Errorf("unable to parse entry to original type: %s", entry)
-	}
+func (p *SubsonicPoller) parseToUnifiedScrobble(entry subsonic.Entry) (*services.UnifiedScrobbleEntry, error) {
 
 	return &services.UnifiedScrobbleEntry{
-		Username:      scrobble.Username,
-		Title:         scrobble.Title,
-		MusicBrainzID: scrobble.MusicBrainzID,
+		Username:      entry.Username,
+		Title:         entry.Title,
+		MusicBrainzID: entry.MusicBrainzID,
 	}, nil
 
 }
@@ -176,7 +175,7 @@ func (p *SubsonicPoller) generateSalt() string {
 	return string(b)
 }
 
-// isCompleted checks if at least 70% of the track has been played
+// isCompleted checks if at least 80% of the track has been played
 func (p *SubsonicPoller) isCompleted(session *models.Session) bool {
 	elapsed := time.Since(session.StartedAt)
 	threshold := time.Duration(float64(session.Duration) * 0.8)

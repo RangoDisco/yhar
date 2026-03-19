@@ -9,6 +9,7 @@ import (
 	"image"
 	"image/jpeg"
 	"io"
+	"log"
 	"net/http"
 	"os"
 
@@ -67,7 +68,7 @@ func (s *ImageService) saveLocally(ctx context.Context, url string) (string, err
 	defer func(Body io.ReadCloser) {
 		err := Body.Close()
 		if err != nil {
-			fmt.Println("unable to close body: %v", err)
+			log.Printf("unable to close body: %v", err)
 		}
 	}(res.Body)
 
@@ -96,7 +97,7 @@ func (s *ImageService) saveLocally(ctx context.Context, url string) (string, err
 	defer func(file *os.File) {
 		err := file.Close()
 		if err != nil {
-			fmt.Println("unable to close file: %v", err)
+			log.Printf("unable to close file: %v", err)
 		}
 	}(file)
 

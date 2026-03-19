@@ -156,7 +156,7 @@ func (s *ScrobbleService) processScrobbleArtists(ctx context.Context, sArtists [
 
 	// TODO: define if needed
 	if len(artists) == 0 {
-		return nil, fmt.Errorf("%v", errors.Join(errs...))
+		return nil, fmt.Errorf("unable to retrieve artist %v", errors.Join(errs...))
 	}
 
 	return artists, nil

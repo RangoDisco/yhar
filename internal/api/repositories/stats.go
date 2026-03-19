@@ -99,7 +99,7 @@ func (r *StatsRepository) FindTopAlbumsForUser(ctx context.Context, params *Stat
 		Group("al.id, al.title, i.path, i.type, i.domain")
 
 	if params.AlbumArtistID != nil {
-		query.Where("EXISTS(SELECT 1 FROM artist_albums aral2 WHERE aral2.album_id = al.id AND aral2.artist_id = ?)", params.AlbumArtistID)
+		query = query.Where("EXISTS(SELECT 1 FROM artist_albums aral2 WHERE aral2.album_id = al.id AND aral2.artist_id = ?)", params.AlbumArtistID)
 	}
 
 	err := query.Count(&totalCount).Error
@@ -145,7 +145,7 @@ func (r *StatsRepository) FindTopTracksForUser(ctx context.Context, params *Stat
 		Group("tr.id, tr.title, al.id, i.path, i.type, i.domain")
 
 	if params.TrackArtistID != nil {
-		query.Where("EXISTS(SELECT 1 FROM track_artists trar2 WHERE trar2.track_id = tr.id AND trar2.artist_id = ?)", params.TrackArtistID)
+		query = query.Where("EXISTS(SELECT 1 FROM track_artists trar2 WHERE trar2.track_id = tr.id AND trar2.artist_id = ?)", params.TrackArtistID)
 	}
 
 	err := query.Count(&totalCount).Error
@@ -190,7 +190,7 @@ func (r *StatsRepository) FindByUserID(ctx context.Context, params *StatsTrackQu
 		Group("tr.id, tr.title, al.id, scrobbles.scrobbled_at, i.path, i.type, i.domain")
 
 	if params.TrackArtistID != nil {
-		query.Where("EXISTS(SELECT 1 FROM track_artists trar2 WHERE trar2.track_id = tr.id AND trar2.artist_id = ?)", params.TrackArtistID)
+		query = query.Where("EXISTS(SELECT 1 FROM track_artists trar2 WHERE trar2.track_id = tr.id AND trar2.artist_id = ?)", params.TrackArtistID)
 	}
 
 	err := query.Count(&totalCount).Error

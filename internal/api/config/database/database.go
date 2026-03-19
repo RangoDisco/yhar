@@ -3,6 +3,7 @@ package database
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/rangodisco/yhar/internal/api/models"
@@ -22,7 +23,6 @@ func SetupDatabase() (*gorm.DB, error) {
 	case gin.TestMode:
 		logLevel = logger.Info
 		panic("not implemented yet")
-	case gin.ReleaseMode:
 	default:
 		logLevel = logger.Silent
 		return InitDatabase()
@@ -46,6 +46,20 @@ func InitDatabase() (*gorm.DB, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	sqlDB, err := db.DB()
+	if err != nil {
+		return nil, err
+	}
+
+	// SetMaxIdleConns sets the maximum number of connections in the idle connection pool.
+	sqlDB.SetMaxIdleConns(10)
+
+	// SetMaxOpenConns sets the maximum number of open connections to the database.
+	sqlDB.SetMaxOpenConns(20)
+
+	// SetConnMaxLifetime sets the maximum amount of time a connection may be reused.
+	sqlDB.SetConnMaxLifetime(time.Hour)
 
 	err = db.AutoMigrate(
 		&models.Album{},

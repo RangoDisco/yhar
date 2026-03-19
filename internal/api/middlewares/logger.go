@@ -18,9 +18,11 @@ func LoggerMiddleware(l *slog.Logger) gin.HandlerFunc {
 
 		rawUser, exists := c.Get("user")
 		if exists && rawUser != nil {
-			user := rawUser.(*dto.UserPassport)
-			id := strconv.FormatInt(user.ID, 10)
-			logger = logger.With(slog.String("user_id", id))
+			user, ok := rawUser.(*dto.UserPassport)
+			if ok {
+				id := strconv.FormatInt(user.ID, 10)
+				logger = logger.With(slog.String("user_id", id))
+			}
 		}
 
 		c.Set("logger", logger)

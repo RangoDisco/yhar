@@ -2,6 +2,7 @@ package models
 
 import (
 	"database/sql/driver"
+	"fmt"
 	"time"
 )
 
@@ -12,7 +13,18 @@ const (
 )
 
 func (so *scrobbleOrigin) Scan(value interface{}) error {
-	*so = scrobbleOrigin(value.([]byte))
+	if value == nil {
+		*so = ""
+		return nil
+	}
+	switch v := value.(type) {
+	case []byte:
+		*so = scrobbleOrigin(v)
+	case string:
+		*so = scrobbleOrigin(v)
+	default:
+		return fmt.Errorf("cannot scan type %T into scrobbleOrigin", value)
+	}
 	return nil
 }
 

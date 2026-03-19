@@ -17,7 +17,11 @@ func RequirePermissions(perms []string) gin.HandlerFunc {
 			return
 		}
 
-		u := rawUser.(*dto.UserPassport)
+		u, ok := rawUser.(*dto.UserPassport)
+		if !ok {
+			common.RespondWithError(c, http.StatusInternalServerError, errors.New("unable to convert user to passport"), "Internal server error")
+			return
+		}
 		uPerms := make(map[string]bool)
 		for _, p := range u.Role.Permissions {
 			uPerms[p.Name] = true

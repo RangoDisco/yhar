@@ -40,7 +40,8 @@ func InitDatabase() (*gorm.DB, error) {
 		host, user, password, name, port)
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
-		Logger: logger.Default.LogMode(logLevel),
+		Logger:         logger.Default.LogMode(logLevel),
+		TranslateError: true,
 	})
 	if err != nil {
 		return nil, err

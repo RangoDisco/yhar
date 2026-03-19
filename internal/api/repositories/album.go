@@ -26,7 +26,7 @@ func (r *AlbumRepository) FindActiveByFilters(ctx context.Context, filters []fil
 	query := r.Db.WithContext(ctx).Preload("Artists.Picture").Preload("Picture")
 
 	for _, f := range filters {
-		query.Where(fmt.Sprintf("%s = ?", f.Key), f.Value)
+		query = query.Where(fmt.Sprintf("%s = ?", f.Key), f.Value)
 	}
 
 	err := query.First(&a).Error

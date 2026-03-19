@@ -105,22 +105,27 @@ func (s *MetadataService) addPicturesToArtists(ctx context.Context, trackInfo *p
 
 		img, err := dProvider.GetArtistImage(ctx, "", trackArtist.Name)
 		if err != nil {
-			return
+			continue
 		}
 
 		trackInfo.Artists[i].ImageUrl = img
 	}
 
 	for i, albumArtists := range trackInfo.Album.Artists {
+		alreadyHasImg := false
 		// No need to fetch the image if the artists also appears on the track, as it will be found when trying to GetOrCreate
 		for _, tAr := range trackInfo.Artists {
 			if albumArtists.MBID == tAr.MBID {
+				alreadyHasImg = true
 				continue
 			}
-			// Fetch artist image URL
+		}
+
+		// Fetch artist image URL
+		if !alreadyHasImg {
 			img, err := dProvider.GetArtistImage(ctx, "", albumArtists.Name)
 			if err != nil {
-				return
+				continue
 			}
 
 			trackInfo.Album.Artists[i].ImageUrl = img

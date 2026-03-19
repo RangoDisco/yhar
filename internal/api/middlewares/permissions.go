@@ -13,9 +13,8 @@ func RequirePermissions(perms []string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		rawUser, exists := c.Get("user")
 		if !exists {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-				"error": "Unauthorized",
-			})
+			common.RespondWithError(c, http.StatusForbidden, errors.New("no user found in context"), "Unauthorized")
+			return
 		}
 
 		u := rawUser.(*dto.UserPassport)

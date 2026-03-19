@@ -117,7 +117,7 @@ func (p *MusicBrainzProvider) GetTrackByInfos(ctx context.Context, data Scrobble
 	track := p.convertRecordingToTrack(ctx, rec)
 
 	// Find the "best" release and put it as track
-	album, err := p.findBestRelease(ctx, rec.Releases)
+	album, err := p.findBestRelease(ctx, rec.Releases, data.Album)
 	if err != nil {
 		return nil, fmt.Errorf("unable to find best release: %w", err)
 	}
@@ -175,8 +175,18 @@ func (p *MusicBrainzProvider) searchTrack(ctx context.Context, title, artist, al
 		return nil, errors.New("no recording found")
 	}
 
-	// TODO: determine best recording in case multiple were returned
-	return &recordingRes.Recordings[0], nil
+	if len(recordingRes.Recordings) == 1 {
+		return &recordingRes.Recordings[0], nil
+	}
+
+	bestCandidate := recordingRes.Recordings[0]
+	for _, rec := range recordingRes.Recordings {
+		if len(rec.Releases) > len(bestCandidate.Releases) {
+			bestCandidate = rec
+		}
+	}
+
+	return &bestCandidate, nil
 }
 
 // GetArtistImage is not implemented by this provider as MusicBrainz doesn't provide images for artists
@@ -231,23 +241,23 @@ func (p *MusicBrainzProvider) convertReleaseToAlbum(ctx context.Context, release
 }
 
 // findBestRelease selects the "best" release and fetch its complete metadata
-func (p *MusicBrainzProvider) findBestRelease(ctx context.Context, releases []release) (*AlbumMetadata, error) {
+func (p *MusicBrainzProvider) findBestRelease(ctx context.Context, releases []release, albumTitle string) (*AlbumMetadata, error) {
 	if len(releases) == 0 {
 		return nil, fmt.Errorf("no releases were found")
 	}
 
-	// I have no fucking clue on how to determine the best release, so I just take the first official + dated one
-	var bestRelease *release
+	// I have no fucking clue on how to determine the best release, so
+	// In case a release has the same exact title, take it, otherwise take the first dated + official release
+	bestRelease := releases[0]
 	for _, r := range releases {
-		if r.Date != "" && r.Status == "Official" && r.ReleaseGroup.PrimaryType == "Album" {
-			bestRelease = &r
+		if strings.ToLower(r.Title) == strings.ToLower(albumTitle) {
+			bestRelease = r
 			break
 		}
-	}
 
-	// Default to the first release
-	if bestRelease == nil {
-		bestRelease = &releases[0]
+		if r.Date != "" && r.Status == "Official" && r.ReleaseGroup.PrimaryType == "Album" && r.Date < bestRelease.Date {
+			bestRelease = r
+		}
 	}
 
 	// Including release doesn't include its cover so we have to fetch it

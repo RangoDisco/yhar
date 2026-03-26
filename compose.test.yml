@@ -1,0 +1,9 @@
+services:
+  database:
+    image: 'postgres:latest'
+    ports:
+      - target: 5432
+    environment:
+      - POSTGRES_DB=yhar
+      - POSTGRES_USER=yhar
+      - POSTGRES_PASSWORD=yhar

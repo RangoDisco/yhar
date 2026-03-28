@@ -1,8 +1,7 @@
 services:
   database:
     image: 'postgres:latest'
-    ports:
-      - target: 5432
+    ports: [ "54020:5432" ]
     environment:
       - POSTGRES_DB=yhar
       - POSTGRES_USER=yhar

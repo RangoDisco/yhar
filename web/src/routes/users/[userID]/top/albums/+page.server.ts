@@ -14,7 +14,7 @@ export const load: PageServerLoad = async ({ url, params, cookies }) => {
 		queryUrl = queryUrl + `&artist=${artist}`;
 	}
 
-	const albums = await fetcher(queryUrl, 'GET', null, cookies);
+	const albums = await fetcher(queryUrl, 'GET', cookies, null);
 
 	return {
 		period,

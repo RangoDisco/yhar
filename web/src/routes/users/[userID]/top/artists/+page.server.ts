@@ -10,8 +10,8 @@ export const load: PageServerLoad = async ({ url, params, cookies }) => {
 	const artists = await fetcher(
 		`${API_URL}/users/${userID}/scrobbles/top/artists?period=${period}&page=${page}&limit=10`,
 		'GET',
-		null,
-		cookies
+		cookies,
+		null
 	);
 
 	return {

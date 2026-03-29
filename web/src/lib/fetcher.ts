@@ -3,8 +3,8 @@ import { type Cookies, redirect } from '@sveltejs/kit';
 export const fetcher = async (
 	url: string,
 	method: 'GET' | 'POST' | 'PUT' | 'DELETE',
-	body = null,
-	cookies: Cookies
+	cookies: Cookies,
+	body?: string | null
 ) => {
 	// Build query and fetch
 	const headers: Headers = new Headers();
@@ -27,7 +27,7 @@ export const fetcher = async (
 	 * - If there's a refresh token in the user's local storage, use it to get a new token and retry
 	 * - If not redirect to the login screen
 	 */
-	if (response.status === 401) {
+	if (response.status === 401 && !url.endsWith('/auth/login')) {
 		const refresh = cookies?.get('refresh_token');
 		if (refresh) {
 			// TODO: Get token and try again

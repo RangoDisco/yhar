@@ -9,20 +9,20 @@ export const load: PageServerLoad = async ({ url, params, cookies }) => {
 		artists: await fetcher(
 			`${API_URL}/users/${userID}/scrobbles/top/artists?period=${period}&limit=6`,
 			'GET',
-			null,
-			cookies
+			cookies,
+			null
 		),
 		albums: await fetcher(
 			`${API_URL}/users/${userID}/scrobbles/top/albums?&period=${period}&limit=6`,
 			'GET',
-			null,
-			cookies
+			cookies,
+			null
 		),
 		tracks: await fetcher(
 			`${API_URL}/users/${userID}/scrobbles/top/tracks?period=${period}&limit=6`,
 			'GET',
-			null,
-			cookies
+			cookies,
+			null
 		)
 	});
 
@@ -34,8 +34,8 @@ export const load: PageServerLoad = async ({ url, params, cookies }) => {
 	const history = await fetcher(
 		`${API_URL}/users/${userID}/scrobbles/history`,
 		'GET',
-		null,
-		cookies
+		cookies,
+		null
 	);
 
 	return {

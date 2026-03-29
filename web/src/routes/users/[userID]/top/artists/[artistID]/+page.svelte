@@ -2,7 +2,7 @@
     import ContentListWrapper from "$lib/components/top/ContentListWrapper.svelte";
     import HistoryListItem from "$lib/components/top/tracks/HistoryListItem.svelte";
     import ContentListItem from "$lib/components/top/ContentListItem.svelte";
-    import ContentCard from "$lib/components/top/ContentCard.svelte";
+    import ContentCard from "$lib/components/top/contentCard/contentCard.svelte";
 
     let {data} = $props();
 </script>

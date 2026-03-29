@@ -1,7 +1,7 @@
 <script>
     import * as Avatar from "$lib/components/ui/avatar/index";
     import {Button} from "$lib/components/ui/button/index";
-    import {Trash} from "@lucide/svelte";
+    import {Trash, ListMusic} from "@lucide/svelte";
     import dayjs from "dayjs";
     import relativeTime from "dayjs/plugin/relativeTime";
 
@@ -20,7 +20,9 @@
         <Avatar.Root class="rounded-md h-8 w-8">
             <Avatar.Image src={track.picture_url}
                           alt={`${track.title}'s picture`}/>
-            <Avatar.Fallback>{track.title}</Avatar.Fallback>
+            <Avatar.Fallback class="rounded-md h-8 w-8">
+                <ListMusic size={18} class="text-muted-foreground"/>
+            </Avatar.Fallback>
         </Avatar.Root>
         <div class="flex flex-col w-full">
             <div class="flex gap-2 items-center">

@@ -9,28 +9,28 @@ export const load: PageServerLoad = async ({ url, params, cookies }) => {
 	const artists = await fetcher(
 		`${API_URL}/users/${userID}/scrobbles/top/artists?period=overall&artist=${artistID}&limit=1`,
 		'GET',
-		null,
-		cookies
+		cookies,
+		null
 	);
 
 	const albums = await fetcher(
 		`${API_URL}/users/${userID}/scrobbles/top/albums?&period=overall&artist=${artistID}&limit=6`,
 		'GET',
-		null,
-		cookies
+		cookies,
+		null
 	);
 	const tracks = await fetcher(
 		`${API_URL}/users/${userID}/scrobbles/top/tracks?period=overall&artist=${artistID}&limit=6`,
 		'GET',
-		null,
-		cookies
+		cookies,
+		null
 	);
 
 	const history = await fetcher(
 		`${API_URL}/users/${userID}/scrobbles/history?artist=${artistID}`,
 		'GET',
-		null,
-		cookies
+		cookies,
+		null
 	);
 
 	return {

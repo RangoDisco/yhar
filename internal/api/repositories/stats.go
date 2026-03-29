@@ -60,6 +60,10 @@ func (r *StatsRepository) FindTopArtistsForUser(ctx context.Context, params *Sta
 		Joins("LEFT JOIN images i ON i.id = ar.picture_id").
 		Group("ar.id, ar.name, i.path, i.type, i.domain")
 
+	if params.TrackArtistID != nil {
+		query = query.Where("ar.id = ?", *params.TrackArtistID)
+	}
+
 	err := query.Count(&totalCount).Error
 	if err != nil {
 		return nil, 0, fmt.Errorf("unable to count top artists: %w", err)

@@ -1,5 +1,8 @@
 <script>
     import * as Avatar from "$lib/components/ui/avatar/index";
+    import {Image} from '@lucide/svelte';
+    import disc from "$lib/assets/placeholders/disc-3.svg";
+    import user from "$lib/assets/placeholders/user.svg";
 
     import {page} from "$app/state";
 
@@ -23,11 +26,15 @@
             <Avatar.Root class="{contentType !== 'artists' ? 'rounded-md' : ''} h-12 w-12 ">
                 <Avatar.Image src={pictureUrl}
                               alt={`${title}'s picture`}/>
-                <Avatar.Fallback>{title}</Avatar.Fallback>
+                <Avatar.Fallback>
+                    <img class="rounded-full h-12 w-12" src={contentType === "artists" ? user: disc}
+                         alt="Artist placeholder"/>
+                </Avatar.Fallback>
             </Avatar.Root>
             <div class="flex flex-col">
                 {#if contentID}
-                    <a class="hover:underline" href="/users/{page.params.userID}/top/{contentType}/{contentID}">{title}</a>
+                    <a class="hover:underline"
+                       href="/users/{page.params.userID}/top/{contentType}/{contentID}">{title}</a>
                 {:else}
                     <p>{title}</p>
                 {/if}

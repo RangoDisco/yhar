@@ -58,8 +58,11 @@ type MetadataProvider interface {
 	// GetTrackByInfos fetches a track from the scrobble data
 	GetTrackByInfos(ctx context.Context, infos ScrobbleData) (*TrackMetadata, error)
 
-	// GetArtistImage fetches an artist's image URL (not all providers supports it)
+	// GetArtistImage fetches an artist's image URL (not all providers support it)
 	GetArtistImage(ctx context.Context, mbid, name string) (string, error)
+
+	// GetAlbumImage fetches an album's image URL (not all providers support it)
+	GetAlbumImage(ctx context.Context, title, artist string) (string, error)
 }
 
 // sendRequest ensures to not exceed rate limit, execute the request and unmarshal the body into the given interface

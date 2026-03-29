@@ -2,8 +2,10 @@ package providers
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/url"
+	"strings"
 )
 
 type DeezerProvider struct {
@@ -16,7 +18,18 @@ type ArtistRes struct {
 }
 
 type Artist struct {
+	Name    string `json:"name"`
 	Picture string `json:"picture_medium"`
+}
+
+type AlbumRes struct {
+	Data []Album `json:"data"`
+}
+
+type Album struct {
+	Title  string `json:"title"`
+	Cover  string `json:"cover_medium"`
+	Artist Artist `json:"artist"`
 }
 
 func NewDeezerProvider() MetadataProvider {
@@ -49,10 +62,36 @@ func (d *DeezerProvider) GetArtistImage(ctx context.Context, _, name string) (st
 	}
 
 	if artistRes.Data == nil || len(artistRes.Data) == 0 {
-		return "", fmt.Errorf("no artist found")
+		return "", errors.New("no artist found")
 	}
 
 	artist := artistRes.Data[0]
 
 	return artist.Picture, nil
+}
+
+func (d *DeezerProvider) GetAlbumImage(ctx context.Context, title, artist string) (string, error) {
+	params := url.Values{
+		"q": {title},
+	}
+
+	endpoint := fmt.Sprintf("%s/%s", d.baseURL, "album")
+
+	var albumRes AlbumRes
+	err := sendRequest(ctx, endpoint, nil, nil, params, &albumRes)
+	if err != nil {
+		return "", fmt.Errorf("unable to search album: %w", err)
+	}
+
+	if albumRes.Data == nil || len(albumRes.Data) == 0 {
+		return "", errors.New("no album found")
+	}
+
+	for _, album := range albumRes.Data {
+		if strings.ToLower(album.Title) == strings.ToLower(title) && strings.ToLower(album.Artist.Name) == strings.ToLower(artist) {
+			return album.Cover, nil
+		}
+	}
+
+	return "", errors.New("no matching album found")
 }

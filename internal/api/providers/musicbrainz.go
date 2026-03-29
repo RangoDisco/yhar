@@ -327,3 +327,7 @@ func (p *MusicBrainzProvider) getAlbumCover(ctx context.Context, releaseID strin
 
 	return "", nil
 }
+
+func (p *MusicBrainzProvider) GetAlbumImage(ctx context.Context, title, artist string) (string, error) {
+	panic("not implemented yet")
+}

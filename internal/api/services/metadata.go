@@ -58,23 +58,32 @@ func (s *MetadataService) enrichMetadata(ctx context.Context, infos *providers.S
 		}
 	}
 
-	// If MusicBrainz wasn't enough, try all others until data was found
-	if trackInfo == nil {
-		// TODO:
-		for _, p := range s.providers {
-			// Skip MusicBrainz as it was already used
-			if p.Name() == "musicbrainz" {
-				continue
-			}
-		}
-	}
+	// TODO: If MusicBrainz wasn't enough, try all others until data was found
+	//if trackInfo == nil {
+	//	// TODO:
+	//	for _, p := range s.providers {
+	//		// Skip MusicBrainz as it was already used
+	//		if p.Name() == "musicbrainz" {
+	//			continue
+	//		}
+	//	}
+	//}
 
 	// If track info is still nil after all providers were called, return the errors
 	if trackInfo == nil {
 		return nil, fmt.Errorf("%w, %v", ErrNoMetadataFound, errors.Join(errs...))
 	}
 
-	// Maybe handle errs and log ?
+	if trackInfo.Album.ImageURL == "" {
+		// Fallback to deezer for album image
+		dzProvider := s.findProviderByName("deezer")
+		img, err := dzProvider.GetAlbumImage(ctx, trackInfo.Album.Title, trackInfo.Album.Artists[0].Name)
+		if err == nil {
+			trackInfo.Album.ImageURL = img
+		}
+	}
+
+	// TODO: Maybe handle errs and log ?
 	s.addPicturesToArtists(ctx, trackInfo)
 
 	return &providers.InfoResponse{

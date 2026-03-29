@@ -260,10 +260,8 @@ func (r *StatsRepository) buildImageURL(imageType, domain, path string) *string 
 	baseURL := os.Getenv("BASE_URL")
 	switch imageType {
 	case "distant":
-		contentURL := fmt.Sprintf("%s/%s", domain, path)
-		return &contentURL
+		return new(fmt.Sprintf("%s/%s", domain, path))
 	default:
-		contentURL := fmt.Sprintf("%s/images/%s", baseURL, path)
-		return &contentURL
+		return new(fmt.Sprintf("%s/images/%s", baseURL, path))
 	}
 }

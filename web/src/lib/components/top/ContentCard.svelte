@@ -2,7 +2,7 @@
     import * as Avatar from "$lib/components/ui/avatar/index";
 
     import {page} from "$app/state";
-    console.log("GOONCLUB")
+
     let {
         title,
         contentID = $bindable(null),

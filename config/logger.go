@@ -5,7 +5,17 @@ import (
 	"os"
 )
 
-func SetupLogger() *slog.Logger {
-	return slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
-		Level: slog.LevelInfo}))
+func SetupLogger() {
+	var minLevel slog.Level
+
+	switch os.Getenv("APP_ENV") {
+	case "debug":
+		minLevel = slog.LevelDebug
+	default:
+		minLevel = slog.LevelInfo
+	}
+
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
+		Level: minLevel}))
+	slog.SetDefault(logger)
 }

@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
+	"log/slog"
 	"os"
 	"sync"
 	"time"
@@ -84,7 +84,11 @@ func (i *MalojaImporter) Import(ctx context.Context) error {
 			defer sem.Release(1)
 			err = i.importScrobble(ctx, scrobble)
 			if err != nil {
-				log.Printf("unable to import scrobble: %s - %s : %s \n", scrobble.Track.Artists, scrobble.Track.Title, err)
+				slog.Error("unable to import scrobble:",
+					slog.String("artist", scrobble.Track.Artists[0]),
+					slog.String("track", scrobble.Track.Title),
+					slog.String("error", err.Error()),
+				)
 			}
 		}()
 	}
@@ -104,6 +108,11 @@ func (i *MalojaImporter) importScrobble(ctx context.Context, scrobble malojaScro
 	if err != nil {
 		return fmt.Errorf("unable to handle to new scrobble: %w", err)
 	}
+
+	slog.Debug("scrobble imported successfully",
+		slog.String("artist", uScrobble.Artist),
+		slog.String("track", uScrobble.Title),
+	)
 
 	return nil
 }

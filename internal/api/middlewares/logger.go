@@ -19,6 +19,7 @@ func LoggerMiddleware() gin.HandlerFunc {
 			slog.String("method", c.Request.Method),
 			slog.String("path", c.Request.URL.Path),
 			slog.String("ip", c.ClientIP()),
+			slog.String("user_agent", c.Request.UserAgent()),
 			slog.String("duration", time.Since(startTime).String()),
 			slog.Int("status", c.Writer.Status()),
 		}
@@ -34,8 +35,8 @@ func LoggerMiddleware() gin.HandlerFunc {
 		}
 
 		if len(c.Errors) > 0 {
-			args = append(args, slog.String("error", c.Errors.Last().Error()))
-			slog.Error("Request completed with errors", args...)
+			args = append(args, slog.Any("error", c.Errors.Last()))
+			slog.ErrorContext(c.Request.Context(), "Request completed with errors", args...)
 		} else {
 			slog.Info("Request completed", args...)
 		}

@@ -8,7 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
+	"log/slog"
 	"math/rand"
 	"net/http"
 	"os"
@@ -56,10 +56,10 @@ func (p *SubsonicPoller) Start(ctx context.Context) {
 		case <-ticker.C:
 			err := p.PollPlaying(ctx)
 			if err != nil {
-				log.Printf("unable to poll subsonic : %v", err)
+				slog.Error("unable to poll subsonic", slog.String("error", err.Error()))
 			}
 		case <-ctx.Done():
-			log.Printf("Subsonic poller stopped")
+			slog.Debug("Subsonic poller stopped")
 			return
 		}
 	}
@@ -89,7 +89,7 @@ func (p *SubsonicPoller) PollPlaying(ctx context.Context) error {
 	defer func(Body io.ReadCloser) {
 		err = Body.Close()
 		if err != nil {
-			log.Println(err)
+			slog.Error("unable to close body", slog.String("error", err.Error()))
 		}
 	}(res.Body)
 
@@ -104,11 +104,16 @@ func (p *SubsonicPoller) PollPlaying(ctx context.Context) error {
 
 	// No need to go further if nothing is being played
 	if len(nowPlayingRes.NowPlaying.Entry) == 0 {
+		slog.Debug("polled subsonic, no track were currently played")
 		return nil
 	}
 
 	errChan := make(chan error, len(nowPlayingRes.NowPlaying.Entry))
 	for _, e := range nowPlayingRes.NowPlaying.Entry {
+		slog.Debug("polled subsonic, found track being played",
+			slog.String("track", e.Title),
+			slog.String("album", e.Album),
+			slog.String("artist", e.Artist))
 		go func() {
 			errChan <- p.handleEntry(ctx, e)
 		}()

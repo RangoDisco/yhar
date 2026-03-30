@@ -3,6 +3,7 @@ package config
 import (
 	"time"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	serverConfig "github.com/rangodisco/yhar/internal/api/config"
 	"github.com/rangodisco/yhar/internal/api/middlewares"
@@ -23,8 +24,11 @@ func SetupRouter(
 
 func loadRoutes(r *gin.Engine, repo *serverConfig.Repositories, s *serverConfig.Services, h *serverConfig.Handlers) {
 	api := r.Group("/api")
-	api.Use(middlewares.TimeoutMiddleware(10 * time.Second))
 	api.Use(middlewares.LoggerMiddleware())
+	api.Use(cors.Default())
+	api.Use(middlewares.SecurityMiddleware())
+	api.Use(middlewares.RateLimiter())
+	api.Use(middlewares.TimeoutMiddleware(10 * time.Second))
 
 	r.Static("/images", "images")
 

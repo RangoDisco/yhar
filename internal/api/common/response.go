@@ -29,15 +29,10 @@ type Pagination struct {
 }
 
 func RespondWithError(c *gin.Context, statusCode int, err error, message string) {
-	rawLogger, exists := c.Get("logger")
-	logger, ok := rawLogger.(*slog.Logger)
-	if exists && ok {
-		logger.Error(message,
-			slog.Int("status_code", statusCode),
-			slog.String("error", err.Error()),
-		)
+	contextErr := c.Error(err)
+	if contextErr != nil {
+		slog.Error("request failed but unable to get error", slog.String("err", contextErr.Error()))
 	}
-
 	c.AbortWithStatusJSON(statusCode, ErrorResponse{Error: ErrorMessage{
 		Message: message,
 	}})

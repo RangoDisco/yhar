@@ -1,8 +1,6 @@
 package config
 
 import (
-	"log/slog"
-
 	"github.com/gin-gonic/gin"
 	serverConfig "github.com/rangodisco/yhar/internal/api/config"
 	"github.com/rangodisco/yhar/internal/api/middlewares"
@@ -13,17 +11,17 @@ func SetupRouter(
 	s *serverConfig.Services,
 	h *serverConfig.Handlers,
 ) *gin.Engine {
-	l := SetupLogger()
+	SetupLogger()
 	r := gin.New()
 
-	loadRoutes(r, repo, s, h, l)
+	loadRoutes(r, repo, s, h)
 
 	return r
 }
 
-func loadRoutes(r *gin.Engine, repo *serverConfig.Repositories, s *serverConfig.Services, h *serverConfig.Handlers, l *slog.Logger) {
+func loadRoutes(r *gin.Engine, repo *serverConfig.Repositories, s *serverConfig.Services, h *serverConfig.Handlers) {
 	api := r.Group("/api")
-	api.Use(middlewares.LoggerMiddleware(l))
+	api.Use(middlewares.LoggerMiddleware())
 
 	r.Static("/images", "images")
 

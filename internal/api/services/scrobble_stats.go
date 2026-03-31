@@ -16,6 +16,7 @@ type StatsRequestParams struct {
 	UserID     string
 	Period     dto.Period
 	ArtistID   *string
+	AlbumID    *string
 	TrackID    *string
 	Pagination struct {
 		Page  int
@@ -51,6 +52,7 @@ func (s *ScrobbleStatsService) FetchUserTopAlbums(ctx context.Context, params *S
 	queryParams := &repositories.StatsAlbumQueryParams{
 		BaseStatsQueryParams: s.buildBaseParams(params),
 		AlbumArtistID:        params.ArtistID,
+		AlbumID:              params.AlbumID,
 	}
 	return s.repo.FindTopAlbumsForUser(ctx, queryParams)
 }
@@ -60,6 +62,7 @@ func (s *ScrobbleStatsService) FetchUserTopTracks(ctx context.Context, params *S
 		BaseStatsQueryParams: s.buildBaseParams(params),
 		TrackID:              params.TrackID,
 		TrackArtistID:        params.ArtistID,
+		AlbumID:              params.AlbumID,
 	}
 	return s.repo.FindTopTracksForUser(ctx, queryParams)
 }

@@ -33,10 +33,12 @@ type StatsArtistQueryParams struct {
 type StatsAlbumQueryParams struct {
 	BaseStatsQueryParams
 	AlbumArtistID *string
+	AlbumID       *string
 }
 
 type StatsTrackQueryParams struct {
 	BaseStatsQueryParams
+	AlbumID       *string
 	TrackArtistID *string
 	TrackID       *string
 	GroupBy       *string
@@ -106,6 +108,10 @@ func (r *StatsRepository) FindTopAlbumsForUser(ctx context.Context, params *Stat
 		query = query.Where("EXISTS(SELECT 1 FROM artist_albums aral2 WHERE aral2.album_id = al.id AND aral2.artist_id = ?)", params.AlbumArtistID)
 	}
 
+	if params.AlbumID != nil {
+		query = query.Where("al.id = ? ", params.AlbumID)
+	}
+
 	err := query.Count(&totalCount).Error
 	if err != nil {
 		return nil, 0, fmt.Errorf("unable to count top albums: %w", err)
@@ -150,6 +156,10 @@ func (r *StatsRepository) FindTopTracksForUser(ctx context.Context, params *Stat
 
 	if params.TrackArtistID != nil {
 		query = query.Where("EXISTS(SELECT 1 FROM track_artists trar2 WHERE trar2.track_id = tr.id AND trar2.artist_id = ?)", params.TrackArtistID)
+	}
+
+	if params.AlbumID != nil {
+		query = query.Where("al.id = ?", params.AlbumID)
 	}
 
 	err := query.Count(&totalCount).Error

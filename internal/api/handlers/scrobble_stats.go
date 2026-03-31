@@ -85,6 +85,10 @@ func (h *ScrobbleStatsHandler) parseStatsParams(c *gin.Context) (*services.Stats
 		params.TrackID = &trackID
 	}
 
+	if albumID := c.Query("album"); albumID != "" {
+		params.AlbumID = &albumID
+	}
+
 	return params, nil
 }
 

@@ -3,16 +3,22 @@
     import * as Pagination from "$lib/components/ui/pagination/index";
     import ContentListItem from "$lib/components/top/ContentListItem.svelte";
     import {goto} from "$app/navigation";
+    import {page} from "$app/state";
 
     let {data} = $props();
     const periods = ["week", "month", "year", "overall"];
 
     const handlePeriodChange = (period: string) => {
-        goto(`?period=${period}&page=1`, {keepFocus: true});
+        const query = new URLSearchParams(page.url.searchParams.toString());
+        query.set("period", period);
+        query.set("page", "1");
+        goto(`?${query.toString()}`, {keepFocus: true});
     };
 
-    const handlePageChange = (page: number) => {
-        goto(`?period=${data.period}&page=${page}`);
+    const handlePageChange = (newPage: number) => {
+        const query = new URLSearchParams(page.url.searchParams.toString());
+        query.set("page", newPage.toString());
+        goto(`?${query.toString()}`, {keepFocus: true});
     };
 
 </script>

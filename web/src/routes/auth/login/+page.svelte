@@ -12,7 +12,6 @@
 
 
     let {data, form}: PageProps = $props();
-    console.log(form);
 </script>
 
 <div class="w-md md:w-lg 2xl:w-xl max-w-2xl mx-auto justify-center">

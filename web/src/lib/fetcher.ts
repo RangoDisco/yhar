@@ -36,5 +36,11 @@ export const fetcher = async (
 		redirect(302, `/auth/login`);
 	}
 
-	throw new Error(response.statusText);
+	// TODO: use a real 404 page
+	if (response.status === 404) {
+		redirect(302, '/auth/login');
+	}
+
+	return null
+
 };

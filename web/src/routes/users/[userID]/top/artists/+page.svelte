@@ -34,7 +34,7 @@
                 <ContentListItem index={i} contentID={artist.id} title={artist.name} parents={[]}
                                  pictureUrl={artist.picture_url}
                                  scrobbleCount={artist.scrobble_count}
-                                 mode="artists"
+                                 parentType={null}
                                  contentType="artists"/>
             {/each}
             <Pagination.Root count={data.artists.pagination.total_count} perPage={10} page={data.page}

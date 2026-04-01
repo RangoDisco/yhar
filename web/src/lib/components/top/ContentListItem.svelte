@@ -1,6 +1,5 @@
 <script>
     import * as Avatar from "$lib/components/ui/avatar/index";
-    import {Image} from '@lucide/svelte';
     import disc from "$lib/assets/placeholders/disc-3.svg";
     import user from "$lib/assets/placeholders/user.svg";
 

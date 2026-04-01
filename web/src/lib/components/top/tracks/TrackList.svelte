@@ -9,7 +9,7 @@
 </script>
 
 
-<ContentListWrapper title="Top tracks" url="tracks{params}">
+<ContentListWrapper title="Top tracks" url="top/tracks{params}">
     <div class="flex flex-col gap-4">
         {#each tracks as track, i (track.id)}
             <ContentListItem index={i} title={track.title}

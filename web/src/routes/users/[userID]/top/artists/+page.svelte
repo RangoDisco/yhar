@@ -30,7 +30,7 @@
     </Tabs.List>
     {#each periods as period}
         <Tabs.Content value={period} class="flex flex-col gap-8">
-            {#each data.artists.results as artist, i}
+            {#each data.artists.results as artist, i (artist.id)}
                 <ContentListItem index={i} contentID={artist.id} title={artist.name} parents={[]}
                                  pictureUrl={artist.picture_url}
                                  scrobbleCount={artist.scrobble_count}

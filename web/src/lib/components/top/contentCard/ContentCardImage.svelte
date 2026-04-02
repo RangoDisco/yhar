@@ -1,17 +1,18 @@
 <script lang="ts">
     import disc from "$lib/assets/placeholders/disc-3.svg";
-    import user from "$lib/assets/placeholders/user.svg"
+    import user from "$lib/assets/placeholders/user.jpg";
 
     let {
         contentType,
         pictureUrl,
     } = $props();
+
+    let fallback = $derived(contentType === "artists" ? user : disc);
 </script>
 
-{#if contentType === "artists"}
-    <img class="rounded-full w-full aspect-square" src={pictureUrl ?? user}
-         alt={`Content picture`}/>
-{:else}
-    <img class="rounded-md w-full aspect-square" src={pictureUrl ?? disc}
-         alt={`Content picture`}/>
-{/if}
+<img
+    class="w-full aspect-square object-cover {contentType === 'artists' ? 'rounded-full' : 'rounded-md'}"
+    src={pictureUrl ?? fallback}
+    alt="Content's cover"
+    onerror={() => pictureUrl = fallback}
+/>

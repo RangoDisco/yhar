@@ -1,4 +1,4 @@
-import { type Cookies, redirect } from '@sveltejs/kit';
+import { type Cookies, error, redirect } from '@sveltejs/kit';
 
 export const fetcher = async (
 	url: string,
@@ -36,11 +36,9 @@ export const fetcher = async (
 		redirect(302, `/auth/login`);
 	}
 
-	// TODO: use a real 404 page
 	if (response.status === 404) {
-		redirect(302, '/auth/login');
+		error(404, 'Not found');
 	}
 
-	return null
-
+	return null;
 };

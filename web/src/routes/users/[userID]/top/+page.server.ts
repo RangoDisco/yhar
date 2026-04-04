@@ -26,9 +26,9 @@ export const load: PageServerLoad = async ({ url, params, cookies }) => {
 		)
 	});
 
-	const overall = getStreamedPeriodData('overall');
-	const year = getStreamedPeriodData('year');
-	const month = getStreamedPeriodData('month');
+	const overall = getStreamedPeriodData('overall').catch(() => null);
+	const year = getStreamedPeriodData('year').catch(() => null);
+	const month = getStreamedPeriodData('month').catch(() => null);
 	const week = await getStreamedPeriodData('week');
 
 	const history = await fetcher(

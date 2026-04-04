@@ -3,7 +3,7 @@
     import ContentListItem from "$lib/components/top/ContentListItem.svelte";
     import ContentListWrapper from "$lib/components/top/ContentListWrapper.svelte";
     import HistoryListItem from "$lib/components/top/tracks/HistoryListItem.svelte";
-    import ContentCard from "$lib/components/top/contentCard/contentCard.svelte";
+    import ContentCard from "$lib/components/top/contentCard/ContentCard.svelte";
     import {page} from "$app/state";
 
     const {data} = $props();

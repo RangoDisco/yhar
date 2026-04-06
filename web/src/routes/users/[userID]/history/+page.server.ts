@@ -8,7 +8,7 @@ export const load: PageServerLoad = async ({ url, params, cookies }) => {
 	const artist = url.searchParams.get('artist') ?? '';
 
 	const history = await fetcher(
-		`${API_URL}/users/${userID}/scrobbles/history?artist=${artist}&page=${page}&limit=20`,
+		`${API_URL}/users/${userID}/scrobbles/history?artist=${artist}&page=${page}&period=overall&limit=20`,
 		'GET',
 		cookies,
 		null

@@ -1,11 +1,20 @@
 import type { PageServerLoad } from './$types';
 import { API_URL } from '$env/static/private';
 import { fetcher } from '$lib/fetcher';
+import type { Paginated } from '$lib/types/pagination';
+import type { Album, Artist, Track } from '$lib/types/content';
+import { Period } from '$lib/types/period';
 
 export const load: PageServerLoad = async ({ url, params, cookies }) => {
 	const { userID } = params;
 
-	const getStreamedPeriodData = async (period: 'week' | 'month' | 'year' | 'overall') => ({
+	const getStreamedPeriodData = async (
+		period: Period
+	): Promise<{
+		artists: Paginated<Artist>;
+		albums: Paginated<Album>;
+		tracks: Paginated<Track>;
+	}> => ({
 		artists: await fetcher(
 			`${API_URL}/users/${userID}/scrobbles/top/artists?period=${period}&limit=6`,
 			'GET',
@@ -26,12 +35,12 @@ export const load: PageServerLoad = async ({ url, params, cookies }) => {
 		)
 	});
 
-	const overall = getStreamedPeriodData('overall').catch(() => null);
-	const year = getStreamedPeriodData('year').catch(() => null);
-	const month = getStreamedPeriodData('month').catch(() => null);
-	const week = await getStreamedPeriodData('week');
+	const overall = getStreamedPeriodData(Period.overall).catch(() => null);
+	const year = getStreamedPeriodData(Period.year).catch(() => null);
+	const month = getStreamedPeriodData(Period.month).catch(() => null);
+	const week = await getStreamedPeriodData(Period.week);
 
-	const history = await fetcher(
+	const history: Paginated<Track> = await fetcher(
 		`${API_URL}/users/${userID}/scrobbles/history`,
 		'GET',
 		cookies,

@@ -1,6 +1,8 @@
 import type { PageServerLoad } from './$types';
 import { fetcher } from '$lib/fetcher';
 import { API_URL } from '$env/static/private';
+import type { Album } from '$lib/types/content';
+import type { Paginated } from '$lib/types/pagination';
 
 export const load: PageServerLoad = async ({ url, params, cookies }) => {
 	const { userID } = params;
@@ -14,7 +16,7 @@ export const load: PageServerLoad = async ({ url, params, cookies }) => {
 		queryUrl = queryUrl + `&artist=${artist}`;
 	}
 
-	const albums = await fetcher(queryUrl, 'GET', cookies, null);
+	const albums: Paginated<Album> = await fetcher(queryUrl, 'GET', cookies, null);
 
 	return {
 		period,

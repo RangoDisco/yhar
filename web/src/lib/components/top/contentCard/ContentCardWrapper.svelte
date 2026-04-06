@@ -1,5 +1,6 @@
 <script lang="ts">
     import {page} from "$app/state";
+    import type {Snippet} from "svelte";
 
     type Props = {
         contentType: string;
@@ -11,7 +12,7 @@
         contentType,
         contentID = $bindable(null),
         children,
-    } = $props();
+    }: Props = $props();
 </script>
 
 <!-- Make card clickable if contentID is provided -->

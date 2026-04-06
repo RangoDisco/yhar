@@ -1,11 +1,17 @@
 <script lang="ts">
     import ContentListItem from "$lib/components/top/ContentListItem.svelte";
     import ContentListWrapper from "$lib/components/top/ContentListWrapper.svelte";
+    import type {Track} from "$lib/types/content";
+
+    type Props = {
+        tracks: Track[]
+        params: string | null
+    }
 
     let {
         tracks,
         params = $bindable(""),
-    } = $props();
+    }: Props = $props();
 </script>
 
 

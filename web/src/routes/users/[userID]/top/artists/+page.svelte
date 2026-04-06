@@ -7,6 +7,7 @@
 
     let {data} = $props();
     const periods = ["week", "month", "year", "overall"];
+    let currentPage = $derived(parseInt(data.page));
 
     const handlePeriodChange = (period: string) => {
         const query = new URLSearchParams(page.url.searchParams.toString());
@@ -37,7 +38,7 @@
                                  parentType={null}
                                  contentType="artists"/>
             {/each}
-            <Pagination.Root count={data.artists.pagination.total_count} perPage={10} page={data.page}
+            <Pagination.Root count={data.artists.pagination.total_count} perPage={10} page={currentPage}
                              onPageChange={handlePageChange}>
                 {#snippet children({pages, currentPage})}
                     <Pagination.Content>

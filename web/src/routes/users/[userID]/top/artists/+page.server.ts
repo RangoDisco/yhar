@@ -4,7 +4,7 @@ import { API_URL } from '$env/static/private';
 
 export const load: PageServerLoad = async ({ url, params, cookies }) => {
 	const { userID } = params;
-	const page = url.searchParams.get('page') ?? 1;
+	const page = url.searchParams.get('page') ?? '1';
 	const period = url.searchParams.get('period') ?? 'week';
 
 	const artists = await fetcher(
@@ -16,6 +16,7 @@ export const load: PageServerLoad = async ({ url, params, cookies }) => {
 
 	return {
 		period,
-		artists
+		artists,
+		page
 	};
 };

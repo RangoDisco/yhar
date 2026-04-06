@@ -7,15 +7,19 @@
 
     let {data} = $props();
     const periods = ["week", "month", "year", "overall"];
+    let currentPage = $derived(parseInt(data.page))
 
     const handlePeriodChange = (period: string) => {
-        page.url.searchParams.set("period", period);
-        goto(page.url, {keepFocus: true});
+        const query = new URLSearchParams(page.url.searchParams.toString());
+        query.set("period", period);
+        query.set("page", "1");
+        goto(`?${query.toString()}`, {keepFocus: true});
     };
 
     const handlePageChange = (newPage: number) => {
-        page.url.searchParams.set("page", newPage.toString());
-        goto(page.url);
+        const query = new URLSearchParams(page.url.searchParams.toString());
+        query.set("page", newPage.toString());
+        goto(`?${query.toString()}`, {keepFocus: true});
     };
 
 </script>
@@ -27,7 +31,7 @@
     </Tabs.List>
     {#each periods as period}
         <Tabs.Content value={period} class="flex flex-col gap-8">
-            {#each data.albums.results as album, i}
+            {#each data.albums.results as album, i (album.id)}
                 <ContentListItem index={i} contentID={album.id} title={album.title}
                                  pictureUrl={album.picture_url}
                                  scrobbleCount={album.scrobble_count}
@@ -35,7 +39,7 @@
                                  parents={album.artists}
                                  contentType="albums"/>
             {/each}
-            <Pagination.Root count={data.albums.pagination.total_count} perPage={10} page={data.page}
+            <Pagination.Root count={data.albums.pagination.total_count} perPage={10} page={currentPage}
                              onPageChange={handlePageChange}>
                 {#snippet children({pages, currentPage})}
                     <Pagination.Content>

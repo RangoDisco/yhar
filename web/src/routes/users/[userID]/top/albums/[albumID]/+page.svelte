@@ -11,15 +11,17 @@
         <img class="rounded-md aspect-square h-24" src={data.album.picture_url} alt="{data.album.title}'s picture"/>
         <div class="flex flex-col">
             <p class="text-3xl">{data.album.title}</p>
-            {#each data.album.artists as artist, i}
-                {#if i < 3}
-                    {#if i !== 0}
-                        ·
+            <div class="flex gap-1 items-center">
+                {#each data.album.artists as artist, i}
+                    {#if i < 3}
+                        {#if i !== 0}
+                            ·
+                        {/if}
+                        <a class="text-sm text-muted-foreground hover:underline"
+                           href="/users/{page.params.userID}/top/artists/{artist.id}">{artist.name}</a>
                     {/if}
-                    <a class="text-sm text-muted-foreground hover:underline"
-                       href="/users/{page.params.userID}/top/artists/{artist.id}">{artist.name}</a>
-                {/if}
-            {/each}
+                {/each}
+            </div>
             <p class="text-muted-foreground">{data.album.scrobble_count} scrobbles</p>
         </div>
     </section>

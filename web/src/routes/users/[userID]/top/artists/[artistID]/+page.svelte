@@ -31,7 +31,7 @@
         <ContentListWrapper title="Top tracks" url="top/tracks?artist={data.artist.id}">
             <div class="flex flex-col gap-4">
                 {#each data.tracks.results as track, i (track.id)}
-                    <ContentListItem index={i} title={track.title}
+                    <ContentListItem index={i+1} title={track.title}
                                      pictureUrl={track.picture_url}
                                      scrobbleCount={track.scrobble_count}
                                      parentType="albums"

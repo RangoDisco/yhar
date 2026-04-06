@@ -1,26 +1,14 @@
 <script lang="ts">
     import * as Tabs from "$lib/components/ui/tabs/index";
-    import * as Pagination from "$lib/components/ui/pagination/index";
     import ContentListItem from "$lib/components/top/ContentListItem.svelte";
-    import {goto} from "$app/navigation";
-    import {page} from "$app/state";
+    import {handlePeriodChange, PER_PAGE} from "$lib/pagination";
+    import Paginator from "$lib/components/Paginator.svelte";
 
     let {data} = $props();
     const periods = ["week", "month", "year", "overall"];
-    let currentPage = $derived(parseInt(data.page))
+    let currentPage = $derived(parseInt(data.page));
+    let firstIndex = $derived((currentPage - 1) * PER_PAGE + 1);
 
-    const handlePeriodChange = (period: string) => {
-        const query = new URLSearchParams(page.url.searchParams.toString());
-        query.set("period", period);
-        query.set("page", "1");
-        goto(`?${query.toString()}`, {keepFocus: true});
-    };
-
-    const handlePageChange = (newPage: number) => {
-        const query = new URLSearchParams(page.url.searchParams.toString());
-        query.set("page", newPage.toString());
-        goto(`?${query.toString()}`, {keepFocus: true});
-    };
 
 </script>
 <Tabs.Root value={data.period} onValueChange={handlePeriodChange}>
@@ -32,39 +20,14 @@
     {#each periods as period}
         <Tabs.Content value={period} class="flex flex-col gap-8">
             {#each data.albums.results as album, i (album.id)}
-                <ContentListItem index={i} contentID={album.id} title={album.title}
+                <ContentListItem index={firstIndex + i} contentID={album.id} title={album.title}
                                  pictureUrl={album.picture_url}
                                  scrobbleCount={album.scrobble_count}
                                  parentType="artists"
                                  parents={album.artists}
                                  contentType="albums"/>
             {/each}
-            <Pagination.Root count={data.albums.pagination.total_count} perPage={10} page={currentPage}
-                             onPageChange={handlePageChange}>
-                {#snippet children({pages, currentPage})}
-                    <Pagination.Content>
-                        <Pagination.Item>
-                            <Pagination.Previous/>
-                        </Pagination.Item>
-                        {#each pages as page (page.key)}
-                            {#if page.type === "ellipsis"}
-                                <Pagination.Item>
-                                    <Pagination.Ellipsis/>
-                                </Pagination.Item>
-                            {:else}
-                                <Pagination.Item>
-                                    <Pagination.Link {page} isActive={currentPage === page.value}>
-                                        {page.value}
-                                    </Pagination.Link>
-                                </Pagination.Item>
-                            {/if}
-                        {/each}
-                        <Pagination.Item>
-                            <Pagination.Next/>
-                        </Pagination.Item>
-                    </Pagination.Content>
-                {/snippet}
-            </Pagination.Root>
+            <Paginator totalCount={data.albums.pagination.total_count} page={currentPage}/>
         </Tabs.Content>
     {/each}
 </Tabs.Root>

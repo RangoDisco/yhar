@@ -1,26 +1,13 @@
 <script lang="ts">
     import * as Tabs from "$lib/components/ui/tabs/index";
-    import * as Pagination from "$lib/components/ui/pagination/index";
     import ContentListItem from "$lib/components/top/ContentListItem.svelte";
-    import {goto} from "$app/navigation";
-    import {page} from "$app/state";
+    import {handlePeriodChange, PER_PAGE} from "$lib/pagination";
+    import Paginator from "$lib/components/Paginator.svelte";
 
     let {data} = $props();
     const periods = ["week", "month", "year", "overall"];
     let currentPage = $derived(parseInt(data.page));
-
-    const handlePeriodChange = (period: string) => {
-        const query = new URLSearchParams(page.url.searchParams.toString());
-        query.set("period", period);
-        query.set("page", "1");
-        goto(`?${query.toString()}`, {keepFocus: true});
-    };
-
-    const handlePageChange = (newPage: number) => {
-        const query = new URLSearchParams(page.url.searchParams.toString());
-        query.set("page", newPage.toString());
-        goto(`?${query.toString()}`, {keepFocus: true});
-    };
+    let firstIndex = $derived((currentPage - 1) * PER_PAGE + 1);
 
 </script>
 <Tabs.Root value={data.period} onValueChange={handlePeriodChange}>
@@ -32,38 +19,13 @@
     {#each periods as period}
         <Tabs.Content value={period} class="flex flex-col gap-8">
             {#each data.artists.results as artist, i (artist.id)}
-                <ContentListItem index={i} contentID={artist.id} title={artist.name} parents={[]}
+                <ContentListItem index={firstIndex + i} contentID={artist.id} title={artist.name} parents={[]}
                                  pictureUrl={artist.picture_url}
                                  scrobbleCount={artist.scrobble_count}
                                  parentType={null}
                                  contentType="artists"/>
             {/each}
-            <Pagination.Root count={data.artists.pagination.total_count} perPage={10} page={currentPage}
-                             onPageChange={handlePageChange}>
-                {#snippet children({pages, currentPage})}
-                    <Pagination.Content>
-                        <Pagination.Item>
-                            <Pagination.Previous/>
-                        </Pagination.Item>
-                        {#each pages as page (page.key)}
-                            {#if page.type === "ellipsis"}
-                                <Pagination.Item>
-                                    <Pagination.Ellipsis/>
-                                </Pagination.Item>
-                            {:else}
-                                <Pagination.Item>
-                                    <Pagination.Link {page} isActive={currentPage === page.value}>
-                                        {page.value}
-                                    </Pagination.Link>
-                                </Pagination.Item>
-                            {/if}
-                        {/each}
-                        <Pagination.Item>
-                            <Pagination.Next/>
-                        </Pagination.Item>
-                    </Pagination.Content>
-                {/snippet}
-            </Pagination.Root>
+            <Paginator totalCount={data.artists.pagination.total_count} page={currentPage}/>
         </Tabs.Content>
     {/each}
 </Tabs.Root>

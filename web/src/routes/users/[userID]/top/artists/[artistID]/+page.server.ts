@@ -27,7 +27,7 @@ export const load: PageServerLoad = async ({ url, params, cookies }) => {
 	);
 
 	const history = await fetcher(
-		`${API_URL}/users/${userID}/scrobbles/history?artist=${artistID}`,
+		`${API_URL}/users/${userID}/scrobbles/history?artist=${artistID}&period=overall`,
 		'GET',
 		cookies,
 		null

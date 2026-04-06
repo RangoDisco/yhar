@@ -4,7 +4,6 @@
     import ContentListWrapper from "$lib/components/top/ContentListWrapper.svelte";
     import HistoryListItem from "$lib/components/top/tracks/HistoryListItem.svelte";
     import ContentCard from "$lib/components/top/contentCard/ContentCard.svelte";
-    import {page} from "$app/state";
 
     const {data} = $props();
     const periods = ['week', 'month', 'year', 'overall'];
@@ -46,7 +45,7 @@
                     <ContentListWrapper title="Top tracks" url="top/tracks">
                         <div class="flex flex-col gap-4">
                             {#each periodData.tracks.results as track, i (track.id)}
-                                <ContentListItem index={i} title={track.title}
+                                <ContentListItem index={i+1} title={track.title}
                                                  pictureUrl={track.picture_url}
                                                  scrobbleCount={track.scrobble_count}
                                                  parentType="artists"

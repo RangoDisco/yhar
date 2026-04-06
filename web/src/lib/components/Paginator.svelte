@@ -1,8 +1,13 @@
-<script>
+<script lang="ts">
     import * as Pagination from "$lib/components/ui/pagination/index";
     import {handlePageChange, PER_PAGE} from "$lib/pagination";
 
-    let {totalCount, page} = $props();
+    type Props = {
+        totalCount: number
+        page: number
+    }
+
+    let {totalCount, page}: Props = $props();
 
 </script>
 

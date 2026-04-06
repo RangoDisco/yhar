@@ -1,9 +1,21 @@
-<script>
+<script lang="ts">
     import * as Avatar from "$lib/components/ui/avatar/index";
     import disc from "$lib/assets/placeholders/disc-3.svg";
     import user from "$lib/assets/placeholders/user.jpg";
 
     import {page} from "$app/state";
+    import type {Album, Artist} from "$lib/types/content";
+
+    type Props = {
+        contentID: string | null
+        index: number
+        title: string
+        parentType: "artists" | "albums"
+        parents: Artist[] | Album[]
+        pictureUrl: string | null
+        contentType: string
+        scrobbleCount: number
+    }
 
     let {
         contentID = $bindable(null),

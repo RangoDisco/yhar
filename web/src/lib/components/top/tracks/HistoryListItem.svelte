@@ -1,18 +1,24 @@
-<script>
+<script lang="ts">
     import * as Avatar from "$lib/components/ui/avatar/index";
     import {Button} from "$lib/components/ui/button/index";
     import {Trash, ListMusic} from "@lucide/svelte";
     import dayjs from "dayjs";
     import relativeTime from "dayjs/plugin/relativeTime";
 
-    import {page} from "$app/state"
+    import {page} from "$app/state";
+    import type {Track} from "$lib/types/content";
 
     dayjs.extend(relativeTime);
+
+    type Props = {
+        track: Track,
+        parentType: "artists" | "albums"
+    }
 
     let {
         track,
         parentType
-    } = $props();
+    }: Props = $props();
 </script>
 
 <article class="flex items-center justify-between">

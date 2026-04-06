@@ -2,12 +2,19 @@
     import ContentCardImage from "$lib/components/top/contentCard/ContentCardImage.svelte";
     import ContentCardWrapper from "$lib/components/top/contentCard/ContentCardWrapper.svelte";
 
+    type Props = {
+        title: string
+        contentID: string | null
+        pictureUrl: string | null
+        contentType: string
+    }
+
     let {
         title,
         contentID = $bindable(null),
         pictureUrl,
         contentType
-    } = $props();
+    }: Props = $props();
 
 </script>
 

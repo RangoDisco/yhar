@@ -20,7 +20,7 @@
 
 <article class="flex items-center gap-4 justify-between">
     <div class="flex gap-4 items-center">
-        <h3 class="text-lg w-4">{index + 1}</h3>
+        <h3 class="text-lg w-6">{index}</h3>
         <div class="flex gap-2 items-center">
             <Avatar.Root class="{contentType !== 'artists' ? 'rounded-md' : ''} h-12 w-12 ">
                 <Avatar.Image src={pictureUrl}

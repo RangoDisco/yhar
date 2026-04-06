@@ -18,5 +18,6 @@ export const load: PageServerLoad = async ({ url, params, cookies }) => {
 	return {
 		period,
 		tracks,
+		page
 	};
 };

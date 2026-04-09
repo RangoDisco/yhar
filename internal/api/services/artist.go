@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/rangodisco/yhar/internal/api/dto"
 	"github.com/rangodisco/yhar/internal/api/models"
 	"github.com/rangodisco/yhar/internal/api/providers"
 	"github.com/rangodisco/yhar/internal/api/repositories"
@@ -32,7 +33,7 @@ func (s *ArtistService) GetOrCreate(ctx context.Context, info providers.ArtistMe
 		queryFilters = append(queryFilters, filters.QueryFilter{Key: "name", Value: info.Name})
 	}
 
-	existingArtist, err := s.repo.FindActiveByFilters(ctx, queryFilters)
+	existingArtist, err := s.Get(ctx, queryFilters)
 	if err == nil && existingArtist != nil {
 		return existingArtist, err
 	}
@@ -57,9 +58,9 @@ func (s *ArtistService) GetOrCreate(ctx context.Context, info providers.ArtistMe
 	//}
 
 	// Build the model object from all the infos
-	model := scrobbleInfoToArtistModel(info, img)
+	a := scrobbleInfoToArtistModel(info, img)
 
-	err = s.repo.Persist(ctx, model)
+	err = s.repo.Persist(ctx, a)
 	if err != nil {
 		// could happen if another routine inserted the same artist first
 		if errors.Is(err, gorm.ErrDuplicatedKey) {
@@ -68,7 +69,32 @@ func (s *ArtistService) GetOrCreate(ctx context.Context, info providers.ArtistMe
 		return nil, err
 	}
 
-	return model, nil
+	return a, nil
+}
+
+// Get finds a models.Artist by filters
+func (s *ArtistService) Get(ctx context.Context, filters []filters.QueryFilter) (*models.Artist, error) {
+	return s.repo.FindActiveByFilters(ctx, filters)
+}
+
+// Update partially updates a models.Artist with given dto.UpdateArtistInput
+func (s *ArtistService) Update(ctx context.Context, a *models.Artist, input dto.UpdateArtistInput) (*models.Artist, error) {
+	updates := make(map[string]interface{})
+
+	if input.Name != nil {
+		updates["name"] = *input.Name
+	}
+
+	if input.ImageID != nil {
+		updates["picture_id"] = *input.ImageID
+	}
+
+	err := s.repo.Update(ctx, a, updates)
+	if err != nil {
+		return nil, fmt.Errorf("unable to update artist: %w", err)
+	}
+
+	return a, nil
 }
 
 // scrobbleInfoToArtistModel builds a new models.Artist based on a scrobble

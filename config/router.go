@@ -42,6 +42,11 @@ func loadRoutes(r *gin.Engine, repo *serverConfig.Repositories, s *serverConfig.
 	// Image
 	protected.POST("/images", middlewares.RequirePermissions([]string{"IMAGE_UPLOAD"}), h.Image.Upload)
 
+	// Artists
+	protected.PATCH("/artists/:id", middlewares.RequirePermissions([]string{"UPDATE_ARTIST"}), h.Artist.Update)
+
+	// Albums
+
 	// THIRDPARTY
 	subsonic := protected.Group("/subsonic")
 	subsonic.GET("/getNowPlaying", middlewares.RequirePermissions([]string{"MANUAL_SCROBBLE"}), h.Scrobble.ManualNowPlayingPoll)

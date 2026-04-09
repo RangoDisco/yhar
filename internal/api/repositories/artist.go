@@ -32,7 +32,7 @@ func (r *ArtistRepository) FindActiveByFilters(ctx context.Context, filters []fi
 		query = query.Where(fmt.Sprintf("%s = ?", f.Key), f.Value)
 	}
 
-	err := query.First(&a).Error
+	err := query.Preload("Picture").First(&a).Error
 	if err != nil {
 		return nil, err
 	}
@@ -41,5 +41,10 @@ func (r *ArtistRepository) FindActiveByFilters(ctx context.Context, filters []fi
 
 func (r *ArtistRepository) Persist(ctx context.Context, a *models.Artist) error {
 	res := r.Db.WithContext(ctx).Create(&a)
+	return res.Error
+}
+
+func (r *ArtistRepository) Update(ctx context.Context, a *models.Artist, updates map[string]interface{}) error {
+	res := r.Db.WithContext(ctx).Model(&a).Updates(updates)
 	return res.Error
 }

@@ -39,6 +39,9 @@ func loadRoutes(r *gin.Engine, repo *serverConfig.Repositories, s *serverConfig.
 	protected := api.Group("/")
 	protected.Use(middlewares.Authenticate(s.Auth))
 
+	// Image
+	protected.POST("/images", middlewares.RequirePermissions([]string{"IMAGE_UPLOAD"}), h.Image.Upload)
+
 	// THIRDPARTY
 	subsonic := protected.Group("/subsonic")
 	subsonic.GET("/getNowPlaying", middlewares.RequirePermissions([]string{"MANUAL_SCROBBLE"}), h.Scrobble.ManualNowPlayingPoll)
@@ -55,4 +58,5 @@ func loadRoutes(r *gin.Engine, repo *serverConfig.Repositories, s *serverConfig.
 	userScrobbles.GET("/top/artists", h.ScrobbleStats.GetUserTopArtists)
 	userScrobbles.GET("/top/albums", h.ScrobbleStats.GetUserTopAlbums)
 	userScrobbles.GET("/top/tracks", h.ScrobbleStats.GetUserTopTracks)
+
 }

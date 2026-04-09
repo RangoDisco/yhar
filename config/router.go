@@ -46,6 +46,7 @@ func loadRoutes(r *gin.Engine, repo *serverConfig.Repositories, s *serverConfig.
 	protected.PATCH("/artists/:id", middlewares.RequirePermissions([]string{"UPDATE_ARTIST"}), h.Artist.Update)
 
 	// Albums
+	protected.PATCH("/albums/:id", middlewares.RequirePermissions([]string{"UPDATE_ALBUM"}), h.Album.Update)
 
 	// THIRDPARTY
 	subsonic := protected.Group("/subsonic")

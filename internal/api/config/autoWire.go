@@ -43,6 +43,7 @@ type Handlers struct {
 	User          *handlers.UserHandler
 	Image         *handlers.ImageHandler
 	Artist        *handlers.ArtistHandler
+	Album         *handlers.AlbumHandler
 }
 
 type Pollers struct {
@@ -102,6 +103,7 @@ func AutoWire(db *gorm.DB) (*Repositories, *Services, *Handlers, *Pollers, *Impo
 	}
 
 	hdls := &Handlers{
+		Album:         handlers.NewAlbumHandler(svs.Album),
 		Auth:          handlers.NewAuthHandler(svs.Auth),
 		Artist:        handlers.NewArtistHandler(svs.Artist),
 		User:          handlers.NewUserHandler(svs.Auth),

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/rangodisco/yhar/internal/api/dto"
 	"github.com/rangodisco/yhar/internal/api/models"
 	"github.com/rangodisco/yhar/internal/api/providers"
 	"github.com/rangodisco/yhar/internal/api/repositories"
@@ -39,7 +40,7 @@ func (s *AlbumService) GetOrCreateAlbum(ctx context.Context, info providers.Albu
 		})
 	}
 
-	existingAlbum, err := s.repo.FindActiveByFilters(ctx, queryFilters)
+	existingAlbum, err := s.Get(ctx, queryFilters)
 	if err == nil {
 		return existingAlbum, nil
 	}
@@ -72,6 +73,31 @@ func (s *AlbumService) GetOrCreateAlbum(ctx context.Context, info providers.Albu
 	}
 
 	return model, nil
+}
+
+// Get finds a models.Album by filters
+func (s *AlbumService) Get(ctx context.Context, filters []filters.QueryFilter) (*models.Album, error) {
+	return s.repo.FindActiveByFilters(ctx, filters)
+}
+
+// Update partially updates a models.Album with given dto.UpdateAlbumInput
+func (s *AlbumService) Update(ctx context.Context, a *models.Album, input dto.UpdateAlbumInput) (*models.Album, error) {
+	updates := make(map[string]interface{})
+
+	if input.Title != nil {
+		updates["name"] = *input.Title
+	}
+
+	if input.ImageID != nil {
+		updates["picture_id"] = *input.ImageID
+	}
+
+	err := s.repo.Update(ctx, a, updates)
+	if err != nil {
+		return nil, fmt.Errorf("unable to update album: %w", err)
+	}
+
+	return a, nil
 }
 
 func (s *AlbumService) parseAlbumType(at string) (*models.AlbumType, error) {

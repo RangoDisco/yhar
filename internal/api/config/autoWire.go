@@ -41,6 +41,7 @@ type Handlers struct {
 	ScrobbleStats *handlers.ScrobbleStatsHandler
 	Auth          *handlers.AuthHandler
 	User          *handlers.UserHandler
+	Image         *handlers.ImageHandler
 }
 
 type Pollers struct {
@@ -104,6 +105,7 @@ func AutoWire(db *gorm.DB) (*Repositories, *Services, *Handlers, *Pollers, *Impo
 		User:          handlers.NewUserHandler(svs.Auth),
 		Scrobble:      handlers.NewScrobbleHandler(plrs.Subsonic),
 		ScrobbleStats: handlers.NewScrobbleStatsHandler(svs.ScrobbleStats),
+		Image:         handlers.NewImageHandler(svs.Image),
 	}
 
 	impts := &Importers{

@@ -10,8 +10,11 @@ import (
 	"image/jpeg"
 	"io"
 	"log"
+	"mime/multipart"
 	"net/http"
 	"os"
+	"path/filepath"
+	"strings"
 
 	_ "image/jpeg"
 	_ "image/png"
@@ -23,6 +26,18 @@ import (
 	"github.com/rangodisco/yhar/internal/api/models"
 	"github.com/rangodisco/yhar/internal/api/repositories"
 )
+
+type FileConfig struct {
+	MaxSize           int64
+	AllowedTypes      []string
+	AllowedExtensions []string
+}
+
+var DefaultConfig = FileConfig{
+	MaxSize:           5 << 20,
+	AllowedTypes:      []string{"image/jpeg", "image/png", "image/gif", "image/webp"},
+	AllowedExtensions: []string{".jpg", ".jpeg", ".png", ".gif", ".webp"},
+}
 
 type ImageService struct {
 	repo *repositories.ImageRepository
@@ -38,26 +53,61 @@ func (s *ImageService) GetOrCreate(ctx context.Context, url string) (*models.Ima
 		return nil, fmt.Errorf("url is empty")
 	}
 
-	filename, err := s.saveLocally(ctx, url)
+	filename, err := s.SaveDistant(ctx, url)
 	if err != nil {
 		return nil, fmt.Errorf("unable to save image locally: %w", err)
 	}
 
+	return s.Persist(ctx, filename)
+}
+
+func (s *ImageService) Persist(ctx context.Context, filename string) (*models.Image, error) {
 	model := &models.Image{
-		Path:       filename,
-		Type:       "local",
-		ContentURL: url,
+		Path: filename,
+		Type: "local",
 	}
 
-	err = s.repo.Persist(ctx, model)
+	err := s.repo.Persist(ctx, model)
 	if err != nil {
 		return nil, err
 	}
 	return model, nil
 }
 
-// saveLocally saves a distant image to our local images dir
-func (s *ImageService) saveLocally(ctx context.Context, url string) (string, error) {
+// Validate ensure that the given file respect our requirements
+func (s *ImageService) Validate(file *multipart.FileHeader, buf []byte) error {
+	ext := strings.ToLower(filepath.Ext(file.Filename))
+	isExtValid := false
+
+	for _, allowedExtension := range DefaultConfig.AllowedExtensions {
+		if ext == allowedExtension {
+			isExtValid = true
+			break
+		}
+	}
+
+	if !isExtValid {
+		return fmt.Errorf("extension is not valid got: %s", ext)
+	}
+
+	contentType := http.DetectContentType(buf)
+	isTypeValid := false
+
+	for _, allowedType := range DefaultConfig.AllowedTypes {
+		if contentType == allowedType {
+			isTypeValid = true
+			break
+		}
+	}
+
+	if !isTypeValid {
+		return fmt.Errorf("type is not allowed, got: %s", contentType)
+	}
+
+	return nil
+}
+
+func (s *ImageService) SaveDistant(ctx context.Context, url string) (string, error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		return "", fmt.Errorf("unable to build req: %w", err)
@@ -80,12 +130,16 @@ func (s *ImageService) saveLocally(ctx context.Context, url string) (string, err
 		return "", fmt.Errorf("unable to read image: %w", err)
 	}
 
+	return s.SaveLocally(ctx, data)
+}
+
+// SaveLocally saves a distant image to our local images dir
+func (s *ImageService) SaveLocally(ctx context.Context, data []byte) (string, error) {
 	// Probably overkill, just needed a random string
 	rawHash := sha256.Sum256(data)
 	hash := hex.EncodeToString(rawHash[:])[:16]
 	filename := fmt.Sprintf("%s.%s", hash, "jpg")
-
-	err = os.MkdirAll("images", 0755)
+	err := os.MkdirAll("images", 0755)
 	if err != nil {
 		return "", fmt.Errorf("unable to create dir: %w", err)
 	}
@@ -104,6 +158,7 @@ func (s *ImageService) saveLocally(ctx context.Context, url string) (string, err
 		}
 	}(file)
 
+	// Resize & encode img to jpg
 	img, err := s.resizeImg(data)
 	if err != nil {
 		return "", fmt.Errorf("unable to resize img: %w", err)

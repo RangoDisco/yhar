@@ -43,3 +43,8 @@ func (r *AlbumRepository) Persist(ctx context.Context, album *models.Album) erro
 	}
 	return nil
 }
+
+func (r *AlbumRepository) Update(ctx context.Context, a *models.Album, updates map[string]interface{}) error {
+	res := r.Db.WithContext(ctx).Model(&a).Updates(updates)
+	return res.Error
+}

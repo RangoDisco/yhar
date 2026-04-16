@@ -2,7 +2,7 @@ import { type Cookies, error, redirect } from '@sveltejs/kit';
 
 export const fetcher = async (
 	url: string,
-	method: 'GET' | 'POST' | 'PUT' | 'DELETE',
+	method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE',
 	cookies: Cookies,
 	body?: string | null
 ) => {

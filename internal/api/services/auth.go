@@ -35,9 +35,10 @@ func (s *AuthService) ComparePassword(password, hash string) bool {
 }
 
 // CreateToken creates a JWT with user's name as claim
-func (s *AuthService) CreateToken(username string) (string, error) {
+func (s *AuthService) CreateToken(username, role string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"username": username,
+		"role":     role,
 		"exp":      time.Now().Add(time.Hour * 72).Unix(),
 	})
 
@@ -66,7 +67,7 @@ func (s *AuthService) HandleUserLogin(ctx context.Context, request auth.LoginReq
 		return "", errors.New("invalid password")
 	}
 
-	token, err := s.CreateToken(user.Username)
+	token, err := s.CreateToken(user.Username, user.Role.Name)
 	if err != nil {
 		return "", err
 	}

@@ -2,6 +2,7 @@ import { type Actions, fail, redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { API_URL } from '$env/static/private';
 import { fetcher } from '$lib/fetcher';
+import { jwtDecode } from 'jwt-decode';
 
 export const load: PageServerLoad = async ({ cookies }) => {
 	const token = cookies?.get('token');
@@ -32,7 +33,19 @@ export const actions = {
 				JSON.stringify({ username, password })
 			);
 
+			const decodedToken = jwtDecode(response.token);
+			if (!decodedToken || !decodedToken.exp) {
+				return fail(401, { field: null, error: 'Invalid username or password' });
+			}
+
+			const expiresAt = new Date(decodedToken.exp * 1000);
 			cookies.set('token', response.token, { path: '/', httpOnly: true, sameSite: 'strict' });
+			cookies.set('user', JSON.stringify(decodedToken), {
+				path: '/',
+				httpOnly: true,
+				sameSite: 'strict',
+				expires: expiresAt
+			});
 			redirect(302, '/');
 		} catch (error) {
 			return fail(401, { field: null, error: 'Invalid username or password' });

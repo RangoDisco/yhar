@@ -4,11 +4,10 @@ export const fetcher = async (
 	url: string,
 	method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE',
 	cookies: Cookies,
-	body?: string | null
+	body?: string | FormData | null
 ) => {
 	// Build query and fetch
 	const headers: Headers = new Headers();
-	headers.set('Accept', 'application/json');
 
 	const token = cookies?.get('token');
 	if (token) {
@@ -36,9 +35,5 @@ export const fetcher = async (
 		redirect(302, `/auth/login`);
 	}
 
-	if (response.status === 404) {
-		error(404, 'Not found');
-	}
-
-	return null;
+	error(response.status, response.statusText);
 };

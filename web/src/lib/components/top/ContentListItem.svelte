@@ -7,14 +7,14 @@
     import type {Album, Artist} from "$lib/types/content";
 
     type Props = {
-        contentID: string | null
+        contentID?: string | null
         index: number
         title: string
         parentType: "artists" | "albums"
-        parents: Artist[] | Album[]
+        parents: Artist[] | Album[] | null
         pictureUrl: string | null
         contentType: string
-        scrobbleCount: number
+        scrobbleCount: number | null
     }
 
     let {
@@ -26,7 +26,7 @@
         pictureUrl,
         contentType,
         scrobbleCount,
-    } = $props();
+    }: Props = $props();
 
 </script>
 

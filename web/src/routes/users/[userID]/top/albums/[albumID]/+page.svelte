@@ -2,13 +2,16 @@
     import ContentListWrapper from "$lib/components/top/ContentListWrapper.svelte";
     import ContentListItem from "$lib/components/top/ContentListItem.svelte";
     import {page} from "$app/state";
+    import UploadableImage from "$lib/components/top/UploadableImage.svelte";
 
     let {data} = $props();
 </script>
 
 <main class="flex flex-col gap-8">
     <section class="flex items-center gap-4">
-        <img class="rounded-md aspect-square h-24" src={data.album.picture_url} alt="{data.album.title}'s picture"/>
+        <UploadableImage pictureUrl={data.album.picture_url} alt="{data.album.title}'s picture" contentType="albums"
+                         contentID={parseInt(data.album.id)}
+                         uploadEnabled={data.user?.role === 'ADMIN'}/>
         <div class="flex flex-col">
             <p class="text-3xl">{data.album.title}</p>
             <div class="flex gap-1 items-center">

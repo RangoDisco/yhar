@@ -2,13 +2,13 @@ import type { PageServerLoad } from './$types';
 import { fetcher } from '$lib/fetcher';
 import { API_URL } from '$env/static/private';
 import type { Paginated } from '$lib/types/pagination';
-import type { Album, Track } from '$lib/types/content';
+import type { Album, Artist, Track } from '$lib/types/content';
 
-export const load: PageServerLoad = async ({ url, params, cookies }) => {
+export const load: PageServerLoad = async ({ url, params, cookies, locals }) => {
 	const { userID, artistID } = params;
 
 	// TODO: change
-	const artists = await fetcher(
+	const artists: Paginated<Artist> = await fetcher(
 		`${API_URL}/users/${userID}/scrobbles/top/artists?period=overall&artist=${artistID}&limit=1`,
 		'GET',
 		cookies,
@@ -39,6 +39,7 @@ export const load: PageServerLoad = async ({ url, params, cookies }) => {
 		artist: artists.results[0],
 		albums,
 		tracks,
-		history
+		history,
+		user: locals.user
 	};
 };

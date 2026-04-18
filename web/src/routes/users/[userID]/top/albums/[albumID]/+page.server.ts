@@ -4,7 +4,7 @@ import { API_URL } from '$env/static/private';
 import type { Paginated } from '$lib/types/pagination';
 import type { Album, Track } from '$lib/types/content';
 
-export const load: PageServerLoad = async ({ url, params, cookies }) => {
+export const load: PageServerLoad = async ({ url, params, cookies, locals }) => {
 	const { userID, albumID } = params;
 	const albums: Paginated<Album> = await fetcher(
 		`${API_URL}/users/${userID}/scrobbles/top/albums?&period=overall&album=${albumID}&limit=1`,
@@ -22,6 +22,7 @@ export const load: PageServerLoad = async ({ url, params, cookies }) => {
 
 	return {
 		album: albums.results[0] ?? null,
-		tracks
+		tracks,
+		user: locals.user,
 	};
 };

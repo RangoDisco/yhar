@@ -17,7 +17,7 @@
 
 <!-- Make card clickable if contentID is provided -->
 {#if contentID}
-    <a class="flex flex-col items-center justify-center gap-2"
+    <a class="flex flex-col items-center justify-center gap-2 w-full"
        href="/users/{page.params.userID}/top/{contentType}/{contentID}" disabled>
         {@render children()}
     </a>

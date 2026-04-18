@@ -1,5 +1,6 @@
-export function load({ cookies }) {
+export function load({ cookies, locals }) {
+	const user = locals.user;
 	return {
-		isLoggedIn: cookies.get('token')
+		user
 	};
 }

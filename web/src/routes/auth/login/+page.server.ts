@@ -35,17 +35,11 @@ export const actions = {
 
 			const decodedToken = jwtDecode(response.token);
 			if (!decodedToken || !decodedToken.exp) {
-				return fail(401, { field: null, error: 'Invalid username or password' });
+				return fail(401, { field: null, error: 'Invalid token stored' });
 			}
 
 			const expiresAt = new Date(decodedToken.exp * 1000);
-			cookies.set('token', response.token, { path: '/', httpOnly: true, sameSite: 'strict' });
-			cookies.set('user', JSON.stringify(decodedToken), {
-				path: '/',
-				httpOnly: true,
-				sameSite: 'strict',
-				expires: expiresAt
-			});
+			cookies.set('token', response.token, { path: '/', httpOnly: true, sameSite: 'strict', expires: expiresAt });
 			redirect(302, '/');
 		} catch (error) {
 			return fail(401, { field: null, error: 'Invalid username or password' });

@@ -5,7 +5,7 @@
 </script>
 
 <main class="flex flex-col gap-4">
-    {#if data.isLoggedIn}
+    {#if data.user}
         <div class="flex flex-col gap-2">
             <nav class="w-full">
                 <ul class="flex w-full flex-wrap items-center justify-end gap-2">

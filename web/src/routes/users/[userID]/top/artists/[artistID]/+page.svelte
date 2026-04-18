@@ -3,13 +3,15 @@
     import HistoryListItem from "$lib/components/top/tracks/HistoryListItem.svelte";
     import ContentListItem from "$lib/components/top/ContentListItem.svelte";
     import ContentCard from "$lib/components/top/contentCard/ContentCard.svelte";
+    import UploadableImage from "$lib/components/top/UploadableImage.svelte";
 
     let {data} = $props();
 </script>
 
 <main class="flex flex-col gap-8">
     <section class="flex items-center gap-4">
-        <img class="rounded-full aspect-square h-24" src={data.artist.picture_url} alt="{data.artist.name}'s picture"/>
+        <UploadableImage pictureUrl={data.artist.picture_url} alt="{data.artist.name}'s picture" contentType="artists"
+                         contentID={parseInt(data.artist.id)} uploadEnabled={data.user?.role === 'ADMIN'}/>
         <div class="flex flex-col">
             <p class="text-3xl">{data.artist.name}</p>
             <p class="text-muted-foreground">{data.artist.scrobble_count} scrobbles</p>

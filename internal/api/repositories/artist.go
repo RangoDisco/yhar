@@ -45,6 +45,6 @@ func (r *ArtistRepository) Persist(ctx context.Context, a *models.Artist) error 
 }
 
 func (r *ArtistRepository) Update(ctx context.Context, a *models.Artist, updates map[string]interface{}) error {
-	res := r.Db.WithContext(ctx).Model(&a).Updates(updates)
-	return res.Error
+	_, err := gorm.G[map[string]interface{}](r.Db).Table("artists").Where("id = ?", a.ID).Updates(ctx, updates)
+	return err
 }

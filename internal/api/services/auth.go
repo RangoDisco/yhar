@@ -40,7 +40,7 @@ func (s *AuthService) CreateTokens(username, role string) (string, string, error
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"username": username,
 		"role":     role,
-		"exp":      time.Now().Add(time.Second * 10).Unix(),
+		"exp":      time.Now().Add(time.Second * 60).Unix(),
 	})
 
 	tokenString, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))

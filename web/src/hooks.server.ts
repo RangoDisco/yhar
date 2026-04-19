@@ -4,7 +4,7 @@ import type { User } from '@lucide/svelte';
 
 export const handle = (async ({ event, resolve }) => {
 	let user = null;
-	const token = event.cookies?.get('token');
+	const token = event.cookies?.get('access_token');
 
 	if (token !== undefined) {
 		user = jwtDecode(token);

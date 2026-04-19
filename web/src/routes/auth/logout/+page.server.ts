@@ -2,7 +2,7 @@ import { redirect } from '@sveltejs/kit';
 
 export const actions = {
 	default: ({ cookies }) => {
-		cookies.delete('token', { path: '/' });
+		cookies.delete('access_token', { path: '/' });
 		redirect(303, '/');
 	}
 };

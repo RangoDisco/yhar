@@ -4,7 +4,7 @@ import { API_URL } from '$env/static/private';
 import { redirect } from '@sveltejs/kit';
 
 export const load: PageServerLoad = async ({ cookies }) => {
-	if (cookies.get('token')) {
+	if (cookies.get('access_token')) {
 		// Get current user and redirect to their profile
 		const response = await fetcher(`${API_URL}/users/me`, 'GET', cookies, null);
 		const userID = response.user.id;

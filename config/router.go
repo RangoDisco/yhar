@@ -35,6 +35,7 @@ func loadRoutes(r *gin.Engine, repo *serverConfig.Repositories, s *serverConfig.
 	// AUTH
 	auth := api.Group("/auth")
 	auth.POST("/login", h.Auth.Login)
+	auth.POST("/refresh", h.Auth.Refresh)
 
 	protected := api.Group("/")
 	protected.Use(middlewares.Authenticate(s.Auth))

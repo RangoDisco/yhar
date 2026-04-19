@@ -14,7 +14,12 @@ type AuthHandler struct {
 }
 
 type LoginResponse struct {
-	Token string `json:"token"`
+	AccessToken  string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
+}
+
+type RefreshResponse struct {
+	AccessToken string `json:"access_token"`
 }
 
 func NewAuthHandler(a *services.AuthService) *AuthHandler {
@@ -29,11 +34,28 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		return
 	}
 
-	token, err := h.service.HandleUserLogin(c.Request.Context(), body)
+	token, refreshToken, err := h.service.HandleUserLogin(c.Request.Context(), body)
 	if err != nil {
 		common.RespondWithError(c, http.StatusUnauthorized, err, "Invalid credentials")
 		return
 	}
 
-	common.RespondWithData(c, http.StatusOK, &LoginResponse{Token: token})
+	common.RespondWithData(c, http.StatusOK, &LoginResponse{AccessToken: token, RefreshToken: refreshToken})
+}
+
+func (h *AuthHandler) Refresh(c *gin.Context) {
+	var body auth.RefreshRequest
+	err := c.ShouldBindJSON(&body)
+	if err != nil {
+		common.RespondWithError(c, http.StatusBadRequest, err, "Invalid body")
+		return
+	}
+
+	token, err := h.service.RefreshToken(body.RefreshToken)
+	if err != nil {
+		common.RespondWithError(c, http.StatusInternalServerError, err, "Unable to create new token")
+		return
+	}
+
+	common.RespondWithData(c, http.StatusOK, &RefreshResponse{AccessToken: token})
 }

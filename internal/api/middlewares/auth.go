@@ -2,6 +2,7 @@ package middlewares
 
 import (
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -21,7 +22,8 @@ func Authenticate(auth *services.AuthService) gin.HandlerFunc {
 			c.Next()
 		} else {
 			stringToken := authHeader[7:]
-			token, err := services.ParseToken(stringToken)
+			secret := os.Getenv("JWT_SECRET")
+			token, err := services.ParseToken(stringToken, secret)
 			if err != nil {
 				common.RespondWithError(c, http.StatusUnauthorized, err, "Unauthorized")
 				return

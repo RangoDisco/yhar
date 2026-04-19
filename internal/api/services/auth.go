@@ -34,51 +34,80 @@ func (s *AuthService) ComparePassword(password, hash string) bool {
 	return err == nil
 }
 
-// CreateToken creates a JWT with user's name as claim
-func (s *AuthService) CreateToken(username, role string) (string, error) {
+// CreateTokens creates a JWT and its refresh with user's name as claim
+func (s *AuthService) CreateTokens(username, role string) (string, string, error) {
+
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"username": username,
 		"role":     role,
-		"exp":      time.Now().Add(time.Hour * 72).Unix(),
+		"exp":      time.Now().Add(time.Second * 10).Unix(),
 	})
 
 	tokenString, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
+
 	if err != nil {
-		return "", fmt.Errorf("unable to creat token: %w", err)
+		return "", "", fmt.Errorf("unable to create token: %w", err)
 	}
 
-	return tokenString, nil
+	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"username": username,
+		"role":     role,
+		"exp":      time.Now().Add(time.Hour * 168).Unix(),
+	})
+
+	refreshTokenString, err := refreshToken.SignedString([]byte(os.Getenv("REFRESH_SECRET")))
+
+	if err != nil {
+		return "", "", fmt.Errorf("unable to create refresh token: %w", err)
+	}
+
+	return tokenString, refreshTokenString, nil
+}
+
+func (s *AuthService) RefreshToken(t string) (string, error) {
+	secret := os.Getenv("REFRESH_SECRET")
+	token, err := ParseToken(t, secret)
+	if err != nil {
+		return "", fmt.Errorf("unable to parse token: %w", err)
+	}
+
+	newToken, _, err := s.CreateTokens(token.Claims.(jwt.MapClaims)["username"].(string), token.Claims.(jwt.MapClaims)["role"].(string))
+	if err != nil {
+		return "", fmt.Errorf("unable to generate new token from refresh: %w", err)
+	}
+
+	return newToken, nil
 }
 
 // HandleUserLogin receives an auth.LoginRequest
 // tries to find user by its username
 // compares the passwords and creates a token
-func (s *AuthService) HandleUserLogin(ctx context.Context, request auth.LoginRequest) (string, error) {
+func (s *AuthService) HandleUserLogin(ctx context.Context, request auth.LoginRequest) (string, string, error) {
 
 	user, err := s.repo.FindActiveByFilters(ctx, []filters.QueryFilter{
 		{Key: "username", Value: request.Username},
 	})
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
 	success := s.ComparePassword(request.Password, user.Password)
 	if !success {
-		return "", errors.New("invalid password")
+		return "", "", errors.New("invalid password")
 	}
 
-	token, err := s.CreateToken(user.Username, user.Role.Name)
+	token, refresh, err := s.CreateTokens(user.Username, user.Role.Name)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
-	return token, nil
+	return token, refresh, nil
 }
 
 // ParseToken parses the given tokenString with
-func ParseToken(tokenString string) (*jwt.Token, error) {
+func ParseToken(tokenString string, secret string) (*jwt.Token, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		return []byte(os.Getenv("JWT_SECRET")), nil
+		return []byte(secret), nil
 	})
 
 	if err != nil {

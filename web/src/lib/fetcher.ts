@@ -27,6 +27,9 @@ export const fetcher = async (
 	 * - If not redirect to the login screen
 	 */
 	if (response.status === 401 && !url.endsWith('/auth/login')) {
+		cookies.delete('token', {
+			path: '/'
+		});
 		const refresh = cookies?.get('refresh_token');
 		if (refresh) {
 			// TODO: Get token and try again

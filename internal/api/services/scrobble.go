@@ -6,9 +6,11 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/rangodisco/yhar/internal/api/dto"
 	"github.com/rangodisco/yhar/internal/api/models"
 	"github.com/rangodisco/yhar/internal/api/providers"
 	"github.com/rangodisco/yhar/internal/api/repositories"
+	"github.com/rangodisco/yhar/internal/api/types/filters"
 	"gorm.io/gorm"
 )
 
@@ -98,6 +100,24 @@ func (s *ScrobbleService) HandleNewScrobble(ctx context.Context, entry *UnifiedS
 		return nil, err
 	}
 	return scrobble, nil
+}
+
+// Get finds a models.Scrobble by filters
+func (s *ScrobbleService) Get(ctx context.Context, user *dto.UserPassport, filters []filters.QueryFilter) (*models.Scrobble, error) {
+	scrobble, err := s.repo.FindActiveByFilters(ctx, filters)
+	if err != nil {
+		return nil, err
+	}
+
+	if scrobble.UserID != user.ID && user.Role.Name != "ADMIN" {
+		return nil, gorm.ErrRecordNotFound
+	}
+
+	return scrobble, nil
+}
+
+func (s *ScrobbleService) Delete(ctx context.Context, scrobble *models.Scrobble) error {
+	return s.repo.Delete(ctx, scrobble)
 }
 
 // getOrCreateTrack finds or create all content (track, album, artists) related to the scrobble

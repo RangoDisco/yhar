@@ -107,7 +107,7 @@ func AutoWire(db *gorm.DB) (*Repositories, *Services, *Handlers, *Pollers, *Impo
 		Auth:          handlers.NewAuthHandler(svs.Auth),
 		Artist:        handlers.NewArtistHandler(svs.Artist),
 		User:          handlers.NewUserHandler(svs.Auth),
-		Scrobble:      handlers.NewScrobbleHandler(plrs.Subsonic),
+		Scrobble:      handlers.NewScrobbleHandler(plrs.Subsonic, svs.Scrobble),
 		ScrobbleStats: handlers.NewScrobbleStatsHandler(svs.ScrobbleStats),
 		Image:         handlers.NewImageHandler(svs.Image),
 	}

@@ -238,7 +238,8 @@ func (r *StatsRepository) buildBaseStatQuery(ctx context.Context, params BaseSta
 		Joins("JOIN tracks tr ON tr.id = scrobbles.track_id").
 		Joins("JOIN track_artists trar ON trar.track_id = tr.id").
 		Joins("JOIN artists ar ON ar.id = trar.artist_id").
-		Where("scrobbles.user_id = ?", params.UserID)
+		Where("scrobbles.user_id = ?", params.UserID).
+		Where("scrobbles.deleted_at IS null")
 
 	if !params.Start.IsZero() {
 		query = query.Where("scrobbles.scrobbled_at >= ?", params.Start)

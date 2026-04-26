@@ -61,6 +61,7 @@ func loadRoutes(r *gin.Engine, repo *serverConfig.Repositories, s *serverConfig.
 
 	// USER'S STATS
 	userScrobbles := user.Group("/scrobbles")
+	userScrobbles.DELETE("/:id", h.Scrobble.Delete)
 	userScrobbles.GET("/history", h.ScrobbleStats.GetUserHistory)
 	userScrobbles.GET("/top/artists", h.ScrobbleStats.GetUserTopArtists)
 	userScrobbles.GET("/top/albums", h.ScrobbleStats.GetUserTopAlbums)

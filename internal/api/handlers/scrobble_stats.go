@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"errors"
 	"net/http"
 	"strconv"
 
@@ -33,13 +32,9 @@ func (h *ScrobbleStatsHandler) parseStatsParams(c *gin.Context) (*services.Stats
 	var userID string
 
 	if paramUserID == "me" {
-		rawUser, exists := c.Get("user")
-		if !exists {
-			return nil, errors.New("user not authenticated")
-		}
-		currentUser, ok := rawUser.(*dto.UserPassport)
-		if !ok {
-			return nil, errors.New("invalid user")
+		currentUser, err := common.GetUserFromContext(c)
+		if err != nil {
+			return nil, err
 		}
 		userID = strconv.Itoa(int(currentUser.ID))
 	} else {

@@ -137,7 +137,6 @@ func (r *StatsRepository) FindTopAlbumsForUser(ctx context.Context, params *Stat
 	return res, totalCount, nil
 }
 
-// TODO: MAYBE MERGE THOSE 2
 func (r *StatsRepository) FindTopTracksForUser(ctx context.Context, params *StatsTrackQueryParams) ([]dto.TrackResult, int64, error) {
 	var res []dto.TrackResult
 	var totalCount int64
@@ -187,21 +186,20 @@ func (r *StatsRepository) FindTopTracksForUser(ctx context.Context, params *Stat
 	return res, totalCount, nil
 }
 
-// TODO: MAYBE MERGE THOSE 2
-func (r *StatsRepository) FindByUserID(ctx context.Context, params *StatsTrackQueryParams) ([]dto.TrackResult, int64, error) {
-	var res []dto.TrackResult
+func (r *StatsRepository) FindByUserID(ctx context.Context, params *StatsTrackQueryParams) ([]dto.HistoryResult, int64, error) {
+	var res []dto.HistoryResult
 	var totalCount int64
 
 	query := r.buildBaseStatQuery(ctx, params.BaseStatsQueryParams).
-		Select("tr.id as id, tr.title as title, scrobbles.scrobbled_at as scrobbled_at, " +
-			"i.path AS picture_path, i.type AS picture_type, i.domain AS picture_domain, " +
-			"jsonb_build_object('id', al.id, 'title', al.title) as album, " +
-			"JSON_AGG(DISTINCT jsonb_build_object('id', ar.id, 'name', ar.name, " +
-			"'picture_path', ari.path, 'picture_type', ari.type, 'picture_domain', ari.domain)) as artists").
+		Select("scrobbles.id as id, scrobbles.scrobbled_at as scrobbled_at, json_build_object('id', tr.id, 'title', tr.title, " +
+			"'picture_path', i.path, 'picture_type', i.type, 'picture_domain', i.domain,  " +
+			"'album', jsonb_build_object('id', al.id, 'title', al.title), " +
+			"'artists', JSON_AGG(DISTINCT jsonb_build_object('id', ar.id, 'name', ar.name, " +
+			"'picture_path', ari.path, 'picture_type', ari.type, 'picture_domain', ari.domain))) as track").
 		Joins("JOIN albums al ON al.id = tr.album_id").
 		Joins("LEFT JOIN images i ON i.id = al.picture_id").
 		Joins("LEFT JOIN images ari ON ari.id = ar.picture_id").
-		Group("tr.id, tr.title, al.id, scrobbles.scrobbled_at, i.path, i.type, i.domain")
+		Group("scrobbles.id, tr.id, tr.title, al.id, scrobbles.scrobbled_at, i.path, i.type, i.domain")
 
 	if params.TrackArtistID != nil {
 		query = query.Where("EXISTS(SELECT 1 FROM track_artists trar2 WHERE trar2.track_id = tr.id AND trar2.artist_id = ?)", params.TrackArtistID)
@@ -222,9 +220,10 @@ func (r *StatsRepository) FindByUserID(ctx context.Context, params *StatsTrackQu
 	}
 
 	for i := range res {
-		res[i].PictureURL = r.buildImageURL(res[i].PictureType, res[i].PictureDomain, res[i].PicturePath)
-		for j := range res[i].Artists {
-			a := &res[i].Artists[j]
+		t := &res[i].Track
+		t.PictureURL = r.buildImageURL(t.PictureType, t.PictureDomain, t.PicturePath)
+		for j := range res[i].Track.Artists {
+			a := &res[i].Track.Artists[j]
 			a.PictureURL = r.buildImageURL(a.PictureType, a.PictureDomain, a.PicturePath)
 		}
 	}

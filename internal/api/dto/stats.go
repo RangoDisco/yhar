@@ -43,9 +43,14 @@ type TrackResult struct {
 	PictureURL    *string           `json:"picture_url"`
 	Album         TopAlbumResult    `json:"album" gorm:"serializer:json"`
 	ScrobbleCount *int              `json:"scrobble_count,omitempty"` // could be nil in the history query
-	ScrobbledAt   *time.Time        `json:"scrobbled_at,omitempty"`   // could be nil in the top tracks query
 	// raw fields only used for building PictureURL (hidden in JSON response)
 	PicturePath   string `json:"-" gorm:"column:picture_path"`
 	PictureType   string `json:"-" gorm:"column:picture_type"`
 	PictureDomain string `json:"-" gorm:"column:picture_domain"`
+}
+
+type HistoryResult struct {
+	ID          int64       `json:"id"`
+	ScrobbledAt time.Time   `json:"scrobbled_at"`
+	Track       TrackResult `json:"track" gorm:"serializer:json"`
 }

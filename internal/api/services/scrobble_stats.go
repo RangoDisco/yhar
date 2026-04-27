@@ -67,7 +67,7 @@ func (s *ScrobbleStatsService) FetchUserTopTracks(ctx context.Context, params *S
 	return s.repo.FindTopTracksForUser(ctx, queryParams)
 }
 
-func (s *ScrobbleStatsService) FetchUserHistory(ctx context.Context, params *StatsRequestParams) ([]dto.TrackResult, int64, error) {
+func (s *ScrobbleStatsService) FetchUserHistory(ctx context.Context, params *StatsRequestParams) ([]dto.HistoryResult, int64, error) {
 	queryParams := &repositories.StatsTrackQueryParams{
 		BaseStatsQueryParams: s.buildBaseParams(params),
 		TrackID:              params.TrackID,

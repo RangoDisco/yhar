@@ -1,9 +1,9 @@
 <script lang="ts">
     import ContentListWrapper from "$lib/components/top/ContentListWrapper.svelte";
-    import HistoryListItem from "$lib/components/top/tracks/HistoryListItem.svelte";
     import ContentListItem from "$lib/components/top/ContentListItem.svelte";
     import ContentCard from "$lib/components/top/contentCard/ContentCard.svelte";
     import UploadableImage from "$lib/components/top/UploadableImage.svelte";
+    import HistoryList from "$lib/components/top/tracks/HistoryList.svelte";
 
     let {data} = $props();
 </script>
@@ -44,12 +44,6 @@
         </ContentListWrapper>
 
         <!--HISTORY-->
-        <ContentListWrapper title="History" url="history?artist={data.artist.id}">
-            <div class="flex flex-col gap-2">
-                {#each data.history.results as track}
-                    <HistoryListItem track={track} parentType="albums"/>
-                {/each}
-            </div>
-        </ContentListWrapper>
+        <HistoryList scrobbles={data.history.results} url="history?artist={data.artist.id}" parentType="albums"/>
     </div>
 </main>

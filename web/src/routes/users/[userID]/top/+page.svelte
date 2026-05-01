@@ -2,9 +2,9 @@
     import * as Tabs from "$lib/components/ui/tabs/index";
     import ContentListItem from "$lib/components/top/ContentListItem.svelte";
     import ContentListWrapper from "$lib/components/top/ContentListWrapper.svelte";
-    import HistoryListItem from "$lib/components/top/tracks/HistoryListItem.svelte";
     import ContentCard from "$lib/components/top/contentCard/ContentCard.svelte";
-    import {Period} from "$lib/types/period"
+    import {Period} from "$lib/types/period";
+    import HistoryList from "$lib/components/top/tracks/HistoryList.svelte";
 
     const {data} = $props();
     const periods = [Period.week, Period.month, Period.year, Period.overall];
@@ -61,11 +61,5 @@
     </Tabs.Root>
 
     <!--HISTORY-->
-    <ContentListWrapper title="History" url="history">
-        <div class="flex flex-col gap-2">
-            {#each data.history.results as track}
-                <HistoryListItem track={track} parentType="artists"/>
-            {/each}
-        </div>
-    </ContentListWrapper>
+    <HistoryList scrobbles={data.history.results} url="history" parentType="artists"/>
 </div>

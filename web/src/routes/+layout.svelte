@@ -3,6 +3,8 @@
     import favicon from "$lib/assets/favicon.svg";
     import {Toaster} from "$lib/components/ui/sonner";
 
+    import {ModeWatcher} from "mode-watcher";
+
     let {children} = $props();
 </script>
 
@@ -12,6 +14,7 @@
     <link rel="icon" href={favicon}/>
 </svelte:head>
 <section class="min-h-screen md:max-w-300 mx-auto p-6">
+    <ModeWatcher/>
     <Toaster/>
     {@render children()}
 </section>

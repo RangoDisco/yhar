@@ -30,6 +30,9 @@ func init() {
 		log.Fatalf("BASE_URL environment variable not set")
 	}
 
+	if os.Getenv("GIN_MODE") == "" {
+		log.Fatalf("GIN_MODE environment variable not set")
+	}
 }
 
 func main() {
@@ -54,7 +57,7 @@ func main() {
 	serverRepos, serverServices, handlers, pollers, importers := serverConfig.AutoWire(yDb)
 
 	// Start pollers (subsonic only for now)
-	if pollers.Subsonic != nil {
+	if os.Getenv("GIN_MODE") == gin.ReleaseMode && pollers.Subsonic != nil {
 		go pollers.Subsonic.Start(ctx)
 		log.Println("Started Subsonic poller")
 	}

@@ -13,12 +13,17 @@ export type Album = {
 	artists: Artist[] | null;
 };
 
+export type Scrobble = {
+	id: string;
+	scrobbled_at: Date;
+	track: Track;
+};
+
 export type Track = {
 	id: string;
 	title: string;
 	artists: Artist[] | null;
 	picture_url: string;
 	album: Album;
-	scrobble_count: number | null;
-	scrobbled_at: Date | null;
+	scrobble_count: number;
 };

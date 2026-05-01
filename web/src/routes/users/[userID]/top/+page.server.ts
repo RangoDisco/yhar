@@ -2,7 +2,7 @@ import type { PageServerLoad } from './$types';
 import { API_URL } from '$env/static/private';
 import { fetcher } from '$lib/fetcher';
 import type { Paginated } from '$lib/types/pagination';
-import type { Album, Artist, Track } from '$lib/types/content';
+import type { Album, Artist, Scrobble, Track } from '$lib/types/content';
 import { Period } from '$lib/types/period';
 
 export const load: PageServerLoad = async ({ url, params, cookies }) => {
@@ -40,7 +40,7 @@ export const load: PageServerLoad = async ({ url, params, cookies }) => {
 	const month = getStreamedPeriodData(Period.month).catch(() => null);
 	const week = await getStreamedPeriodData(Period.week);
 
-	const history: Paginated<Track> = await fetcher(
+	const history: Paginated<Scrobble> = await fetcher(
 		`${API_URL}/users/${userID}/scrobbles/history`,
 		'GET',
 		cookies,

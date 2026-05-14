@@ -1,6 +1,7 @@
 import {type Cookies, error, redirect} from '@sveltejs/kit';
 import {jwtDecode} from 'jwt-decode';
-import {API_URL} from '$env/static/private';
+
+const API_URL = process.env.API_URL
 
 export const fetcher = async (
     url: string,

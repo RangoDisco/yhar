@@ -1,0 +1,31 @@
+services:
+  api:
+    build:
+      context: .
+    ports:
+      - "8080:8080"
+    environment:
+      - APP_VERSION=${APP_VERSION}
+      - GIN_MODE=${GIN_MODE}
+      - JWT_SECRET=${JWT_SECRET}
+      - BASE_URL=${BASE_URL}
+      - YHAR_DB_NAME=${YHAR_DB_NAME}
+      - YHAR_DB_PASSWORD=${YHAR_DB_PASSWORD}
+      - YHAR_DB_USER=${YHAR_DB_USER}
+      - YHAR_DB_HOST=${YHAR_DB_HOST}
+      - YHAR_DB_PORT=${YHAR_DB_PORT}
+      - SUBSONIC_BASE_URL=${SUBSONIC_BASE_URL}
+      - SUBSONIC_USER=${SUBSONIC_USER}
+      - SUBSONIC_VERSION=${SUBSONIC_VERSION}
+      - SUBSONIC_PASSWORD=${SUBSONIC_PASSWORD}
+      - CONTACT_EMAIL=${CONTACT_EMAIL}
+    restart: unless-stopped
+  web:
+    build:
+      context: ./web/
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - API_URL=${API_URL}
+    restart: unless-stopped

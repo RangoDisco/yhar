@@ -17,11 +17,6 @@ import (
 )
 
 func init() {
-	err := config.LoadEnv()
-	if err != nil {
-		log.Fatalf("failed to load environment variables: %v", err)
-	}
-
 	if os.Getenv("JWT_SECRET") == "" {
 		log.Fatalf("JWT_SECRET environment variable not set")
 	}

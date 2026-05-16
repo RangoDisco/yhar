@@ -1,0 +1,22 @@
+services:
+  api:
+    build:
+      context: .
+      target: gin-dev
+    ports:
+      - "2345:2345"
+      - "8080:8080"
+    volumes:
+      - .:/app
+    security_opt:
+      - "seccomp:unconfined"
+    cap_add:
+      - SYS_PTRACE
+  web:
+    build:
+      target: web-dev
+    ports:
+      - "5173:5173"
+    environment:
+      - API_URL=${API_URL}
+    restart: unless-stopped

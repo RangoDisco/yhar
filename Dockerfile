@@ -4,7 +4,7 @@ WORKDIR /app
 COPY go.mod go.sum ./
 RUN go mod download
 COPY . ./
-RUN GOOS=linux go build -o /yhar-api ./cmd/
+RUN CGO_ENABLED=0 GOOS=linux go build -o /yhar-api ./cmd/
 
 FROM gin-build-stage as gin-dev
 ENV GIN_MODE=debug

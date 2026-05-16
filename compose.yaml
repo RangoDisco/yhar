@@ -2,11 +2,8 @@ services:
   api:
     build:
       context: .
-    ports:
-      - "8080:8080"
     environment:
       - APP_VERSION=${APP_VERSION}
-      - GIN_MODE=${GIN_MODE}
       - JWT_SECRET=${JWT_SECRET}
       - BASE_URL=${BASE_URL}
       - YHAR_DB_NAME=${YHAR_DB_NAME}
@@ -20,6 +17,8 @@ services:
       - SUBSONIC_PASSWORD=${SUBSONIC_PASSWORD}
       - CONTACT_EMAIL=${CONTACT_EMAIL}
     restart: unless-stopped
+    volumes:
+      - ./images:/app/images
   web:
     build:
       context: ./web/

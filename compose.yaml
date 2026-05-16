@@ -1,7 +1,5 @@
 services:
   api:
-    build:
-      context: .
     environment:
       - APP_VERSION=${APP_VERSION}
       - JWT_SECRET=${JWT_SECRET}
@@ -22,9 +20,6 @@ services:
   web:
     build:
       context: ./web/
-      dockerfile: Dockerfile
-    ports:
-      - "3000:3000"
     environment:
       - API_URL=${API_URL}
     restart: unless-stopped

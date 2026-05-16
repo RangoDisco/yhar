@@ -1,21 +1,27 @@
-FROM node:24-slim AS base
+# TODO: slim image
+FROM node:24-slim AS web-base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 ENV CI=true
-RUN corepack enable
 COPY . /app
 WORKDIR /app
 
-FROM base AS prod-deps
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod --frozen-lockfile
+FROM web-base AS web-dev
+RUN corepack enable
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install
+EXPOSE 5173
+ENV NODE_ENV=development
+CMD ["pnpm", "run", "dev", "--host"]
 
-FROM base AS build
+FROM web-base AS web-prod-build
+RUN corepack enable
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 RUN pnpm run build
 
-FROM base
-COPY --from=prod-deps /app/node_modules /app/node_modules
-COPY --from=build /app/build /app/build
+
+FROM web-base as web-prod
+COPY --from=web-prod-build /app/node_modules /app/node_modules
+COPY --from=web-prod-build /app/build /app/build
 EXPOSE 3000
 ENV NODE_ENV=production
 ENV ORIGIN=http://127.0.0.1:3000

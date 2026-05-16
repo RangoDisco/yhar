@@ -1,0 +1,15 @@
+services:
+  api:
+    build:
+      context: .
+      target: gin-release
+    ports:
+      - "8080:8080"
+  web:
+    build:
+      target: web-prod
+    ports:
+      - "3000:3000"
+    environment:
+      - API_URL=${API_URL}
+    restart: unless-stopped

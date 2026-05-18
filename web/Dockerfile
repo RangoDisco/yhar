@@ -20,6 +20,7 @@ RUN pnpm run build
 RUN pnpm prune --prod
 
 FROM node:24-alpine AS web-prod
+LABEL org.opencontainers.image.source="https://github.com/rangodisco/yhar"
 WORKDIR /app
 COPY --from=web-prod-build /app/node_modules ./node_modules
 COPY --from=web-prod-build /app/build ./build

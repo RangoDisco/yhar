@@ -1,11 +1,13 @@
 services:
   api:
+    image: ghcr.io/rangodisco/yhar-api:latest
     build:
       context: .
       target: gin-release
     ports:
       - "8080:8080"
   web:
+    image: ghcr.io/rangodisco/yhar-web:latest
     build:
       target: web-prod
     ports:

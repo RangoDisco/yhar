@@ -6,7 +6,7 @@ RUN go mod download
 COPY . ./
 RUN CGO_ENABLED=0 GOOS=linux go build -o /yhar-api ./cmd/
 
-FROM gin-build-stage as gin-dev
+FROM gin-build-stage AS gin-dev
 ENV GIN_MODE=debug
 RUN curl -sSfL https://raw.githubusercontent.com/air-verse/air/master/install.sh | sh -s -- -b $(go env GOPATH)/bin
 RUN go install github.com/go-delve/delve/cmd/dlv@latest
@@ -20,6 +20,7 @@ CMD ["air"]
 
 # Deploy the application binary into a lean image
 FROM alpine:3.21 AS gin-release
+LABEL org.opencontainers.image.source="https://github.com/rangodisco/yhar"
 COPY --from=gin-build-stage /yhar-api /yhar-api
 ENV GIN_MODE=release
 WORKDIR /

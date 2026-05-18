@@ -26,5 +26,4 @@ COPY --from=web-prod-build /app/node_modules ./node_modules
 COPY --from=web-prod-build /app/build ./build
 EXPOSE 3000
 ENV NODE_ENV=production
-ENV ORIGIN=http://127.0.0.1:3000
 CMD [ "node", "build/index.js" ]

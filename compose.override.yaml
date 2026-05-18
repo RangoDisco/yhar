@@ -17,6 +17,4 @@ services:
       target: web-dev
     ports:
       - "5173:5173"
-    environment:
-      - API_URL=${API_URL}
     restart: unless-stopped

@@ -12,6 +12,4 @@ services:
       target: web-prod
     ports:
       - "3000:3000"
-    environment:
-      - API_URL=${API_URL}
     restart: unless-stopped

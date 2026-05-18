@@ -22,4 +22,5 @@ services:
       context: ./web/
     environment:
       - API_URL=${API_URL}
+      - ORIGIN=${ORIGIN}
     restart: unless-stopped

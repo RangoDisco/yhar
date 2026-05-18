@@ -1,18 +1,22 @@
-name: ci.yaml
+name: Releaser
 on:
   push:
     tags:
       - '*'
 
 jobs:
-  create-package:
+  create-release:
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
       id-token: write
-
     steps:
+      - name: Create release
+        uses: softprops/action-gh-release@v3
+        with:
+          generate_release_notes: true
+
       - name: Checkout code
         uses: actions/checkout@v4
 

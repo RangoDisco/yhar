@@ -1,0 +1,42 @@
+name: ci.yaml
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  create-package:
+    runs-on: ubuntu-20.04
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Login
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{github.actor}}
+          password: ${{secrets.GITHUB_TOKEN}}
+
+      - name: Build & create API package
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          target: gin-release
+          push: true
+          tags: |
+            ghcr.io/rangodisco/yhar-api:${{github.ref_name}}
+            ghcr.io/rangodisco/yhar-api:latest
+      - name: Build & create Web package
+        uses: docker/build-push-action@v5
+        with:
+          context: ./web
+          target: web-prod
+          push: true
+          tags: |
+            ghcr.io/rangodisco/yhar-web:${{github.ref_name}}
+            ghcr.io/rangodisco/yhar-web:latest

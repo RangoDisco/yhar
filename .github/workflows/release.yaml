@@ -9,14 +9,18 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      packages: write
-      id-token: write
     steps:
       - name: Create release
         uses: softprops/action-gh-release@v3
         with:
           generate_release_notes: true
 
+  publish-packages:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      id-token: write
+    steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -36,6 +40,7 @@ jobs:
           tags: |
             ghcr.io/rangodisco/yhar-api:${{github.ref_name}}
             ghcr.io/rangodisco/yhar-api:latest
+
       - name: Build & create Web package
         uses: docker/build-push-action@v6
         with:

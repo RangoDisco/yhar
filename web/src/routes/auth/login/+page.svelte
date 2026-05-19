@@ -14,7 +14,7 @@
     let {data, form}: PageProps = $props();
 </script>
 
-<div class="w-md md:w-lg 2xl:w-xl max-w-2xl mx-auto justify-center">
+<div class="w-full md:w-lg 2xl:w-xl max-w-2xl mx-auto justify-center">
     <form method="POST">
         <FieldGroup>
             <div class="flex flex-col items-center gap-2 text-center">

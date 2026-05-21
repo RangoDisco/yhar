@@ -72,8 +72,7 @@ func (r *StatsRepository) FindTopArtistsForUser(ctx context.Context, params *Sta
 	}
 
 	err = query.Order("scrobble_count DESC").
-		Limit(params.Limit).
-		Offset(r.calculateOffset(params.Page, params.Limit)).
+		Scopes(Paginate(params.Page, params.Limit)).
 		Find(&res).Error
 
 	if err != nil {
@@ -117,9 +116,9 @@ func (r *StatsRepository) FindTopAlbumsForUser(ctx context.Context, params *Stat
 		return nil, 0, fmt.Errorf("unable to count top albums: %w", err)
 	}
 
-	err = query.Order("scrobble_count DESC").
-		Limit(params.Limit).
-		Offset(r.calculateOffset(params.Page, params.Limit)).
+	err = query.
+		Order("scrobble_count DESC").
+		Scopes(Paginate(params.Page, params.Limit)).
 		Find(&res).Error
 
 	if err != nil {
@@ -167,8 +166,7 @@ func (r *StatsRepository) FindTopTracksForUser(ctx context.Context, params *Stat
 	}
 
 	err = query.Order("scrobble_count DESC").
-		Limit(params.Limit).
-		Offset(r.calculateOffset(params.Page, params.Limit)).
+		Scopes(Paginate(params.Page, params.Limit)).
 		Find(&res).Error
 
 	if err != nil {
@@ -211,8 +209,7 @@ func (r *StatsRepository) FindByUserID(ctx context.Context, params *StatsTrackQu
 	}
 
 	err = query.Order("scrobbled_at DESC").
-		Limit(params.Limit).
-		Offset(r.calculateOffset(params.Page, params.Limit)).
+		Scopes(Paginate(params.Page, params.Limit)).
 		Find(&res).Error
 
 	if err != nil {
@@ -249,17 +246,6 @@ func (r *StatsRepository) buildBaseStatQuery(ctx context.Context, params BaseSta
 	}
 
 	return query
-}
-
-func (r *StatsRepository) calculateOffset(page, limit int) int {
-	if page < 1 {
-		page = 1
-	}
-
-	if limit < 1 {
-		limit = 1
-	}
-	return (page - 1) * limit
 }
 
 func (r *StatsRepository) buildImageURL(imageType, domain, path string) *string {

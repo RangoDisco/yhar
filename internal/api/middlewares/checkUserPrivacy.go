@@ -9,7 +9,6 @@ import (
 	"github.com/rangodisco/yhar/internal/api/common"
 	"github.com/rangodisco/yhar/internal/api/dto"
 	"github.com/rangodisco/yhar/internal/api/repositories"
-	"github.com/rangodisco/yhar/internal/api/types/filters"
 )
 
 func CheckUserPrivacy(repo *repositories.UserRepository) gin.HandlerFunc {
@@ -39,10 +38,13 @@ func CheckUserPrivacy(repo *repositories.UserRepository) gin.HandlerFunc {
 			return
 		}
 
-		u, err := repo.FindActiveByFilters(ctx, []filters.QueryFilter{
-			{Key: "id", Value: uID},
-		})
+		iID, err := strconv.ParseInt(uID, 10, 64)
+		if err != nil {
+			common.RespondWithError(c, http.StatusBadRequest, errors.New("invalid userID"), "Invalid userID")
+			return
+		}
 
+		u, err := repo.FindOneByID(ctx, iID, "Role.Permissions")
 		if err != nil {
 			common.RespondWithError(c, http.StatusNotFound, errors.New("user doesn't exist"), "User not found")
 			return

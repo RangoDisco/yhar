@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"github.com/rangodisco/yhar/internal/api/models"
+	"github.com/rangodisco/yhar/internal/api/repositories"
 	"github.com/rangodisco/yhar/internal/api/services"
 	"github.com/rangodisco/yhar/internal/api/types/subsonic"
 )
@@ -25,12 +26,13 @@ type SubsonicPoller struct {
 	username       string
 	password       string
 	sessionService *services.SessionService
+	sessionRepo    *repositories.SessionRepository
 }
 
 // Used for salt generation
 var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
-func NewSubsonicPoller(sessionService *services.SessionService) PlayerPoller {
+func NewSubsonicPoller(sessionService *services.SessionService, sessionRepo *repositories.SessionRepository) PlayerPoller {
 	baseUrl := os.Getenv("SUBSONIC_BASE_URL")
 	username := os.Getenv("SUBSONIC_USER")
 	password := os.Getenv("SUBSONIC_PASSWORD")
@@ -40,6 +42,7 @@ func NewSubsonicPoller(sessionService *services.SessionService) PlayerPoller {
 		username:       username,
 		sessionService: sessionService,
 		password:       password,
+		sessionRepo:    sessionRepo,
 	}
 }
 
@@ -153,7 +156,8 @@ func (p *SubsonicPoller) handleEntry(ctx context.Context, entry subsonic.Entry) 
 		}
 	} else {
 		session.LastSeenAt = time.Now()
-		err = p.sessionService.UpdateSession(ctx, session)
+		updates := map[string]interface{}{"last_seen_at": time.Now()}
+		err := p.sessionRepo.Update(ctx, session.ID, updates)
 		if err != nil {
 			return fmt.Errorf("unable to update session for entry: %s : %w", entry.Title, err)
 		}
@@ -163,7 +167,6 @@ func (p *SubsonicPoller) handleEntry(ctx context.Context, entry subsonic.Entry) 
 }
 
 func (p *SubsonicPoller) parseToUnifiedScrobble(entry subsonic.Entry) (*services.UnifiedScrobbleEntry, error) {
-
 	return &services.UnifiedScrobbleEntry{
 		Username:      entry.Username,
 		Title:         entry.Title,

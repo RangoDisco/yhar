@@ -20,7 +20,7 @@ func NewGenreService(repo *repositories.GenreRepository) *GenreService {
 
 // GetOrCreateGenre tries to find a genre by its name, and creates if it doesn't already exist
 func (s *GenreService) GetOrCreateGenre(ctx context.Context, name string) (*models.Genre, error) {
-	existingGenre, err := s.repo.FindActiveByName(ctx, name)
+	existingGenre, err := s.repo.FindOneBy(ctx, []repositories.QueryFilter{{Key: "name", Value: name}})
 	if err == nil {
 		return existingGenre, nil
 	}

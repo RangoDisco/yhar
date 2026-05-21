@@ -1,42 +1,16 @@
 package repositories
 
 import (
-	"context"
-	"fmt"
-
 	"github.com/rangodisco/yhar/internal/api/models"
-	"github.com/rangodisco/yhar/internal/api/types/filters"
 	"gorm.io/gorm"
 )
 
 type UserRepository struct {
-	Db *gorm.DB
+	BaseRepository[models.User]
 }
 
 func NewUserRepository(Db *gorm.DB) *UserRepository {
-	return &UserRepository{Db: Db}
-}
-
-func (r *UserRepository) FindActiveByFilters(ctx context.Context, filters []filters.QueryFilter) (*models.User, error) {
-	var u models.User
-	query := r.Db.WithContext(ctx).Preload("Role.Permissions")
-
-	for _, filter := range filters {
-		query = query.Where(filter.Key+" = ?", filter.Value)
+	return &UserRepository{
+		BaseRepository[models.User]{Db: Db, Table: "users"},
 	}
-
-	err := query.First(&u).Error
-	if err != nil {
-		return nil, fmt.Errorf("unable to find user: %w", err)
-	}
-
-	return &u, nil
-}
-
-func (r *UserRepository) Persist(ctx context.Context, user *models.User) error {
-	err := r.Db.WithContext(ctx).Create(user).Error
-	if err != nil {
-		return fmt.Errorf("unable to create new user: %w", err)
-	}
-	return nil
 }

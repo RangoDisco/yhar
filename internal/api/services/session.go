@@ -8,7 +8,6 @@ import (
 
 	"github.com/rangodisco/yhar/internal/api/models"
 	"github.com/rangodisco/yhar/internal/api/repositories"
-	"github.com/rangodisco/yhar/internal/api/types/filters"
 	"github.com/rangodisco/yhar/internal/api/types/subsonic"
 	"gorm.io/gorm"
 )
@@ -26,13 +25,14 @@ func NewSessionService(repo *repositories.SessionRepository, scrobble *ScrobbleS
 }
 
 func (s *SessionService) GetOrCreateSession(ctx context.Context, entry subsonic.Entry) (*models.Session, error) {
-	queryFilters := []filters.QueryFilter{
+	queryFilters := []repositories.QueryFilter{
 		{Key: "username", Value: entry.Username},
 		{Key: "player_id", Value: entry.PlayerID},
 		{Key: "title", Value: entry.Title},
+		{Key: "completed_at", Value: nil},
 	}
 
-	session, err := s.repo.FindByFilters(ctx, queryFilters)
+	session, err := s.repo.FindOneBy(ctx, queryFilters)
 	// In case an error occurred, and it's not a gorm not found, skip and return error
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, err
@@ -74,22 +74,17 @@ func (s *SessionService) GetOrCreateSession(ctx context.Context, entry subsonic.
 // HandleCompletedSession updates the session timestamp fields and trigger a scrobble creation
 func (s *SessionService) HandleCompletedSession(ctx context.Context, session *models.Session, entry *UnifiedScrobbleEntry) error {
 	now := time.Now()
-	session.CompletedAt = &now
-	session.LastSeenAt = now
+	updates := map[string]interface{}{"completed_at": &now, "last_seen_at": now}
 
 	_, err := s.scrobble.HandleNewScrobble(ctx, entry)
 	if err != nil {
 		return fmt.Errorf("unable to create new scrobble: %w", err)
 	}
 
-	err = s.UpdateSession(ctx, session)
+	err = s.repo.Update(ctx, session.ID, updates)
 	if err != nil {
 		return fmt.Errorf("unable to update session: %w", err)
 	}
 
 	return nil
-}
-
-func (s *SessionService) UpdateSession(ctx context.Context, session *models.Session) error {
-	return s.repo.Update(ctx, session)
 }

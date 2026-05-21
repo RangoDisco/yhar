@@ -5,7 +5,6 @@ import (
 
 	"github.com/rangodisco/yhar/internal/api/models"
 	"github.com/rangodisco/yhar/internal/api/repositories"
-	"github.com/rangodisco/yhar/internal/api/types/filters"
 )
 
 type UserService struct {
@@ -25,9 +24,9 @@ func (s *UserService) GetOrCreateUser(ctx context.Context, rawUsername string) (
 		username = "rango"
 	}
 
-	existingUser, err := s.repo.FindActiveByFilters(ctx, []filters.QueryFilter{
+	existingUser, err := s.repo.FindOneBy(ctx, []repositories.QueryFilter{
 		{Key: "username", Value: username},
-	})
+	}, "Role.Permissions")
 	if err == nil {
 		return existingUser, err
 	}

@@ -1,33 +1,16 @@
 package repositories
 
 import (
-	"context"
-
 	"github.com/rangodisco/yhar/internal/api/models"
 	"gorm.io/gorm"
 )
 
 type GenreRepository struct {
-	Db *gorm.DB
+	BaseRepository[models.Genre]
 }
 
 func NewGenreRepository(Db *gorm.DB) *GenreRepository {
 	return &GenreRepository{
-		Db: Db,
+		BaseRepository[models.Genre]{Db: Db, Table: "genres"},
 	}
-}
-
-func (r *GenreRepository) FindActiveByName(ctx context.Context, name string) (*models.Genre, error) {
-	var g models.Genre
-	err := r.Db.WithContext(ctx).First(&g, "name = ?", name).Error
-	if err != nil {
-		return nil, err
-	}
-
-	return &g, nil
-}
-
-func (r *GenreRepository) Persist(ctx context.Context, g *models.Genre) error {
-	res := r.Db.WithContext(ctx).Create(g)
-	return res.Error
 }

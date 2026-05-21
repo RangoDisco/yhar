@@ -10,7 +10,6 @@ import (
 	"github.com/rangodisco/yhar/internal/api/models"
 	"github.com/rangodisco/yhar/internal/api/providers"
 	"github.com/rangodisco/yhar/internal/api/repositories"
-	"github.com/rangodisco/yhar/internal/api/types/filters"
 	"gorm.io/gorm"
 )
 
@@ -86,7 +85,8 @@ func (s *ScrobbleService) HandleNewScrobble(ctx context.Context, entry *UnifiedS
 	}
 
 	// Ensure scrobble wasn't already created
-	existingScrobble, err := s.repo.FindByTrackAndTimestamp(ctx, t.ID, user.ID, listenedAt)
+	existingScrobble, err := s.repo.FindOneBy(ctx, []repositories.QueryFilter{{Key: "track_id", Value: t.ID}, {Key: "user_id", Value: user.ID}, {Key: "scrobbled_at", Value: listenedAt}})
+	//existingScrobble, err := s.repo.FindByTrackAndTimestamp(ctx, t.ID, user.ID, listenedAt)
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, fmt.Errorf("unable to query db: %w", err)
 	}
@@ -95,16 +95,16 @@ func (s *ScrobbleService) HandleNewScrobble(ctx context.Context, entry *UnifiedS
 		return nil, fmt.Errorf("scrobble already exists")
 	}
 
-	err = s.repo.PersistScrobble(ctx, scrobble)
+	err = s.repo.Persist(ctx, scrobble)
 	if err != nil {
 		return nil, err
 	}
 	return scrobble, nil
 }
 
-// Get finds a models.Scrobble by filters
-func (s *ScrobbleService) Get(ctx context.Context, user *dto.UserPassport, filters []filters.QueryFilter) (*models.Scrobble, error) {
-	scrobble, err := s.repo.FindActiveByFilters(ctx, filters)
+// GetByID finds a models.Scrobble by ID
+func (s *ScrobbleService) GetByID(ctx context.Context, id int64, user *dto.UserPassport) (*models.Scrobble, error) {
+	scrobble, err := s.repo.FindOneByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -117,7 +117,7 @@ func (s *ScrobbleService) Get(ctx context.Context, user *dto.UserPassport, filte
 }
 
 func (s *ScrobbleService) Delete(ctx context.Context, scrobble *models.Scrobble) error {
-	return s.repo.Delete(ctx, scrobble)
+	return s.repo.Delete(ctx, scrobble.ID)
 }
 
 // getOrCreateTrack finds or create all content (track, album, artists) related to the scrobble

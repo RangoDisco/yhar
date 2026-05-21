@@ -6,7 +6,6 @@ import (
 	"github.com/rangodisco/yhar/internal/api/models"
 	"github.com/rangodisco/yhar/internal/api/providers"
 	"github.com/rangodisco/yhar/internal/api/repositories"
-	"github.com/rangodisco/yhar/internal/api/types/filters"
 )
 
 type TrackService struct {
@@ -19,14 +18,12 @@ func NewTrackService(repo *repositories.TrackRepository) *TrackService {
 
 // GetByScrobbleInfo tries to find an existing models.Track from the database, based on a subsonic.Entry
 func (s *TrackService) GetByScrobbleInfo(ctx context.Context, entry *UnifiedScrobbleEntry) (*models.Track, error) {
-	var queryFilters []filters.QueryFilter
+	filter := repositories.QueryFilter{Key: "title", Value: entry.Title}
 	if entry.MusicBrainzID != "" {
-		queryFilters = append(queryFilters, filters.QueryFilter{Key: "music_brainz_id", Value: entry.MusicBrainzID})
-	} else {
-		queryFilters = append(queryFilters, filters.QueryFilter{Key: "title", Value: entry.Title})
+		filter = repositories.QueryFilter{Key: "music_brainz_id", Value: entry.MusicBrainzID}
 	}
 
-	track, err := s.repo.FindActiveByFilter(ctx, queryFilters)
+	track, err := s.repo.FindOneBy(ctx, []repositories.QueryFilter{filter}, "Artists.Picture", "Album.Picture")
 	if err != nil {
 		return nil, err
 	}

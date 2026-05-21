@@ -2,12 +2,12 @@ package handlers
 
 import (
 	"errors"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/rangodisco/yhar/internal/api/common"
 	"github.com/rangodisco/yhar/internal/api/dto"
 	"github.com/rangodisco/yhar/internal/api/services"
-	"github.com/rangodisco/yhar/internal/api/types/filters"
 	"gorm.io/gorm"
 )
 
@@ -31,7 +31,13 @@ func (h *ArtistHandler) Update(c *gin.Context) {
 		return
 	}
 
-	artist, err := h.service.Get(ctx, []filters.QueryFilter{{Key: "id", Value: id}})
+	iID, err := strconv.ParseInt(id, 10, 64)
+	if err != nil {
+		common.RespondWithError(c, 400, err, "Invalid artist ID")
+		return
+	}
+
+	artist, err := h.service.GetByID(ctx, iID)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			common.RespondWithError(c, 404, err, "Artist not found")

@@ -9,7 +9,6 @@ import (
 	"github.com/rangodisco/yhar/internal/api/models"
 	"github.com/rangodisco/yhar/internal/api/providers"
 	"github.com/rangodisco/yhar/internal/api/repositories"
-	filters "github.com/rangodisco/yhar/internal/api/types/filters"
 	"gorm.io/gorm"
 )
 
@@ -25,15 +24,15 @@ func NewArtistService(repo *repositories.ArtistRepository, image *ImageService, 
 
 // GetOrCreate tries to fetch or create a models.Artist if it doesn't exist
 func (s *ArtistService) GetOrCreate(ctx context.Context, info providers.ArtistMetadata) (*models.Artist, error) {
-	var queryFilters []filters.QueryFilter
+	filter := repositories.QueryFilter{Key: "name", Value: info.Name}
 
 	if info.MBID != "" {
-		queryFilters = append(queryFilters, filters.QueryFilter{Key: "music_brainz_id", Value: info.MBID})
-	} else {
-		queryFilters = append(queryFilters, filters.QueryFilter{Key: "name", Value: info.Name})
+		filter = repositories.QueryFilter{
+			Key: "music_brainz_id", Value: info.MBID,
+		}
 	}
 
-	existingArtist, err := s.Get(ctx, queryFilters)
+	existingArtist, err := s.repo.FindOneBy(ctx, []repositories.QueryFilter{filter}, "Picture")
 	if err == nil && existingArtist != nil {
 		return existingArtist, err
 	}
@@ -64,7 +63,7 @@ func (s *ArtistService) GetOrCreate(ctx context.Context, info providers.ArtistMe
 	if err != nil {
 		// could happen if another routine inserted the same artist first
 		if errors.Is(err, gorm.ErrDuplicatedKey) {
-			return s.repo.FindActiveByFilters(ctx, queryFilters)
+			return s.repo.FindOneBy(ctx, []repositories.QueryFilter{filter}, "Picture")
 		}
 		return nil, err
 	}
@@ -72,9 +71,9 @@ func (s *ArtistService) GetOrCreate(ctx context.Context, info providers.ArtistMe
 	return a, nil
 }
 
-// Get finds a models.Artist by filters
-func (s *ArtistService) Get(ctx context.Context, filters []filters.QueryFilter) (*models.Artist, error) {
-	return s.repo.FindActiveByFilters(ctx, filters)
+// GetByID finds a models.Artist by ID
+func (s *ArtistService) GetByID(ctx context.Context, id int64) (*models.Artist, error) {
+	return s.repo.FindOneByID(ctx, id, "Picture")
 }
 
 // Update partially updates a models.Artist with given dto.UpdateArtistInput
@@ -89,7 +88,7 @@ func (s *ArtistService) Update(ctx context.Context, a *models.Artist, input dto.
 		updates["picture_id"] = *input.ImageID
 	}
 
-	err := s.repo.Update(ctx, a, updates)
+	err := s.repo.Update(ctx, a.ID, updates)
 	if err != nil {
 		return nil, fmt.Errorf("unable to update artist: %w", err)
 	}

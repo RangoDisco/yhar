@@ -11,7 +11,6 @@ import (
 	"github.com/rangodisco/yhar/internal/api/models"
 	"github.com/rangodisco/yhar/internal/api/repositories"
 	"github.com/rangodisco/yhar/internal/api/types/auth"
-	"github.com/rangodisco/yhar/internal/api/types/filters"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -84,7 +83,7 @@ func (s *AuthService) RefreshToken(t string) (string, error) {
 // compares the passwords and creates a token
 func (s *AuthService) HandleUserLogin(ctx context.Context, request auth.LoginRequest) (string, string, error) {
 
-	user, err := s.repo.FindActiveByFilters(ctx, []filters.QueryFilter{
+	user, err := s.repo.FindOneBy(ctx, []repositories.QueryFilter{
 		{Key: "username", Value: request.Username},
 	})
 	if err != nil {
@@ -133,9 +132,9 @@ func (s *AuthService) GetUserFromToken(ctx context.Context, token *jwt.Token) (*
 		return nil, errors.New("username claim is not a valid string")
 	}
 
-	user, err := s.repo.FindActiveByFilters(ctx, []filters.QueryFilter{
+	user, err := s.repo.FindOneBy(ctx, []repositories.QueryFilter{
 		{Key: "username", Value: username},
-	})
+	}, "Role.Permissions")
 
 	if err != nil {
 		return nil, fmt.Errorf("unable to get user from token: %w", err)

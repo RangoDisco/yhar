@@ -99,7 +99,7 @@ func AutoWire(db *gorm.DB) (*Repositories, *Services, *Handlers, *Pollers, *Impo
 	}
 
 	plrs := &Pollers{
-		Subsonic: pollers.NewSubsonicPoller(svs.Session),
+		Subsonic: pollers.NewSubsonicPoller(svs.Session, repos.Session),
 	}
 
 	hdls := &Handlers{

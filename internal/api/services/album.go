@@ -10,7 +10,6 @@ import (
 	"github.com/rangodisco/yhar/internal/api/models"
 	"github.com/rangodisco/yhar/internal/api/providers"
 	"github.com/rangodisco/yhar/internal/api/repositories"
-	"github.com/rangodisco/yhar/internal/api/types/filters"
 	"gorm.io/gorm"
 )
 
@@ -28,19 +27,14 @@ func NewAlbumService(repo *repositories.AlbumRepository, image *ImageService) *A
 
 // GetOrCreateAlbum tries to fetch or create an album if it doesn't exist
 func (s *AlbumService) GetOrCreateAlbum(ctx context.Context, info providers.AlbumMetadata, artists []models.Artist) (*models.Album, error) {
-	var queryFilters []filters.QueryFilter
-
+	filter := repositories.QueryFilter{Key: "title", Value: info.Title}
 	if info.MBID != "" {
-		queryFilters = append(queryFilters, filters.QueryFilter{
+		filter = repositories.QueryFilter{
 			Key: "music_brainz_id", Value: info.MBID,
-		})
-	} else {
-		queryFilters = append(queryFilters, filters.QueryFilter{
-			Key: "title", Value: info.Title,
-		})
+		}
 	}
 
-	existingAlbum, err := s.Get(ctx, queryFilters)
+	existingAlbum, err := s.repo.FindOneBy(ctx, []repositories.QueryFilter{filter}, "Artists.Picture", "Picture")
 	if err == nil {
 		return existingAlbum, nil
 	}
@@ -67,7 +61,7 @@ func (s *AlbumService) GetOrCreateAlbum(ctx context.Context, info providers.Albu
 	if err != nil {
 		// could happen if another routine inserted the same album first
 		if errors.Is(err, gorm.ErrDuplicatedKey) {
-			return s.repo.FindActiveByFilters(ctx, queryFilters)
+			return s.repo.FindOneBy(ctx, []repositories.QueryFilter{filter})
 		}
 		return nil, err
 	}
@@ -75,9 +69,9 @@ func (s *AlbumService) GetOrCreateAlbum(ctx context.Context, info providers.Albu
 	return model, nil
 }
 
-// Get finds a models.Album by filters
-func (s *AlbumService) Get(ctx context.Context, filters []filters.QueryFilter) (*models.Album, error) {
-	return s.repo.FindActiveByFilters(ctx, filters)
+// GetByID finds a models.Album by ID
+func (s *AlbumService) GetByID(ctx context.Context, id int64) (*models.Album, error) {
+	return s.repo.FindOneByID(ctx, id, "Artists.Picture", "Picture")
 }
 
 // Update partially updates a models.Album with given dto.UpdateAlbumInput
@@ -92,7 +86,7 @@ func (s *AlbumService) Update(ctx context.Context, a *models.Album, input dto.Up
 		updates["picture_id"] = *input.ImageID
 	}
 
-	err := s.repo.Update(ctx, a, updates)
+	err := s.repo.Update(ctx, a.ID, updates)
 	if err != nil {
 		return nil, fmt.Errorf("unable to update album: %w", err)
 	}

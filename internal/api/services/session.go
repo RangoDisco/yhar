@@ -25,14 +25,7 @@ func NewSessionService(repo *repositories.SessionRepository, scrobble *ScrobbleS
 }
 
 func (s *SessionService) GetOrCreateSession(ctx context.Context, entry subsonic.Entry) (*models.Session, error) {
-	queryFilters := []repositories.QueryFilter{
-		{Key: "username", Value: entry.Username},
-		{Key: "player_id", Value: entry.PlayerID},
-		{Key: "title", Value: entry.Title},
-		{Key: "completed_at", Value: nil},
-	}
-
-	session, err := s.repo.FindOneBy(ctx, queryFilters)
+	session, err := s.repo.FindCurrentByEntry(ctx, entry)
 	// In case an error occurred, and it's not a gorm not found, skip and return error
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, err
@@ -57,7 +50,7 @@ func (s *SessionService) GetOrCreateSession(ctx context.Context, entry subsonic.
 		StartedAt: time.Now(),
 	}
 
-	duration, err := time.ParseDuration(fmt.Sprintf("%ss", entry.Duration))
+	duration, err := time.ParseDuration(fmt.Sprintf("%s%s", entry.Duration, "s"))
 	if err != nil {
 		return nil, fmt.Errorf("unable to parse duration: %w", err)
 	}

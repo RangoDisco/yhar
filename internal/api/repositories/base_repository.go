@@ -34,30 +34,32 @@ func (r *BaseRepository[T]) FindOneByID(ctx context.Context, id int64, preloads 
 }
 
 func (r *BaseRepository[T]) FindOneBy(ctx context.Context, filters []QueryFilter, preloads ...string) (*T, error) {
-	db := r.preload(r.Db, preloads)
+	var res T
+	query := r.preload(r.Db.WithContext(ctx).Session(&gorm.Session{}), preloads)
 	for _, f := range filters {
 		if f.Value == nil {
-			db = db.Where(fmt.Sprintf("%s IS null", f.Key))
+			query = query.Where(fmt.Sprintf("%s IS null", f.Key))
 		} else {
-			db = db.Where(fmt.Sprintf("%s = ?", f.Key), f.Value)
+			query = query.Where(fmt.Sprintf("%s = ?", f.Key), f.Value)
 		}
 	}
 
-	res, err := gorm.G[T](db).First(ctx)
+	err := query.First(&res).Error
 	if err != nil {
 		return nil, err
 	}
-
-	return &res, err
+	return &res, nil
 }
 
 func (r *BaseRepository[T]) FindBy(ctx context.Context, filters []QueryFilter, preloads ...string) ([]T, error) {
-	db := r.preload(r.Db, preloads)
+	var res []T
+	query := r.preload(r.Db.WithContext(ctx).Session(&gorm.Session{}), preloads)
+
 	for _, f := range filters {
-		db = db.Where(fmt.Sprintf("%s = ?", f.Key), f.Value)
+		query = query.Where(fmt.Sprintf("%s = ?", f.Key), f.Value)
 	}
 
-	res, err := gorm.G[T](db).Find(ctx)
+	err := query.Find(&res).Error
 	if err != nil {
 		return nil, err
 	}

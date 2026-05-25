@@ -53,18 +53,13 @@ func SetupDB(t *testing.T) *gorm.DB {
 	return tx
 }
 
-func SetupRouter(t *testing.T, db *gorm.DB) (*gin.Engine, *config.Handlers) {
+func SetupRouter(t *testing.T, db *gorm.DB, caller *models.User) *gin.Engine {
 	t.Helper()
 	gin.SetMode(gin.TestMode)
-	r := gin.Default()
 
-	_, _, handlers, _, _ := config.AutoWire(db)
+	_, s, h, _, _ := config.AutoWire(db)
 
-	// Mock authentication middleware, TODO: remove
-	r.Use(func(c *gin.Context) {
-		c.Set("user", &dto.UserPassport{ID: 1, Username: "rango"})
-		c.Next()
+	return config.SetupRouter(s, h, func(c *gin.Context) {
+		c.Set("user", &dto.UserPassport{ID: caller.ID, Username: caller.Username, Role: caller.Role})
 	})
-
-	return r, handlers
 }

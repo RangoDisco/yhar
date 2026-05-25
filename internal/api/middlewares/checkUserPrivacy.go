@@ -8,10 +8,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/rangodisco/yhar/internal/api/common"
 	"github.com/rangodisco/yhar/internal/api/dto"
-	"github.com/rangodisco/yhar/internal/api/repositories"
+	"github.com/rangodisco/yhar/internal/api/services"
 )
 
-func CheckUserPrivacy(repo *repositories.UserRepository) gin.HandlerFunc {
+func CheckUserPrivacy(service *services.UserService) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx := c.Request.Context()
 		rawUser, exists := c.Get("user")
@@ -44,7 +44,7 @@ func CheckUserPrivacy(repo *repositories.UserRepository) gin.HandlerFunc {
 			return
 		}
 
-		u, err := repo.FindOneByID(ctx, iID, "Role.Permissions")
+		u, err := service.GetUserByID(ctx, iID)
 		if err != nil {
 			common.RespondWithError(c, http.StatusNotFound, errors.New("user doesn't exist"), "User not found")
 			return

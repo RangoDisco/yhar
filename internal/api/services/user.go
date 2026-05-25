@@ -43,3 +43,7 @@ func (s *UserService) GetOrCreateUser(ctx context.Context, rawUsername string) (
 
 	return model, nil
 }
+
+func (s *UserService) GetUserByID(ctx context.Context, id int64) (*models.User, error) {
+	return s.repo.FindOneByID(ctx, id, "Role.Permissions")
+}

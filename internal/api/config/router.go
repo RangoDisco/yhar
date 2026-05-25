@@ -5,24 +5,16 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	serverConfig "github.com/rangodisco/yhar/internal/api/config"
 	"github.com/rangodisco/yhar/internal/api/middlewares"
 )
 
 func SetupRouter(
-	repo *serverConfig.Repositories,
-	s *serverConfig.Services,
-	h *serverConfig.Handlers,
+	s *Services,
+	h *Handlers,
+	authMiddleware gin.HandlerFunc,
 ) *gin.Engine {
-	SetupLogger()
 	r := gin.New()
 
-	loadRoutes(r, repo, s, h)
-
-	return r
-}
-
-func loadRoutes(r *gin.Engine, repo *serverConfig.Repositories, s *serverConfig.Services, h *serverConfig.Handlers) {
 	api := r.Group("/api")
 	api.Use(middlewares.LoggerMiddleware())
 	api.Use(cors.Default())
@@ -38,7 +30,7 @@ func loadRoutes(r *gin.Engine, repo *serverConfig.Repositories, s *serverConfig.
 	auth.POST("/refresh", h.Auth.Refresh)
 
 	protected := api.Group("/")
-	protected.Use(middlewares.Authenticate(s.Auth))
+	protected.Use(authMiddleware)
 
 	// Image
 	protected.POST("/images", middlewares.RequirePermissions([]string{"IMAGE_UPLOAD"}), h.Image.Upload)
@@ -58,7 +50,7 @@ func loadRoutes(r *gin.Engine, repo *serverConfig.Repositories, s *serverConfig.
 
 	// USER DATA
 	user := protected.Group("/users/:userID")
-	user.Use(middlewares.CheckUserPrivacy(repo.User))
+	user.Use(middlewares.CheckUserPrivacy(s.User))
 
 	user.GET("", h.User.GetUser)
 
@@ -69,4 +61,5 @@ func loadRoutes(r *gin.Engine, repo *serverConfig.Repositories, s *serverConfig.
 	userScrobbles.GET("/top/albums", h.ScrobbleStats.GetUserTopAlbums)
 	userScrobbles.GET("/top/tracks", h.ScrobbleStats.GetUserTopTracks)
 
+	return r
 }

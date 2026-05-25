@@ -11,9 +11,9 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/rangodisco/yhar/config"
 	serverConfig "github.com/rangodisco/yhar/internal/api/config"
 	ydb "github.com/rangodisco/yhar/internal/api/config/database"
+	"github.com/rangodisco/yhar/internal/api/middlewares"
 )
 
 func init() {
@@ -49,7 +49,7 @@ func main() {
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer cancel()
 
-	serverRepos, serverServices, handlers, pollers, importers := serverConfig.AutoWire(yDb)
+	_, serverServices, handlers, pollers, importers := serverConfig.AutoWire(yDb)
 
 	// Start pollers (subsonic only for now)
 	if os.Getenv("GIN_MODE") == gin.ReleaseMode && pollers.Subsonic != nil {
@@ -67,8 +67,9 @@ func main() {
 		}()
 	}
 
+	serverConfig.SetupLogger()
 	// Start router
-	r := config.SetupRouter(serverRepos, serverServices, handlers)
+	r := serverConfig.SetupRouter(serverServices, handlers, middlewares.Authenticate(serverServices.Auth))
 
 	srv := &http.Server{
 		Addr:    ":8080",

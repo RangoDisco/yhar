@@ -174,18 +174,18 @@ func TestGetHistory(t *testing.T) {
 		w := doRequest(t, router, privateUser.ID, "/scrobbles/history")
 		assert.Equal(t, http.StatusOK, w.Code)
 
-		var result common.APIResponse[common.PaginatedResponse[[]dto.TrackResult]]
+		var result common.APIResponse[common.PaginatedResponse[[]dto.HistoryResult]]
 		body, err := io.ReadAll(w.Body)
 		assert.NoError(t, err)
 
 		err = json.Unmarshal(body, &result)
 
 		assert.Len(t, result.Data.Results, 8)
-		assert.NotNil(t, result.Data.Results[0].Title)
-		assert.NotNil(t, result.Data.Results[0].Album)
-		assert.NotEmpty(t, result.Data.Results[0].Artists)
-		assert.NotNil(t, result.Data.Results[0].Artists[0].Name)
-		assert.Equal(t, 1, *result.Data.Results[0].ScrobbleCount)
+		assert.NotNil(t, result.Data.Results[0].Track.Title)
+		assert.NotNil(t, result.Data.Results[0].Track.Album)
+		assert.NotEmpty(t, result.Data.Results[0].Track.Artists)
+		assert.NotNil(t, result.Data.Results[0].Track.Artists[0].Name)
+		assert.NotNil(t, result.Data.Results[0].ScrobbledAt)
 	})
 
 	t.Run("Regular user accessing another private user's history", func(t *testing.T) {
@@ -201,18 +201,18 @@ func TestGetHistory(t *testing.T) {
 		w := doRequest(t, router, regularUser.ID, "/scrobbles/history")
 		assert.Equal(t, http.StatusOK, w.Code)
 
-		var result common.APIResponse[common.PaginatedResponse[[]dto.TrackResult]]
+		var result common.APIResponse[common.PaginatedResponse[[]dto.HistoryResult]]
 		body, err := io.ReadAll(w.Body)
 		assert.NoError(t, err)
 
 		err = json.Unmarshal(body, &result)
 
 		assert.Len(t, result.Data.Results, 8)
-		assert.NotNil(t, result.Data.Results[0].Title)
-		assert.NotNil(t, result.Data.Results[0].Album)
-		assert.NotEmpty(t, result.Data.Results[0].Artists)
-		assert.NotNil(t, result.Data.Results[0].Artists[0].Name)
-		assert.Equal(t, 1, *result.Data.Results[0].ScrobbleCount)
+		assert.NotNil(t, result.Data.Results[0].Track.Title)
+		assert.NotNil(t, result.Data.Results[0].Track.Album)
+		assert.NotEmpty(t, result.Data.Results[0].Track.Artists)
+		assert.NotNil(t, result.Data.Results[0].Track.Artists[0].Name)
+		assert.NotNil(t, result.Data.Results[0].ScrobbledAt)
 	})
 }
 

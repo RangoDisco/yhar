@@ -27,6 +27,20 @@ type RawTracks struct {
 	MusicBrainzID string
 }
 
+func GetStatsSeedData(t *testing.T, db *gorm.DB) (models.User, models.User) {
+	_ = SeedUser(t, db, "admin", "123", "ADMIN", false)
+	privateUser := SeedUser(t, db, "private", "123", "USER", false)
+	regularUser := SeedUser(t, db, "regular", "123", "USER", true)
+
+	trackIDs := CreateScrobbleContent(t, db)
+	for _, trackID := range trackIDs {
+		CreateScrobbles(t, db, trackID, privateUser.ID, 1)
+		CreateScrobbles(t, db, trackID, regularUser.ID, 1)
+	}
+
+	return privateUser, regularUser
+}
+
 // CreateScrobbles creates a given number of scrobbles for a given user and track.
 func CreateScrobbles(t *testing.T, db *gorm.DB, trackID int64, userID int64, count int) {
 	t.Helper()
@@ -74,7 +88,8 @@ func CreateScrobbleContent(t *testing.T, db *gorm.DB) []int64 {
 					{Title: "Some Will Seek Forgiveness, Others Escape", MusicBrainzID: "6be12749-02be-4ac3-97f0-afa0f14d9bf3"},
 				},
 			},
-		}, {
+		},
+		{
 			ArtistName:    "Ptite Soeur",
 			MusicBrainzID: "dac6f818-9b72-42ad-a2ff-1d6ee332ab4c",
 			Album: RawAlbum{

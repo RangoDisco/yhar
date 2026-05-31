@@ -32,10 +32,10 @@ func GetStatsSeedData(t *testing.T, db *gorm.DB) (models.User, models.User) {
 	privateUser := SeedUser(t, db, "private", "123", "USER", false)
 	regularUser := SeedUser(t, db, "regular", "123", "USER", true)
 
-	trackIDs := CreateScrobbleContent(t, db)
-	for _, trackID := range trackIDs {
-		CreateScrobbles(t, db, trackID, privateUser.ID, 1)
-		CreateScrobbles(t, db, trackID, regularUser.ID, 1)
+	tracks := CreateScrobbleContent(t, db)
+	for _, track := range tracks {
+		CreateScrobbles(t, db, track.ID, privateUser.ID, 1)
+		CreateScrobbles(t, db, track.ID, regularUser.ID, 1)
 	}
 
 	return privateUser, regularUser
@@ -59,7 +59,7 @@ func CreateScrobbles(t *testing.T, db *gorm.DB, trackID int64, userID int64, cou
 }
 
 // CreateScrobbleContent creates the whole chain (track, album artists) used to test stats routes
-func CreateScrobbleContent(t *testing.T, db *gorm.DB) []int64 {
+func CreateScrobbleContent(t *testing.T, db *gorm.DB) []models.Track {
 	rawContents := []RawContent{
 		{
 			ArtistName:    "nothing,nowhere.",
@@ -104,7 +104,7 @@ func CreateScrobbleContent(t *testing.T, db *gorm.DB) []int64 {
 		},
 	}
 
-	var trackIDs []int64
+	var tracks []models.Track
 
 	for _, rawContent := range rawContents {
 		// First create artist
@@ -139,9 +139,8 @@ func CreateScrobbleContent(t *testing.T, db *gorm.DB) []int64 {
 			err = db.Table("tracks").Create(track).Error
 			require.NoError(t, err)
 
-			trackIDs = append(trackIDs, track.ID)
+			tracks = append(tracks, *track)
 		}
 	}
-
-	return trackIDs
+	return tracks
 }

@@ -21,14 +21,18 @@ func SeedUser(t *testing.T, db *gorm.DB, name, password, role string, isPublic b
 	}
 
 	ctx := context.Background()
-	u := models.User{
+	rawUser := models.User{
 		Username: name,
 		Password: password,
 		RoleID:   roleId,
 		IsPublic: isPublic,
 	}
 
-	err := db.WithContext(ctx).Create(&u).Error
+	err := db.WithContext(ctx).Create(&rawUser).Error
+	require.NoError(t, err)
+
+	var u models.User
+	err = db.WithContext(ctx).Preload("Role.Permissions").Where("id = ?", rawUser.ID).Find(&u).Error
 	require.NoError(t, err)
 
 	return u

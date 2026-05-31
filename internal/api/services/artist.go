@@ -93,7 +93,9 @@ func (s *ArtistService) Update(ctx context.Context, a *models.Artist, input dto.
 		return nil, fmt.Errorf("unable to update artist: %w", err)
 	}
 
-	return a, nil
+	updated, err := s.repo.FindOneByID(ctx, a.ID, "Picture")
+
+	return updated, nil
 }
 
 // scrobbleInfoToArtistModel builds a new models.Artist based on a scrobble

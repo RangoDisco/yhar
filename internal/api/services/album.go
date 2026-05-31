@@ -79,7 +79,7 @@ func (s *AlbumService) Update(ctx context.Context, a *models.Album, input dto.Up
 	updates := make(map[string]interface{})
 
 	if input.Title != nil {
-		updates["name"] = *input.Title
+		updates["title"] = *input.Title
 	}
 
 	if input.ImageID != nil {
@@ -91,7 +91,12 @@ func (s *AlbumService) Update(ctx context.Context, a *models.Album, input dto.Up
 		return nil, fmt.Errorf("unable to update album: %w", err)
 	}
 
-	return a, nil
+	updated, err := s.repo.FindOneByID(ctx, a.ID, "Picture")
+	if err != nil {
+		return nil, fmt.Errorf("unable to find updated row from db: %w", err)
+	}
+
+	return updated, nil
 }
 
 func (s *AlbumService) parseAlbumType(at string) (*models.AlbumType, error) {

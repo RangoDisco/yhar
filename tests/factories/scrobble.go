@@ -131,6 +131,7 @@ func CreateScrobbleContent(t *testing.T, db *gorm.DB) []models.Track {
 		for _, rawTrack := range rawContent.Album.Tracks {
 			track := &models.Track{
 				Artists:       []models.Artist{*artist},
+				Album:         *album,
 				AlbumID:       album.ID,
 				Title:         rawTrack.Title,
 				MusicBrainzID: rawTrack.MusicBrainzID,

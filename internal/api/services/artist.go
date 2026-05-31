@@ -94,6 +94,9 @@ func (s *ArtistService) Update(ctx context.Context, a *models.Artist, input dto.
 	}
 
 	updated, err := s.repo.FindOneByID(ctx, a.ID, "Picture")
+	if err != nil {
+		return nil, fmt.Errorf("unable to find updated row from db: %w", err)
+	}
 
 	return updated, nil
 }

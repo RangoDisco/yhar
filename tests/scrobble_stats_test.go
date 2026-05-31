@@ -5,15 +5,12 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"net/http/httptest"
 	"testing"
 
-	"github.com/gin-gonic/gin"
 	"github.com/rangodisco/yhar/internal/api/common"
 	"github.com/rangodisco/yhar/internal/api/dto"
 	"github.com/rangodisco/yhar/tests/factories"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 // TODO handle admin case for all
@@ -25,7 +22,7 @@ func TestGetTopArtists(t *testing.T) {
 
 	t.Run("Private user accessing their own artist data", func(t *testing.T) {
 		router := SetupRouter(t, db, &privateUser)
-		w := doRequest(t, router, privateUser.ID, "/scrobbles/top/artists")
+		w := doRequest(t, router, http.MethodGet, fmt.Sprintf("/api/users/%d/scrobbles/top/artists", privateUser.ID), nil)
 		assert.Equal(t, http.StatusOK, w.Code)
 
 		var result common.APIResponse[common.PaginatedResponse[[]dto.TopArtistResult]]
@@ -42,13 +39,13 @@ func TestGetTopArtists(t *testing.T) {
 	t.Run("Regular user accessing another private user's artist data", func(t *testing.T) {
 		router := SetupRouter(t, db, &regularUser)
 
-		w := doRequest(t, router, privateUser.ID, "/scrobbles/top/artists")
+		w := doRequest(t, router, http.MethodGet, fmt.Sprintf("/api/users/%d/scrobbles/top/artists", privateUser.ID), nil)
 		assert.Equal(t, http.StatusNotFound, w.Code)
 	})
 
 	t.Run("Regular user accessing public user's artist data", func(t *testing.T) {
 		router := SetupRouter(t, db, &privateUser)
-		w := doRequest(t, router, regularUser.ID, "/scrobbles/top/artists")
+		w := doRequest(t, router, http.MethodGet, fmt.Sprintf("/api/users/%d/scrobbles/top/artists", regularUser.ID), nil)
 		assert.Equal(t, http.StatusOK, w.Code)
 
 		var result common.APIResponse[common.PaginatedResponse[[]dto.TopArtistResult]]
@@ -71,7 +68,7 @@ func TestGetTopAlbums(t *testing.T) {
 
 	t.Run("Private user accessing their own album data", func(t *testing.T) {
 		router := SetupRouter(t, db, &privateUser)
-		w := doRequest(t, router, privateUser.ID, "/scrobbles/top/albums")
+		w := doRequest(t, router, http.MethodGet, fmt.Sprintf("/api/users/%d/scrobbles/top/albums", privateUser.ID), nil)
 		assert.Equal(t, http.StatusOK, w.Code)
 
 		var result common.APIResponse[common.PaginatedResponse[[]dto.TopAlbumResult]]
@@ -88,13 +85,13 @@ func TestGetTopAlbums(t *testing.T) {
 	t.Run("Regular user accessing another private user's album data", func(t *testing.T) {
 		router := SetupRouter(t, db, &regularUser)
 
-		w := doRequest(t, router, privateUser.ID, "/scrobbles/top/albums")
+		w := doRequest(t, router, http.MethodGet, fmt.Sprintf("api/users/%d/scrobbles/top/albums", privateUser.ID), nil)
 		assert.Equal(t, http.StatusNotFound, w.Code)
 	})
 
 	t.Run("Regular user accessing public user's album data", func(t *testing.T) {
 		router := SetupRouter(t, db, &privateUser)
-		w := doRequest(t, router, regularUser.ID, "/scrobbles/top/albums")
+		w := doRequest(t, router, http.MethodGet, fmt.Sprintf("/api/users/%d/scrobbles/top/albums", regularUser.ID), nil)
 		assert.Equal(t, http.StatusOK, w.Code)
 
 		var result common.APIResponse[common.PaginatedResponse[[]dto.TopAlbumResult]]
@@ -118,7 +115,7 @@ func TestGetTopTracks(t *testing.T) {
 
 	t.Run("Private user accessing their own track data", func(t *testing.T) {
 		router := SetupRouter(t, db, &privateUser)
-		w := doRequest(t, router, privateUser.ID, "/scrobbles/top/tracks")
+		w := doRequest(t, router, http.MethodGet, fmt.Sprintf("/api/users/%d/scrobbles/top/tracks", privateUser.ID), nil)
 		assert.Equal(t, http.StatusOK, w.Code)
 
 		var result common.APIResponse[common.PaginatedResponse[[]dto.TrackResult]]
@@ -138,13 +135,13 @@ func TestGetTopTracks(t *testing.T) {
 	t.Run("Regular user accessing another private user's track data", func(t *testing.T) {
 		router := SetupRouter(t, db, &regularUser)
 
-		w := doRequest(t, router, privateUser.ID, "/scrobbles/top/tracks")
+		w := doRequest(t, router, http.MethodGet, fmt.Sprintf("/api/users/%d/scrobbles/top/tracks", privateUser.ID), nil)
 		assert.Equal(t, http.StatusNotFound, w.Code)
 	})
 
 	t.Run("Regular user accessing public user's track data", func(t *testing.T) {
 		router := SetupRouter(t, db, &privateUser)
-		w := doRequest(t, router, regularUser.ID, "/scrobbles/top/tracks")
+		w := doRequest(t, router, http.MethodGet, fmt.Sprintf("/api/users/%d/scrobbles/top/tracks", regularUser.ID), nil)
 		assert.Equal(t, http.StatusOK, w.Code)
 
 		var result common.APIResponse[common.PaginatedResponse[[]dto.TrackResult]]
@@ -171,7 +168,7 @@ func TestGetHistory(t *testing.T) {
 
 	t.Run("Private user accessing their own history", func(t *testing.T) {
 		router := SetupRouter(t, db, &privateUser)
-		w := doRequest(t, router, privateUser.ID, "/scrobbles/history")
+		w := doRequest(t, router, http.MethodGet, fmt.Sprintf("/api/users/%d/scrobbles/history", privateUser.ID), nil)
 		assert.Equal(t, http.StatusOK, w.Code)
 
 		var result common.APIResponse[common.PaginatedResponse[[]dto.HistoryResult]]
@@ -191,14 +188,14 @@ func TestGetHistory(t *testing.T) {
 	t.Run("Regular user accessing another private user's history", func(t *testing.T) {
 		router := SetupRouter(t, db, &regularUser)
 
-		w := doRequest(t, router, privateUser.ID, "/scrobbles/top/tracks")
+		w := doRequest(t, router, http.MethodGet, fmt.Sprintf("/api/users/%d/scrobbles/top/tracks", privateUser.ID), nil)
 		assert.Equal(t, http.StatusNotFound, w.Code)
 		assert.Equal(t, 1, 1)
 	})
 
 	t.Run("Regular user accessing public user's history", func(t *testing.T) {
 		router := SetupRouter(t, db, &privateUser)
-		w := doRequest(t, router, regularUser.ID, "/scrobbles/history")
+		w := doRequest(t, router, http.MethodGet, fmt.Sprintf("/api/users/%d/scrobbles/history", regularUser.ID), nil)
 		assert.Equal(t, http.StatusOK, w.Code)
 
 		var result common.APIResponse[common.PaginatedResponse[[]dto.HistoryResult]]
@@ -214,15 +211,4 @@ func TestGetHistory(t *testing.T) {
 		assert.NotNil(t, result.Data.Results[0].Track.Artists[0].Name)
 		assert.NotNil(t, result.Data.Results[0].ScrobbledAt)
 	})
-}
-
-func doRequest(t *testing.T, r *gin.Engine, uID int64, path string) *httptest.ResponseRecorder {
-	url := fmt.Sprintf("/api/users/%d%s", uID, path)
-	req, err := http.NewRequest(http.MethodGet, url, nil)
-	require.NoError(t, err)
-
-	w := httptest.NewRecorder()
-	r.ServeHTTP(w, req)
-
-	return w
 }

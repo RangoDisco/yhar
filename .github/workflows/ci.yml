@@ -11,6 +11,7 @@ jobs:
       matrix:
         dbversion: [ 'postgres:latest' ]
         go: [ 'stable' ]
+        platform: ['ubuntu-latest']
     runs-on: ${{matrix.platform}}
 
     services:

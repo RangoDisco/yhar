@@ -6,6 +6,7 @@ import (
 
 	"github.com/rangodisco/yhar/internal/api/models"
 	"github.com/stretchr/testify/require"
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
@@ -20,15 +21,18 @@ func SeedUser(t *testing.T, db *gorm.DB, name, password, role string, isPublic b
 		roleId = 2
 	}
 
+	hashed, err := bcrypt.GenerateFromPassword([]byte(password), 14)
+	require.NoError(t, err)
+
 	ctx := context.Background()
 	rawUser := models.User{
 		Username: name,
-		Password: password,
+		Password: string(hashed),
 		RoleID:   roleId,
 		IsPublic: isPublic,
 	}
 
-	err := db.WithContext(ctx).Create(&rawUser).Error
+	err = db.WithContext(ctx).Create(&rawUser).Error
 	require.NoError(t, err)
 
 	var u models.User

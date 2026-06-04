@@ -1,0 +1,50 @@
+name: ci.yml
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        dbversion: [ 'postgres:latest' ]
+        go: [ 'stable' ]
+    runs-on: ${{matrix.platform}}
+
+    services:
+      database:
+        image: ${{matrix.dbversion}}
+        env:
+          POSTGRES_USER: yhar
+          POSTGRES_PASSWORD: yhar
+          POSTGRES_DB: yhar
+        ports: 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Setup Go ${{matrix.go}}
+        uses: actions/setup-go@v6
+        with:
+          go-version: ${{matrix.go}}
+          cache: false
+
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Package cache
+        uses: actions/cache@v5
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+
+      - name: Run tests
+        run: DSN="user=yhar password=yhar dbname=yhar host=localhost port=54020 sslmode=disable" JWT_SECRET="SECRETJWT" REFRESH_SECRET="SECRETREFRESH"  go test -v ./...
+
+
+

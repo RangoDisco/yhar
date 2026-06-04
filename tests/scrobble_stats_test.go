@@ -14,6 +14,7 @@ import (
 )
 
 // TODO handle admin case for all
+// TODO handle anon case
 
 // TestGetTopArtists tests cases when fetching a user's top artists
 func TestGetTopArtists(t *testing.T) {
@@ -211,4 +212,6 @@ func TestGetHistory(t *testing.T) {
 		assert.NotNil(t, result.Data.Results[0].Track.Artists[0].Name)
 		assert.NotNil(t, result.Data.Results[0].ScrobbledAt)
 	})
+
+	t.Cleanup(func() { db.Rollback() })
 }

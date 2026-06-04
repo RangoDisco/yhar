@@ -34,16 +34,17 @@ func GetStatsSeedData(t *testing.T, db *gorm.DB) (models.User, models.User) {
 
 	tracks := CreateScrobbleContent(t, db)
 	for _, track := range tracks {
-		CreateScrobbles(t, db, track.ID, privateUser.ID, 1)
-		CreateScrobbles(t, db, track.ID, regularUser.ID, 1)
+		_ = CreateScrobbles(t, db, track.ID, privateUser.ID, 1)
+		_ = CreateScrobbles(t, db, track.ID, regularUser.ID, 1)
 	}
 
 	return privateUser, regularUser
 }
 
 // CreateScrobbles creates a given number of scrobbles for a given user and track.
-func CreateScrobbles(t *testing.T, db *gorm.DB, trackID int64, userID int64, count int) {
+func CreateScrobbles(t *testing.T, db *gorm.DB, trackID int64, userID int64, count int) []*models.Scrobble {
 	t.Helper()
+	var scrobbles []*models.Scrobble
 
 	for i := 0; i < count; i++ {
 		scrobble := &models.Scrobble{
@@ -55,7 +56,10 @@ func CreateScrobbles(t *testing.T, db *gorm.DB, trackID int64, userID int64, cou
 
 		err := db.Table("scrobbles").Create(&scrobble).Error
 		require.NoError(t, err)
+		scrobbles = append(scrobbles, scrobble)
 	}
+
+	return scrobbles
 }
 
 // CreateScrobbleContent creates the whole chain (track, album artists) used to test stats routes

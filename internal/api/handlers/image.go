@@ -41,7 +41,7 @@ func (h *ImageHandler) Upload(c *gin.Context) {
 
 	// Pre validate size so we can safely assign the whole file size later on
 	if file.Size > services.DefaultConfig.MaxSize {
-		common.RespondWithError(c, 400, fmt.Errorf("%v maximum size is: %d, got %d", services.DefaultConfig.MaxSize, file.Size), "File is too big")
+		common.RespondWithError(c, 400, fmt.Errorf("maximum size is: %d, got %d", services.DefaultConfig.MaxSize, file.Size), "File is too big")
 		return
 	}
 

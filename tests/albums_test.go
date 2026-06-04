@@ -27,8 +27,6 @@ func TestPatchAlbum(t *testing.T) {
 	require.NoError(t, err)
 	bytesBody := bytes.NewBuffer(out)
 
-	fmt.Println(tracks)
-
 	t.Run("Regular user patching an album", func(t *testing.T) {
 		router := SetupRouter(t, db, &regularUser)
 

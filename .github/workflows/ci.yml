@@ -21,7 +21,8 @@ jobs:
           POSTGRES_USER: yhar
           POSTGRES_PASSWORD: yhar
           POSTGRES_DB: yhar
-        ports: 5432:5432
+        ports:
+        - 5432:5432
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -45,7 +46,7 @@ jobs:
           key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
 
       - name: Run tests
-        run: DSN="user=yhar password=yhar dbname=yhar host=localhost port=54020 sslmode=disable" JWT_SECRET="SECRETJWT" REFRESH_SECRET="SECRETREFRESH"  go test -v ./...
+        run: DSN="user=yhar password=yhar dbname=yhar host=localhost port=5432 sslmode=disable" JWT_SECRET="SECRETJWT" REFRESH_SECRET="SECRETREFRESH"  go test -v ./...
 
 
 

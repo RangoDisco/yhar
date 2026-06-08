@@ -85,7 +85,7 @@ func (s *AuthService) HandleUserLogin(ctx context.Context, request auth.LoginReq
 
 	user, err := s.repo.FindOneBy(ctx, []repositories.QueryFilter{
 		{Key: "username", Value: request.Username},
-	})
+	}, "Role")
 	if err != nil {
 		return "", "", err
 	}

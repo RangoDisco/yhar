@@ -4,7 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
+	"github.com/rangodisco/yhar/internal/api/models"
 	"github.com/rangodisco/yhar/internal/api/providers"
 )
 
@@ -24,20 +26,27 @@ func NewMetadataService(
 }
 
 // GetInfoByScrobble fetches metadata from multiple providers and formats it into a standardized providers.InfoResponse
-func (s *MetadataService) GetInfoByScrobble(ctx context.Context, MBID, title, artist, album string) (*providers.InfoResponse, error) {
+func (s *MetadataService) GetInfoByScrobble(ctx context.Context, MBID, title, artist, album, duration string) (*providers.InfoResponse, error) {
 	if MBID == "" && title == "" {
 		return nil, fmt.Errorf("%w: at least one MBID or title is required", ErrInvalidScrobble)
 	}
 
-	info, err := s.enrichMetadata(ctx, &providers.ScrobbleData{
-		Title:  title,
-		MBID:   MBID,
-		Album:  album,
-		Artist: artist,
-	})
+	data := &providers.ScrobbleData{
+		Title:    title,
+		MBID:     MBID,
+		Album:    album,
+		Artist:   artist,
+		Duration: duration,
+	}
 
+	info, err := s.enrichMetadata(ctx, data)
 	if err != nil {
-		return nil, fmt.Errorf("unable to enrich metadata: %w", err)
+		// Still create manual track infos for tracks without metadata (unreleased, custom songs, etc.)
+		manualInfos, manualErr := s.buildManualProviderInfos(data)
+		if manualErr != nil {
+			return nil, err
+		}
+		return manualInfos, nil
 	}
 
 	return info, nil
@@ -89,7 +98,29 @@ func (s *MetadataService) enrichMetadata(ctx context.Context, infos *providers.S
 	return &providers.InfoResponse{
 		Track: *trackInfo,
 	}, nil
+}
 
+func (s *MetadataService) buildManualProviderInfos(infos *providers.ScrobbleData) (*providers.InfoResponse, error) {
+	duration, err := time.ParseDuration(fmt.Sprintf("%ss", infos.Duration))
+	if err != nil {
+		return nil, err
+	}
+	artists := []providers.ArtistMetadata{{Name: infos.Artist, SortName: infos.Artist, ImageUrl: "", Genres: make([]string, 0), MBID: ""}}
+	return &providers.InfoResponse{
+		Track: providers.TrackMetadata{
+			Title:   infos.Title,
+			Artists: artists,
+			Album: providers.AlbumMetadata{
+				Title:     infos.Album,
+				MBID:      "",
+				Artists:   artists,
+				AlbumType: string(models.ALBUM),
+			},
+			Duration: duration,
+			ISRC:     "",
+			MBID:     "",
+		},
+	}, nil
 }
 
 func (s *MetadataService) findProviderByName(name string) providers.MetadataProvider {

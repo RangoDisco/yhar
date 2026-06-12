@@ -47,6 +47,7 @@ type UnifiedScrobbleEntry struct {
 	Album         string    `json:"album"`
 	MusicBrainzID string    `json:"musicbrainz_id"`
 	ListenedAt    time.Time `json:"listened_at"`
+	Duration      string    `json:"duration"`
 }
 
 // HandleNewScrobble takes a subsonic getNowPlaying entry, fetches/creates associated content and persists a new Scrobble
@@ -130,7 +131,7 @@ func (s *ScrobbleService) getOrCreateTrack(ctx context.Context, entry *UnifiedSc
 		return existingTrack, nil
 	}
 
-	metadata, err := s.metadata.GetInfoByScrobble(ctx, entry.MusicBrainzID, entry.Title, entry.Artist, entry.Album)
+	metadata, err := s.metadata.GetInfoByScrobble(ctx, entry.MusicBrainzID, entry.Title, entry.Artist, entry.Album, entry.Duration)
 	if err != nil {
 		return nil, err
 	}

@@ -173,6 +173,7 @@ func (p *SubsonicPoller) parseToUnifiedScrobble(entry subsonic.Entry) (*services
 		MusicBrainzID: entry.MusicBrainzID,
 		Album:         entry.Album,
 		Artist:        entry.Artist,
+		Duration:      entry.Duration,
 	}, nil
 
 }

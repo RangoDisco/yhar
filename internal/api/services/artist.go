@@ -26,7 +26,7 @@ func NewArtistService(repo *repositories.ArtistRepository, image *ImageService, 
 func (s *ArtistService) GetOrCreate(ctx context.Context, info providers.ArtistMetadata) (*models.Artist, error) {
 	filter := repositories.QueryFilter{Key: "name", Value: info.Name}
 
-	if info.MBID != "" {
+	if info.MBID != nil {
 		filter = repositories.QueryFilter{
 			Key: "music_brainz_id", Value: info.MBID,
 		}

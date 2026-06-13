@@ -8,6 +8,6 @@ type Artist struct {
 	Albums        []Album `json:"albums" gorm:"many2many:artist_albums;"`
 	Tracks        []Track `json:"tracks" gorm:"many2many:track_artists;"`
 	PictureID     *int64
-	Picture       Image  `json:"picture" gorm:"foreignkey:PictureID"`
-	MusicBrainzID string `json:"music_brainz_id" gorm:"uniqueIndex"`
+	Picture       Image   `json:"picture" gorm:"foreignkey:PictureID"`
+	MusicBrainzID *string `json:"music_brainz_id" gorm:"uniqueIndex"`
 }

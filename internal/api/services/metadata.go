@@ -26,8 +26,8 @@ func NewMetadataService(
 }
 
 // GetInfoByScrobble fetches metadata from multiple providers and formats it into a standardized providers.InfoResponse
-func (s *MetadataService) GetInfoByScrobble(ctx context.Context, MBID, title, artist, album, duration string) (*providers.InfoResponse, error) {
-	if MBID == "" && title == "" {
+func (s *MetadataService) GetInfoByScrobble(ctx context.Context, MBID *string, title, artist, album, duration string) (*providers.InfoResponse, error) {
+	if MBID == nil && title == "" {
 		return nil, fmt.Errorf("%w: at least one MBID or title is required", ErrInvalidScrobble)
 	}
 
@@ -105,20 +105,20 @@ func (s *MetadataService) buildManualProviderInfos(infos *providers.ScrobbleData
 	if err != nil {
 		return nil, err
 	}
-	artists := []providers.ArtistMetadata{{Name: infos.Artist, SortName: infos.Artist, ImageUrl: "", Genres: make([]string, 0), MBID: ""}}
+	artists := []providers.ArtistMetadata{{Name: infos.Artist, SortName: infos.Artist, ImageUrl: "", Genres: make([]string, 0), MBID: infos.MBID}}
 	return &providers.InfoResponse{
 		Track: providers.TrackMetadata{
 			Title:   infos.Title,
 			Artists: artists,
 			Album: providers.AlbumMetadata{
 				Title:     infos.Album,
-				MBID:      "",
+				MBID:      infos.MBID,
 				Artists:   artists,
 				AlbumType: string(models.ALBUM),
 			},
 			Duration: duration,
 			ISRC:     "",
-			MBID:     "",
+			MBID:     infos.MBID,
 		},
 	}, nil
 }

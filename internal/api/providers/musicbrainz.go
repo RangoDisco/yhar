@@ -95,7 +95,7 @@ func (p *MusicBrainzProvider) Name() string {
 }
 
 func (p *MusicBrainzProvider) GetTrackByInfos(ctx context.Context, data ScrobbleData) (*TrackMetadata, error) {
-	if data.MBID == "" && data.Title == "" {
+	if data.MBID == nil && data.Title == "" {
 		return nil, errors.New("no MBID nor title was provided")
 	}
 
@@ -103,7 +103,7 @@ func (p *MusicBrainzProvider) GetTrackByInfos(ctx context.Context, data Scrobble
 	var err error
 
 	// If MBID is provided, use it
-	if data.MBID != "" {
+	if data.MBID != nil {
 		rec, err = p.getTrackByMBID(ctx, data.MBID)
 	} else {
 		// Otherwise, search by title and artist
@@ -127,8 +127,8 @@ func (p *MusicBrainzProvider) GetTrackByInfos(ctx context.Context, data Scrobble
 	return track, nil
 }
 
-func (p *MusicBrainzProvider) getTrackByMBID(ctx context.Context, mbid string) (*recording, error) {
-	endpoint := fmt.Sprintf("%s/recording/%s", p.baseURL, mbid)
+func (p *MusicBrainzProvider) getTrackByMBID(ctx context.Context, mbid *string) (*recording, error) {
+	endpoint := fmt.Sprintf("%s/recording/%s", p.baseURL, *mbid)
 	params := url.Values{
 		"fmt": {"json"},
 	}
@@ -198,7 +198,7 @@ func (p *MusicBrainzProvider) GetArtistImage(ctx context.Context, mbid, name str
 func (p *MusicBrainzProvider) convertRecordingToTrack(ctx context.Context, rec *recording) *TrackMetadata {
 	track := &TrackMetadata{
 		Title:    rec.Title,
-		MBID:     rec.ID,
+		MBID:     &rec.ID,
 		Duration: time.Duration(rec.Length) * time.Millisecond,
 	}
 
@@ -208,7 +208,7 @@ func (p *MusicBrainzProvider) convertRecordingToTrack(ctx context.Context, rec *
 		artists = append(artists, ArtistMetadata{
 			Name:     credit.Name,
 			SortName: credit.Artist.SortName,
-			MBID:     credit.Artist.ID,
+			MBID:     &credit.Artist.ID,
 		})
 	}
 	track.Artists = artists
@@ -220,7 +220,7 @@ func (p *MusicBrainzProvider) convertRecordingToTrack(ctx context.Context, rec *
 func (p *MusicBrainzProvider) convertReleaseToAlbum(ctx context.Context, releaseDetails *releaseWithDetails) *AlbumMetadata {
 	album := &AlbumMetadata{
 		Title:     releaseDetails.Title,
-		MBID:      releaseDetails.ID,
+		MBID:      &releaseDetails.ID,
 		AlbumType: releaseDetails.ReleaseGroup.PrimaryType,
 		ImageURL:  releaseDetails.CoverURL,
 	}
@@ -231,7 +231,7 @@ func (p *MusicBrainzProvider) convertReleaseToAlbum(ctx context.Context, release
 		artists = append(artists, ArtistMetadata{
 			Name:     credit.Name,
 			SortName: credit.Artist.SortName,
-			MBID:     credit.Artist.ID,
+			MBID:     &credit.Artist.ID,
 		})
 	}
 

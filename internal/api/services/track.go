@@ -19,7 +19,7 @@ func NewTrackService(repo *repositories.TrackRepository) *TrackService {
 // GetByScrobbleInfo tries to find an existing models.Track from the database, based on a subsonic.Entry
 func (s *TrackService) GetByScrobbleInfo(ctx context.Context, entry *UnifiedScrobbleEntry) (*models.Track, error) {
 	filter := repositories.QueryFilter{Key: "title", Value: entry.Title}
-	if entry.MusicBrainzID != "" {
+	if entry.MusicBrainzID != nil {
 		filter = repositories.QueryFilter{Key: "music_brainz_id", Value: entry.MusicBrainzID}
 	}
 

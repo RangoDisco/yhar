@@ -48,7 +48,7 @@ type Entry struct {
 	Comment            string        `xml:"comment,attr,omitempty"`
 	SortName           string        `xml:"sortName,attr"`
 	MediaType          string        `xml:"mediaType,attr"`
-	MusicBrainzID      string        `xml:"musicBrainzId,attr,omitempty"`
+	MusicBrainzID      *string       `xml:"musicBrainzId,attr,omitempty"`
 	ChannelCount       string        `xml:"channelCount,attr"`
 	SamplingRate       string        `xml:"samplingRate,attr"`
 	BitDepth           string        `xml:"bitDepth,attr"`

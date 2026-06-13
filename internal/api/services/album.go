@@ -28,7 +28,7 @@ func NewAlbumService(repo *repositories.AlbumRepository, image *ImageService) *A
 // GetOrCreateAlbum tries to fetch or create an album if it doesn't exist
 func (s *AlbumService) GetOrCreateAlbum(ctx context.Context, info providers.AlbumMetadata, artists []models.Artist) (*models.Album, error) {
 	filter := repositories.QueryFilter{Key: "title", Value: info.Title}
-	if info.MBID != "" {
+	if info.MBID != nil {
 		filter = repositories.QueryFilter{
 			Key: "music_brainz_id", Value: info.MBID,
 		}

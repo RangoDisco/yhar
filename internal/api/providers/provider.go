@@ -15,12 +15,12 @@ import (
 
 // ScrobbleData is the data received from scrobble services
 type ScrobbleData struct {
-	Title    string `json:"title" binding:"required,min=2,max=255"`
-	Album    string `json:"album" binding:"max=150"`
-	Artist   string `json:"artist" binding:"max=150"`
-	Year     int64  `json:"year" binding:"gte=0,lte=9223372036854775807"`
-	MBID     string `json:"mbid"`
-	Duration string `json:"duration"`
+	Title    string  `json:"title" binding:"required,min=2,max=255"`
+	Album    string  `json:"album" binding:"max=150"`
+	Artist   string  `json:"artist" binding:"max=150"`
+	Year     int64   `json:"year" binding:"gte=0,lte=9223372036854775807"`
+	MBID     *string `json:"mbid"`
+	Duration string  `json:"duration"`
 }
 
 type InfoResponse struct {
@@ -33,7 +33,7 @@ type TrackMetadata struct {
 	Album    AlbumMetadata    `json:"album"`
 	Duration time.Duration    `json:"duration"`
 	ISRC     string           `json:"isrc"`
-	MBID     string           `json:"mbid"`
+	MBID     *string          `json:"mbid"`
 }
 
 type ArtistMetadata struct {
@@ -41,7 +41,7 @@ type ArtistMetadata struct {
 	SortName string   `json:"sort_name"`
 	ImageUrl string   `json:"image_url"`
 	Genres   []string `json:"genres"`
-	MBID     string   `json:"mbid"`
+	MBID     *string  `json:"mbid"`
 }
 
 type AlbumMetadata struct {
@@ -49,7 +49,7 @@ type AlbumMetadata struct {
 	ImageURL  string           `json:"imageUrl"`
 	Artists   []ArtistMetadata `json:"artists"`
 	AlbumType string           `json:"albumType"`
-	MBID      string           `json:"mbid"`
+	MBID      *string          `json:"mbid"`
 }
 
 var httpClient = &http.Client{Timeout: 10 * time.Second}

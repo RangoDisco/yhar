@@ -45,7 +45,7 @@ type UnifiedScrobbleEntry struct {
 	Title         string    `json:"title"`
 	Artist        string    `json:"artist"`
 	Album         string    `json:"album"`
-	MusicBrainzID string    `json:"musicbrainz_id"`
+	MusicBrainzID *string   `json:"musicbrainz_id"`
 	ListenedAt    time.Time `json:"listened_at"`
 	Duration      string    `json:"duration"`
 }

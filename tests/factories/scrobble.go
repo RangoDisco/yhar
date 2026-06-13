@@ -114,7 +114,7 @@ func CreateScrobbleContent(t *testing.T, db *gorm.DB) []models.Track {
 		// First create artist
 		artist := &models.Artist{
 			Name:          rawContent.ArtistName,
-			MusicBrainzID: rawContent.MusicBrainzID,
+			MusicBrainzID: &rawContent.MusicBrainzID,
 		}
 
 		err := db.Table("artists").Create(artist).Error
@@ -125,7 +125,7 @@ func CreateScrobbleContent(t *testing.T, db *gorm.DB) []models.Track {
 			Title:         rawContent.Album.Title,
 			Artists:       []models.Artist{*artist},
 			Type:          rawContent.Album.Type,
-			MusicBrainzID: rawContent.Album.MusicBrainzID,
+			MusicBrainzID: &rawContent.Album.MusicBrainzID,
 		}
 
 		err = db.Table("albums").Create(album).Error
@@ -138,7 +138,7 @@ func CreateScrobbleContent(t *testing.T, db *gorm.DB) []models.Track {
 				Album:         *album,
 				AlbumID:       album.ID,
 				Title:         rawTrack.Title,
-				MusicBrainzID: rawTrack.MusicBrainzID,
+				MusicBrainzID: &rawTrack.MusicBrainzID,
 			}
 
 			err = db.Table("tracks").Create(track).Error

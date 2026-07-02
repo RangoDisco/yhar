@@ -8,11 +8,6 @@
     let {children} = $props();
 </script>
 
-<svelte:head>
-    <title>Yhar</title>
-    <meta name="description" content="Listening habits stats"/>
-    <link rel="icon" href={favicon}/>
-</svelte:head>
 <section class="min-h-screen md:max-w-300 mx-auto p-6">
     <ModeWatcher/>
     <Toaster/>

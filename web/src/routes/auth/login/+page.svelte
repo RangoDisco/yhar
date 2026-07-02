@@ -9,11 +9,13 @@
     import {Input} from "$lib/components/ui/input/index.js";
     import {Button} from "$lib/components/ui/button/index.js";
     import type {PageProps} from "./$types";
+    import SvelteHead from "$lib/components/SvelteHead.svelte";
 
 
     let {data, form}: PageProps = $props();
 </script>
 
+<SvelteHead title="Login" description="Login to your Yhar account"/>
 <div class="w-full md:w-lg 2xl:w-xl max-w-2xl mx-auto justify-center">
     <form method="POST">
         <FieldGroup>

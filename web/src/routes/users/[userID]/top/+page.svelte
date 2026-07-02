@@ -5,10 +5,13 @@
     import ContentCard from "$lib/components/top/contentCard/ContentCard.svelte";
     import {Period} from "$lib/types/period";
     import HistoryList from "$lib/components/top/tracks/HistoryList.svelte";
+    import SvelteHead from "$lib/components/SvelteHead.svelte";
 
     const {data} = $props();
     const periods = [Period.week, Period.month, Period.year, Period.overall];
 </script>
+
+<SvelteHead title="Top"/>
 <div class="flex flex-col gap-8">
     <Tabs.Root value="week">
         <Tabs.List class="w-full">

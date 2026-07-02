@@ -4,10 +4,12 @@
     import ContentCard from "$lib/components/top/contentCard/ContentCard.svelte";
     import UploadableImage from "$lib/components/top/UploadableImage.svelte";
     import HistoryList from "$lib/components/top/tracks/HistoryList.svelte";
+    import SvelteHead from "$lib/components/SvelteHead.svelte";
 
     let {data} = $props();
 </script>
 
+<SvelteHead title={data.artist.name} description="Listening stats for {data.artist.name}"/>
 <main class="flex flex-col gap-8">
     <section class="flex items-center gap-4">
         <UploadableImage pictureUrl={data.artist.picture_url} alt="{data.artist.name}'s picture" contentType="artists"

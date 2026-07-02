@@ -3,10 +3,13 @@
     import ContentListItem from "$lib/components/top/ContentListItem.svelte";
     import {page} from "$app/state";
     import UploadableImage from "$lib/components/top/UploadableImage.svelte";
+    import SvelteHead from "$lib/components/SvelteHead.svelte";
 
     let {data} = $props();
 </script>
 
+
+<SvelteHead title={data.album.title} description="Top tracks for {data.album.title}"/>
 <main class="flex flex-col gap-8">
     <section class="flex items-center gap-4">
         <UploadableImage pictureUrl={data.album.picture_url} alt="{data.album.title}'s picture" contentType="albums"

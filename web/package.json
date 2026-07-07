@@ -47,11 +47,6 @@
 		"typescript-eslint": "^8.59.3",
 		"vite": "8.0.5"
 	},
-	"pnpm": {
-		"onlyBuiltDependencies": [
-			"esbuild"
-		]
-	},
 	"dependencies": {
 		"dayjs": "^1.11.20",
 		"dotenv": "^17.4.2",

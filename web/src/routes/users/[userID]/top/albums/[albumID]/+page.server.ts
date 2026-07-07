@@ -14,7 +14,7 @@ export const load: PageServerLoad = async ({ url, params, cookies, locals }) => 
 	);
 
 	const tracks: Paginated<Track> = await fetcher(
-		`${API_URL}/users/${userID}/scrobbles/top/tracks?period=overall&album=${albumID}&limit=20`,
+		`${API_URL}/users/${userID}/scrobbles/top/tracks?period=overall&album=${albumID}&limit=10`,
 		'GET',
 		cookies,
 		null

@@ -189,6 +189,19 @@ func (s *ScrobbleService) processScrobbleAlbums(ctx context.Context, sAlbum prov
 	if err != nil {
 		return nil, err
 	}
+
+	/*
+	 * Because some albums have a shitton of different releases
+	 * it makes it hard to reliably select the same one each time (they can have different MBID).
+	 * We first search by title, and if none found, proceed with MBID.
+	 */
+	sAlbumWithoutMBID := sAlbum
+	sAlbumWithoutMBID.MBID = nil
+	byTitle, err := s.album.GetOrCreateAlbum(ctx, sAlbumWithoutMBID, artists)
+	if byTitle != nil && err == nil {
+		return byTitle, err
+	}
+
 	album, err := s.album.GetOrCreateAlbum(ctx, sAlbum, artists)
 	if err != nil {
 		return nil, err

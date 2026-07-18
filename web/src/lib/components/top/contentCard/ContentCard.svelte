@@ -1,6 +1,7 @@
 <script lang="ts">
     import ContentCardImage from "$lib/components/top/contentCard/ContentCardImage.svelte";
     import ContentCardWrapper from "$lib/components/top/contentCard/ContentCardWrapper.svelte";
+    import {cn} from "$lib/utils.ts";
 
     type Props = {
         title: string
@@ -13,14 +14,14 @@
         title,
         contentID = $bindable(null),
         pictureUrl,
-        contentType
+        contentType,
     }: Props = $props();
 
 </script>
 
-<article class="w-[30%] md:w-[15%] flex flex-col items-center justify-center gap-2">
+<article class={cn("flex flex-col items-center justify-center gap-2")}>
     <ContentCardWrapper {contentID} {contentType}>
         <ContentCardImage {contentType} {pictureUrl}/>
-        <p class="text-center mb-auto h-12 line-clamp-2">{title}</p>
+        <p class="text-center mb-auto h-12 line-clamp-2 md:text-lg">{title}</p>
     </ContentCardWrapper>
 </article>

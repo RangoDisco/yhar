@@ -25,28 +25,31 @@
                     Loading...
                 {:then periodData}
                     <!--TOP ARTISTS-->
-                    <ContentListWrapper title="Top artists" url="top/artists">
-                        <div class="flex flex-wrap gap-4">
+                    <ContentListWrapper title="TOP ARTISTS" url="top/artists">
+                        <div class="grid grid-cols-3 lg:grid-cols-9 gap-4">
                             {#each periodData?.artists.results as artist, i (artist.id)}
-                                <ContentCard title={artist.name} pictureUrl={artist.picture_url} contentType="artists"
-                                             contentID={artist.id}/>
+                                <div class={i >= 6 ? "hidden lg:block" : ""}>
+                                    <ContentCard title={artist.name} pictureUrl={artist.picture_url}
+                                                 contentType="artists" contentID={artist.id} />
+                                </div>
                             {/each}
                         </div>
                     </ContentListWrapper>
 
                     <!--TOP ALBUMS-->
-                    <ContentListWrapper title="Top albums" url="top/albums">
-                        <div class="flex flex-wrap gap-4">
+                    <ContentListWrapper title="TOP ALBUMS" url="top/albums">
+                        <div class="grid grid-cols-3 lg:grid-cols-9 gap-4">
                             {#each periodData?.albums.results as album, i (album.id)}
-                                <ContentCard title={album.title} pictureUrl={album.picture_url}
-                                             contentID={album.id}
-                                             contentType="albums"/>
+                                <div class={i >= 6 ? "hidden lg:block" : ""}>
+                                    <ContentCard title={album.title} pictureUrl={album.picture_url}
+                                                 contentType="albums" contentID={album.id} />
+                                </div>
                             {/each}
                         </div>
                     </ContentListWrapper>
 
                     <!--TOP TRACKS-->
-                    <ContentListWrapper title="Top tracks" url="top/tracks">
+                    <ContentListWrapper title="TOP TRACKS" url="top/tracks">
                         <div class="flex flex-col gap-4">
                             {#each periodData?.tracks.results as track, i (track.id)}
                                 <ContentListItem index={i+1} title={track.title}

@@ -16,7 +16,7 @@
                          contentID={parseInt(data.album.id)}
                          uploadEnabled={data.user?.role === 'ADMIN'}/>
         <div class="flex flex-col">
-            <p class="text-3xl">{data.album.title}</p>
+            <p class="text-3xl lg:text-4xl">{data.album.title}</p>
             <div class="flex gap-1 items-center">
                 {#each data.album.artists as artist, i}
                     {#if i < 3}

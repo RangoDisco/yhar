@@ -11,7 +11,7 @@
         <Nav user={data.user}/>
     </div>
     <hr/>
-    <div class="md:max-w-300 w-full mx-auto p-6">
+    <div class="lg:max-w-450 w-full mx-auto p-6">
         {@render children()}
     </div>
 </main>

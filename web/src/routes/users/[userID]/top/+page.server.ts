@@ -1,5 +1,5 @@
 import type { PageServerLoad } from './$types';
-import {API_URL} from '$env/static/private';
+import { API_URL } from '$app/env/private';
 import { fetcher } from '$lib/fetcher';
 import type { Paginated } from '$lib/types/pagination';
 import type { Album, Artist, Scrobble, Track } from '$lib/types/content';

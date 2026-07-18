@@ -1,12 +1,12 @@
 import type { PageServerLoad } from './$types';
 import { fetcher } from '$lib/fetcher';
-import {API_URL} from '$env/static/private';
+import { API_URL } from '$app/env/private';
 import type { Album } from '$lib/types/content';
 import type { Paginated } from '$lib/types/pagination';
 
 export const load: PageServerLoad = async ({ url, params, cookies }) => {
 	const { userID } = params;
-	const page = url.searchParams.get('page') ?? "1";
+	const page = url.searchParams.get('page') ?? '1';
 	const period = url.searchParams.get('period') ?? 'week';
 	const artist = url.searchParams.get('artist');
 

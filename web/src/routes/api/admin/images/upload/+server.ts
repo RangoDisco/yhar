@@ -1,5 +1,5 @@
 import { fetcher } from '$lib/fetcher';
-import {API_URL} from '$env/static/private';
+import { API_URL } from '$app/env/private';
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 

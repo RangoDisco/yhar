@@ -1,5 +1,5 @@
 import type { PageServerLoad } from './$types';
-const API_URL = process.env.API_URL
+import {API_URL} from '$env/static/private';
 import { fetcher } from '$lib/fetcher';
 import type { Paginated } from '$lib/types/pagination';
 import type { Scrobble } from '$lib/types/content';

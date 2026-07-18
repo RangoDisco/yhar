@@ -1,5 +1,5 @@
 import { fetcher } from '$lib/fetcher';
-const API_URL = process.env.API_URL
+import {API_URL} from '$env/static/private';
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 

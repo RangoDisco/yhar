@@ -1,6 +1,6 @@
 import type { PageServerLoad } from './$types';
 import { fetcher } from '$lib/fetcher';
-const API_URL = process.env.API_URL
+import {API_URL} from '$env/static/private';
 import type { Album } from '$lib/types/content';
 import type { Paginated } from '$lib/types/pagination';
 

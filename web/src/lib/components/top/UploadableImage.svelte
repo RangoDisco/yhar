@@ -65,7 +65,7 @@
 </script>
 
 <div class="relative">
-    <img class="peer rounded-full aspect-square h-24 {contentType === 'artists' ? 'rounded-full' : 'rounded-md'}"
+    <img class="peer rounded-full aspect-square h-24 md:h-56 {contentType === 'artists' ? 'rounded-full' : 'rounded-md'}"
          src={pictureUrl ?? fallback} bind:this={image} alt={alt} onerror={() => pictureUrl = fallback}/>
 
     {#if uploadEnabled}

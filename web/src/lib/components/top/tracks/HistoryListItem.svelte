@@ -24,16 +24,16 @@
 </script>
 
 <article class="flex items-center justify-between">
-    <div class="flex gap-2 items-center w-full">
-        <Avatar.Root class="rounded-md h-8 w-8">
+    <div class="flex gap-4 items-center w-full min-w-0">
+        <Avatar.Root class="rounded-md h-8 w-8 lg:h-10 lg:w-10">
             <Avatar.Image src={scrobble.track.picture_url}
                           alt={`${scrobble.track.title}'s picture`}/>
             <Avatar.Fallback class="rounded-md h-8 w-8">
                 <ListMusic size={18} class="text-muted-foreground"/>
             </Avatar.Fallback>
         </Avatar.Root>
-        <div class="flex flex-col w-full">
-            <div class="flex gap-2 items-center">
+        <div class="flex flex-col w-full min-w-0">
+            <div class="flex gap-2 items-center min-w-0">
                 <span class="line-clamp-1 w-full min-w-0">{scrobble.track.title}</span>
                 <p class="text-sm text-muted-foreground whitespace-nowrap w-40">{dayjs(scrobble.scrobbled_at).fromNow()}</p>
             </div>

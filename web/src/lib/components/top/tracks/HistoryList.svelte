@@ -28,8 +28,8 @@
     };
 </script>
 
-<ContentListWrapper title="History" url={url}>
-    <div class="flex flex-col gap-2">
+<ContentListWrapper title="HISTORY" url={url}>
+    <div class="flex flex-col gap-2 w-full">
         {#each scrobbles as scrobble}
             <HistoryListItem scrobble={scrobble} parentType={parentType} handleDelete={handleDelete}/>
         {/each}

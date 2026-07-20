@@ -16,7 +16,7 @@
 </script>
 
 <SvelteHead title="Login" description="Login to your Yhar account"/>
-<div class="w-full md:w-lg 2xl:w-xl max-w-2xl mx-auto justify-center">
+<div class="w-full md:w-lg 2xl:w-xl max-w-2xl mx-auto justify-center p-6">
     <form method="POST">
         <FieldGroup>
             <div class="flex flex-col items-center gap-2 text-center">

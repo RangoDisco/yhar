@@ -44,10 +44,10 @@
             </Avatar.Root>
             <div class="flex flex-col">
                 {#if contentID}
-                    <a class="hover:underline"
+                    <a class="text-lg hover:underline"
                        href="/users/{page.params.userID}/top/{contentType}/{contentID}">{title}</a>
                 {:else}
-                    <p>{title}</p>
+                    <p class="text-lg">{title}</p>
                 {/if}
                 <div class="flex gap-1">
                     {#each parents as parent, i}
@@ -55,7 +55,7 @@
                             {#if i !== 0}
                                 ·
                             {/if}
-                            <a class="text-sm text-muted-foreground hover:underline"
+                            <a class="text-muted-foreground hover:underline"
                                href="/users/{page.params.userID}/top/{parentType}/{parent.id}">{parent.name ?? parent.title}</a>
                         {/if}
                     {/each}

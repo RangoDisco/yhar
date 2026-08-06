@@ -4,6 +4,7 @@
     import {Trash, ListMusic} from "@lucide/svelte";
     import dayjs from "dayjs";
     import relativeTime from "dayjs/plugin/relativeTime";
+    import * as Tooltip from "$lib/components/ui/tooltip/index.js";
 
     import {page} from "$app/state";
     import type {Scrobble} from "$lib/types/content";
@@ -34,8 +35,15 @@
         </Avatar.Root>
         <div class="flex flex-col w-full min-w-0">
             <div class="flex gap-2 items-center min-w-0">
-                <span class="line-clamp-1 w-full min-w-0">{scrobble.track.title}</span>
-                <p class="text-sm text-muted-foreground whitespace-nowrap w-40">{dayjs(scrobble.scrobbled_at).fromNow()}</p>
+                <span class="text-lg line-clamp-1 w-full min-w-0">{scrobble.track.title}</span>
+                <Tooltip.Root>
+                    <Tooltip.Trigger>
+                        <p class="text-sm text-muted-foreground whitespace-nowrap w-40">{dayjs(scrobble.scrobbled_at).fromNow()}</p>
+                    </Tooltip.Trigger>
+                    <Tooltip.Content>
+                        <p class="text-sm">{dayjs(scrobble.scrobbled_at).format("YYYY-MM-DD HH:mm ")}</p>
+                    </Tooltip.Content>
+                </Tooltip.Root>
             </div>
             <div class="flex gap-1">
                 {#if parentType === "artists"}
@@ -43,11 +51,11 @@
                         {#if i !== 0}
                             ·
                         {/if}
-                        <a class="text-sm text-muted-foreground hover:underline h-6"
+                        <a class="text-muted-foreground hover:underline h-6"
                            href="/users/{page.params.userID}/top/artists/{artist.id}">{artist.name}</a>
                     {/each}
                 {:else}
-                    <a class="text-sm text-muted-foreground hover:underline"
+                    <a class="text-muted-foreground hover:underline"
                        href="/users/{page.params.userID}/top/albums/{scrobble.track.album.id}">{scrobble.track.album.title}</a>
                 {/if}
             </div>

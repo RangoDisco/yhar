@@ -61,7 +61,7 @@
             </div>
         </div>
     </div>
-    <Button variant="outline" size="icon" onclick={() => handleDelete(scrobble.id)}>
+    <Button variant="outline" size="icon" onclick={() => handleDelete(scrobble.id)} aria-label="Delete scrobble">
         <Trash/>
     </Button>
 </article>

@@ -1,12 +1,14 @@
 export type Artist = {
 	id: string;
 	name: string;
+	music_brainz_id: string | null;
 	picture_url: string;
 	scrobble_count: number | null;
 };
 
 export type Album = {
 	id: string;
+	music_brainz_id: string | null;
 	title: string;
 	picture_url: string;
 	scrobble_count: number | null;

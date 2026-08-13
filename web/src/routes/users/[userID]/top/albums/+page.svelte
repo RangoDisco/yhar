@@ -31,7 +31,7 @@
                                  parents={album.artists}
                                  contentType="albums"/>
             {/each}
-            <Paginator totalCount={data.albums.pagination.total_count} page={currentPage}/>
+            <Paginator totalCount={data.albums.pagination.total_count} page={currentPage} perPage={data.albums.results.length}/>
         </Tabs.Content>
     {/each}
 </Tabs.Root>

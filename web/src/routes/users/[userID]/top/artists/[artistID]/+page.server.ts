@@ -29,7 +29,7 @@ export const load: PageServerLoad = async ({ url, params, cookies, locals }) => 
 	);
 
 	const history: Paginated<Scrobble> = await fetcher(
-		`${API_URL}/users/${userID}/scrobbles/history?artist=${artistID}&period=overall&limit=9`,
+		`${API_URL}/users/${userID}/scrobbles/history?artist=${artistID}&period=overall&limit=8`,
 		'GET',
 		cookies,
 		null

@@ -29,7 +29,7 @@
                                  parentType="artists"
                                  contentType="tracks"/>
             {/each}
-            <Paginator totalCount={data.tracks.pagination.total_count} page={currentPage}/>
+            <Paginator totalCount={data.tracks.pagination.total_count} page={currentPage} perPage={data.tracks.results.length}/>
         </Tabs.Content>
     {/each}
 </Tabs.Root>

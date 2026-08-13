@@ -5,13 +5,14 @@
     type Props = {
         totalCount: number
         page: number
+        perPage: number
     }
 
-    let {totalCount, page}: Props = $props();
+    let {totalCount, page, perPage}: Props = $props();
 
 </script>
 
-<Pagination.Root count={totalCount} perPage={PER_PAGE} page={page}
+<Pagination.Root count={totalCount} perPage={perPage} page={page}
                  onPageChange={handlePageChange}>
     {#snippet children({pages, currentPage})}
         <Pagination.Content>

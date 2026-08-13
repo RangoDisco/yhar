@@ -11,4 +11,4 @@
 </script>
 <SvelteHead title="History" description="Listening history."/>
 <HistoryList scrobbles={data.history.results} url={null} parentType="artists"/>
-<Paginator totalCount={data.history.pagination.total_count} page={currentPage}/>
+<Paginator totalCount={data.history.pagination.total_count} page={currentPage} perPage={data.history.results.length}/>

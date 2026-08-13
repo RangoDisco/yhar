@@ -5,6 +5,8 @@
     import UploadableImage from "$lib/components/top/UploadableImage.svelte";
     import HistoryList from "$lib/components/top/tracks/HistoryList.svelte";
     import SvelteHead from "$lib/components/SvelteHead.svelte";
+    import {Button} from "$lib/components/ui/button";
+    import MusicBrainzLogo from "$lib/components/logo/MusicBrainzLogo.svelte";
 
     let {data} = $props();
 </script>
@@ -17,6 +19,13 @@
         <div class="flex flex-col">
             <p class="text-3xl lg:text-4xl">{data.artist.name}</p>
             <p class="text-muted-foreground">{data.artist.scrobble_count} scrobbles</p>
+            {#if data.artist.music_brainz_id != null}
+                <Button variant="ghost" size="icon-lg"
+                        href="https://musicbrainz.org/artist/{data.artist.music_brainz_id}"
+                        target="_blank">
+                    <MusicBrainzLogo/>
+                </Button>
+            {/if}
         </div>
     </section>
 
@@ -27,7 +36,7 @@
                 {#each data.albums.results as album, i (album.id)}
                     <div class={i >= 6 ? "hidden lg:block" : ""}>
                         <ContentCard title={album.title ?? album.name} pictureUrl={album.picture_url}
-                                     contentType="albums" contentID={album.id} />
+                                     contentType="albums" contentID={album.id}/>
                     </div>
                 {/each}
             </div>

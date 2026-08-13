@@ -4,6 +4,8 @@
     import {page} from "$app/state";
     import UploadableImage from "$lib/components/top/UploadableImage.svelte";
     import SvelteHead from "$lib/components/SvelteHead.svelte";
+    import MusicBrainzLogo from "$lib/components/logo/MusicBrainzLogo.svelte";
+    import {Button} from "$lib/components/ui/button";
 
     let {data} = $props();
 </script>
@@ -29,6 +31,13 @@
                 {/each}
             </div>
             <p class="text-muted-foreground">{data.album.scrobble_count} scrobbles</p>
+            {#if data.album.music_brainz_id != null}
+                <Button variant="ghost" size="icon-lg"
+                        href="https://musicbrainz.org/release/{data.album.music_brainz_id}"
+                        target="_blank">
+                    <MusicBrainzLogo/>
+                </Button>
+            {/if}
         </div>
     </section>
 

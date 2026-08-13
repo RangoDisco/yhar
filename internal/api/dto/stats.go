@@ -17,6 +17,7 @@ type TopArtistResult struct {
 	ID            int64   `json:"id"`
 	Name          string  `json:"name"`
 	PictureURL    *string `json:"picture_url"`
+	MusicBrainzID  *string `json:"music_brainz_id,omitempty"`
 	ScrobbleCount *int    `json:"scrobble_count,omitempty"` // could sometimes be nil/0 when used in some queries
 	// raw fields only used for building PictureURL (hidden in JSON response)
 	PicturePath   string `json:"-" gorm:"column:picture_path"`
@@ -29,6 +30,7 @@ type TopAlbumResult struct {
 	Title         string            `json:"title"`
 	Artists       []TopArtistResult `json:"artists" gorm:"serializer:json"`
 	PictureURL    *string           `json:"picture_url"`
+	MusicBrainzID *string   `json:"music_brainz_id,omitempty"`
 	ScrobbleCount *int              `json:"scrobble_count,omitempty"` // could sometimes be nil/0 when used in some queries
 	// raw fields only used for building PictureURL (hidden in JSON response)
 	PicturePath   string `json:"-" gorm:"column:picture_path"`

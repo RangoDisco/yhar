@@ -57,7 +57,7 @@ func (r *StatsRepository) FindTopArtistsForUser(ctx context.Context, params *Sta
 	var totalCount int64
 
 	query := r.buildBaseStatQuery(ctx, params.BaseStatsQueryParams).
-		Select("ar.id AS id, ar.name AS name, COUNT(scrobbles.id) AS scrobble_count, " +
+		Select("ar.id AS id, ar.name AS name, ar.music_brainz_id as music_brainz_id, COUNT(scrobbles.id) AS scrobble_count, " +
 			"i.path AS picture_path, i.type AS picture_type, i.domain AS picture_domain").
 		Joins("LEFT JOIN images i ON i.id = ar.picture_id").
 		Group("ar.id, ar.name, i.path, i.type, i.domain")
@@ -91,7 +91,7 @@ func (r *StatsRepository) FindTopAlbumsForUser(ctx context.Context, params *Stat
 	var totalCount int64
 
 	query := r.buildBaseStatQuery(ctx, params.BaseStatsQueryParams).
-		Select("al.id as id, al.title as title, " +
+		Select("al.id as id, al.title as title, al.music_brainz_id as music_brainz_id, " +
 			"i.path AS picture_path, i.type AS picture_type, i.domain AS picture_domain, " +
 			"COUNT(DISTINCT scrobbles.id) AS scrobble_count, " +
 			"JSON_AGG(DISTINCT jsonb_build_object('id', ar_al.id, 'name', ar_al.name, " +

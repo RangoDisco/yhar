@@ -14,6 +14,7 @@ services:
       - SUBSONIC_VERSION=${SUBSONIC_VERSION}
       - SUBSONIC_PASSWORD=${SUBSONIC_PASSWORD}
       - CONTACT_EMAIL=${CONTACT_EMAIL}
+      - SENTRY_DSN=${SENTRY_DSN}
     restart: unless-stopped
     volumes:
       - ./images:/app/images

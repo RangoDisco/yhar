@@ -1,8 +1,6 @@
 package common
 
 import (
-	"log/slog"
-
 	"github.com/gin-gonic/gin"
 )
 
@@ -29,9 +27,8 @@ type Pagination struct {
 }
 
 func RespondWithError(c *gin.Context, statusCode int, err error, message string) {
-	contextErr := c.Error(err)
-	if contextErr != nil {
-		slog.Error("request failed but unable to get error", slog.String("err", contextErr.Error()))
+	if err != nil {
+		_ = c.Error(err)
 	}
 	c.AbortWithStatusJSON(statusCode, ErrorResponse{Error: ErrorMessage{
 		Message: message,

@@ -3,6 +3,7 @@ package config
 import (
 	"time"
 
+	sentrygin "github.com/getsentry/sentry-go/gin"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/rangodisco/yhar/internal/api/middlewares"
@@ -16,6 +17,7 @@ func SetupRouter(
 	r := gin.New()
 
 	api := r.Group("/api")
+	api.Use(sentrygin.New(sentrygin.Options{Repanic: true}))
 	api.Use(middlewares.LoggerMiddleware())
 	api.Use(cors.Default())
 	api.Use(middlewares.SecurityMiddleware())

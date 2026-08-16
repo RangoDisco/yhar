@@ -10,6 +10,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/getsentry/sentry-go"
 	"github.com/gin-gonic/gin"
 	serverConfig "github.com/rangodisco/yhar/internal/api/config"
 	ydb "github.com/rangodisco/yhar/internal/api/config/database"
@@ -42,8 +43,12 @@ func main() {
 	case gin.TestMode:
 		gin.SetMode(gin.TestMode)
 	case gin.ReleaseMode:
-	default:
+
 		gin.SetMode(gin.ReleaseMode)
+		serverConfig.SetupSentry()
+		// Flush buffered events before the program terminates.
+		// Set the timeout to the maximum duration the program can afford to wait.
+		defer sentry.Flush(10 * time.Second)
 	}
 
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
@@ -67,7 +72,7 @@ func main() {
 		}()
 	}
 
-	serverConfig.SetupLogger()
+	serverConfig.SetupLogger(ctx)
 	// Start router
 	r := serverConfig.SetupRouter(serverServices, handlers, middlewares.Authenticate(serverServices.Auth))
 

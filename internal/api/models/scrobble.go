@@ -40,5 +40,5 @@ type Scrobble struct {
 	Track       Track          `json:"track" gorm:"foreignKey:TrackID;references:ID;"`
 	UserID      int64          `gorm:"index"`
 	User        User           `json:"user" gorm:"foreignKey:UserID;references:ID;"`
-	ScrobbledAt time.Time      `json:"scrobbled_at" gorm:"not null"`
+	ScrobbledAt time.Time      `json:"scrobbled_at" gorm:"not null;index"`
 }

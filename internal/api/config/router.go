@@ -56,12 +56,20 @@ func SetupRouter(
 
 	user.GET("", h.User.GetUser)
 
-	// USER'S STATS
+	// User's Scrobbles
 	userScrobbles := user.Group("/scrobbles")
 	userScrobbles.GET("/history", h.ScrobbleStats.GetUserHistory)
-	userScrobbles.GET("/top/artists", h.ScrobbleStats.GetUserTopArtists)
-	userScrobbles.GET("/top/albums", h.ScrobbleStats.GetUserTopAlbums)
-	userScrobbles.GET("/top/tracks", h.ScrobbleStats.GetUserTopTracks)
+
+	// User's Stats
+	userStats := user.Group("/stats")
+	userStats.GET("/artists/top", h.ScrobbleStats.GetUserTopArtists)
+	userStats.GET("/artists/:artistID/timeline", h.ScrobbleStats.GetArtistTimeline)
+
+	userStats.GET("/albums/top", h.ScrobbleStats.GetUserTopAlbums)
+	userStats.GET("/albums/:albumID/timeline", h.ScrobbleStats.GetAlbumTimeline)
+
+	userStats.GET("/tracks/top", h.ScrobbleStats.GetUserTopTracks)
+	userStats.GET("/tracks/:trackID/timeline", h.ScrobbleStats.GetTrackTimeline)
 
 	return r
 }

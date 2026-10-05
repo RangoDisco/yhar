@@ -3,6 +3,7 @@ package repositories
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -75,4 +76,11 @@ func (r *BaseRepository[T]) Update(ctx context.Context, id int64, fields map[str
 func (r *BaseRepository[T]) Delete(ctx context.Context, id int64) error {
 	_, err := gorm.G[T](r.Db).Where("id = ?", id).Delete(ctx)
 	return err
+}
+
+func (r *BaseRepository[T]) CreatedBetweenDates(start, end time.Time) func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		return db.Where("created_at >= ?", start).
+			Where("created_at <= ?", end)
+	}
 }

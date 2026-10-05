@@ -12,12 +12,17 @@ type ScrobbleStatsService struct {
 	repo *repositories.StatsRepository
 }
 
-type StatsRequestParams struct {
-	UserID     string
-	Period     dto.Period
-	ArtistID   *string
-	AlbumID    *string
-	TrackID    *string
+type StatsRequest struct {
+	UserID        string
+	Period        dto.Period
+	Start         *time.Time
+	End           *time.Time
+	TargetContent repositories.ContentType
+	TargetID      string
+}
+
+type PaginatedStatsRequest struct {
+	StatsRequest
 	Pagination struct {
 		Page  int
 		Limit int
@@ -28,52 +33,52 @@ func NewScrobbleStatsService(repo *repositories.StatsRepository) *ScrobbleStatsS
 	return &ScrobbleStatsService{repo: repo}
 }
 
-func (s *ScrobbleStatsService) buildBaseParams(params *StatsRequestParams) repositories.BaseStatsQueryParams {
+func (s *ScrobbleStatsService) buildBaseParams(params *PaginatedStatsRequest) *repositories.PaginatedContentStatsQueryParams {
 	start, end := getDateRangeFromPeriod(params.Period)
 
-	return repositories.BaseStatsQueryParams{
-		UserID: params.UserID,
-		Start:  start,
-		End:    end,
-		Page:   params.Pagination.Page,
-		Limit:  params.Pagination.Limit,
+	return &repositories.PaginatedContentStatsQueryParams{
+		UserID:        params.UserID,
+		Start:         start,
+		End:           end,
+		TargetContent: params.TargetContent,
+		TargetID:      params.TargetID,
+		Page:          params.Pagination.Page,
+		Limit:         params.Pagination.Limit,
 	}
 }
 
-func (s *ScrobbleStatsService) FetchUserTopArtists(ctx context.Context, params *StatsRequestParams) ([]dto.TopArtistResult, int64, error) {
-	queryParams := &repositories.StatsArtistQueryParams{
-		BaseStatsQueryParams: s.buildBaseParams(params),
-		TrackArtistID:        params.ArtistID,
-	}
+func (s *ScrobbleStatsService) FetchUserTopArtists(ctx context.Context, params *PaginatedStatsRequest) ([]dto.TopArtistResult, int64, error) {
+	queryParams := s.buildBaseParams(params)
 	return s.repo.FindTopArtistsForUser(ctx, queryParams)
 }
 
-func (s *ScrobbleStatsService) FetchUserTopAlbums(ctx context.Context, params *StatsRequestParams) ([]dto.TopAlbumResult, int64, error) {
-	queryParams := &repositories.StatsAlbumQueryParams{
-		BaseStatsQueryParams: s.buildBaseParams(params),
-		AlbumArtistID:        params.ArtistID,
-		AlbumID:              params.AlbumID,
-	}
+func (s *ScrobbleStatsService) FetchUserTopAlbums(ctx context.Context, params *PaginatedStatsRequest) ([]dto.TopAlbumResult, int64, error) {
+	queryParams := s.buildBaseParams(params)
 	return s.repo.FindTopAlbumsForUser(ctx, queryParams)
 }
 
-func (s *ScrobbleStatsService) FetchUserTopTracks(ctx context.Context, params *StatsRequestParams) ([]dto.TrackResult, int64, error) {
-	queryParams := &repositories.StatsTrackQueryParams{
-		BaseStatsQueryParams: s.buildBaseParams(params),
-		TrackID:              params.TrackID,
-		TrackArtistID:        params.ArtistID,
-		AlbumID:              params.AlbumID,
-	}
+func (s *ScrobbleStatsService) FetchUserTopTracks(ctx context.Context, params *PaginatedStatsRequest) ([]dto.TrackResult, int64, error) {
+	queryParams := s.buildBaseParams(params)
 	return s.repo.FindTopTracksForUser(ctx, queryParams)
 }
 
-func (s *ScrobbleStatsService) FetchUserHistory(ctx context.Context, params *StatsRequestParams) ([]dto.HistoryResult, int64, error) {
-	queryParams := &repositories.StatsTrackQueryParams{
-		BaseStatsQueryParams: s.buildBaseParams(params),
-		TrackID:              params.TrackID,
-		TrackArtistID:        params.ArtistID,
-	}
+func (s *ScrobbleStatsService) FetchUserHistory(ctx context.Context, params *PaginatedStatsRequest) ([]dto.HistoryResult, int64, error) {
+	queryParams := s.buildBaseParams(params)
 	return s.repo.FindByUserID(ctx, queryParams)
+}
+
+func (s *ScrobbleStatsService) FetchLineChartData(ctx context.Context, params *StatsRequest) ([]dto.TimelineResult, error) {
+	queryParams := &repositories.ContentStatsQueryParams{
+		TargetContent: params.TargetContent,
+		TargetID:      params.TargetID,
+		UserID:        params.UserID,
+		// TODO: fix wtf
+		Interval: new(string(params.Period)),
+		End:      *params.End,
+		Start:    *params.Start,
+	}
+
+	return s.repo.FindScrobbleCountByInterval(ctx, queryParams)
 }
 
 func getDateRangeFromPeriod(p dto.Period) (time.Time, time.Time) {

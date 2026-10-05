@@ -10,9 +10,9 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/rangodisco/yhar/internal/api/common"
-	"github.com/rangodisco/yhar/internal/api/handlers"
-	"github.com/rangodisco/yhar/internal/api/types/auth"
+	"github.com/rangodisco/yhar/api/common"
+	"github.com/rangodisco/yhar/api/dto/request"
+	"github.com/rangodisco/yhar/api/handlers"
 	"github.com/rangodisco/yhar/tests/factories"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -23,7 +23,7 @@ func TestLogin(t *testing.T) {
 	_ = factories.SeedUser(t, db, "regularUser", "123", "USER", false)
 
 	t.Run("Login with correct credentials", func(t *testing.T) {
-		body := auth.LoginRequest{Username: "regularUser", Password: "123"}
+		body := request.LoginRequest{Username: "regularUser", Password: "123"}
 		out, err := json.Marshal(body)
 		require.NoError(t, err)
 		bytesBody := bytes.NewBuffer(out)
@@ -43,7 +43,7 @@ func TestLogin(t *testing.T) {
 	})
 
 	t.Run("Login with incorrect credentials", func(t *testing.T) {
-		body := auth.LoginRequest{Username: "regularUser", Password: "12345"}
+		body := request.LoginRequest{Username: "regularUser", Password: "12345"}
 		out, err := json.Marshal(body)
 		require.NoError(t, err)
 		bytesBody := bytes.NewBuffer(out)
@@ -72,7 +72,7 @@ func TestRefresh(t *testing.T) {
 	t.Run("Refresh token with valid refresh token", func(t *testing.T) {
 		router := SetupRouter(t, db, nil)
 
-		body := auth.RefreshRequest{RefreshToken: refreshTokenString}
+		body := request.RefreshRequest{RefreshToken: refreshTokenString}
 		out, err := json.Marshal(body)
 		require.NoError(t, err)
 		bytesBody := bytes.NewBuffer(out)
@@ -91,7 +91,7 @@ func TestRefresh(t *testing.T) {
 	t.Run("Refresh token with invalid refresh token", func(t *testing.T) {
 		router := SetupRouter(t, db, nil)
 
-		body := auth.RefreshRequest{RefreshToken: "INVALID"}
+		body := request.RefreshRequest{RefreshToken: "INVALID"}
 		out, err := json.Marshal(body)
 		require.NoError(t, err)
 		bytesBody := bytes.NewBuffer(out)

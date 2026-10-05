@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/rangodisco/yhar/internal/api/common"
-	"github.com/rangodisco/yhar/internal/api/dto"
+	"github.com/rangodisco/yhar/api/common"
+	"github.com/rangodisco/yhar/api/dto/response"
 	"github.com/rangodisco/yhar/tests/factories"
 	"github.com/stretchr/testify/assert"
 )
@@ -26,7 +26,7 @@ func TestGetTopArtists(t *testing.T) {
 		w := doRequest(t, router, http.MethodGet, fmt.Sprintf("/api/users/%d/scrobbles/top/artists", privateUser.ID), nil)
 		assert.Equal(t, http.StatusOK, w.Code)
 
-		var result common.APIResponse[common.PaginatedResponse[[]dto.TopArtistResult]]
+		var result common.APIResponse[common.PaginatedResponse[[]response.TopArtistResult]]
 		body, err := io.ReadAll(w.Body)
 		assert.NoError(t, err)
 
@@ -49,7 +49,7 @@ func TestGetTopArtists(t *testing.T) {
 		w := doRequest(t, router, http.MethodGet, fmt.Sprintf("/api/users/%d/scrobbles/top/artists", regularUser.ID), nil)
 		assert.Equal(t, http.StatusOK, w.Code)
 
-		var result common.APIResponse[common.PaginatedResponse[[]dto.TopArtistResult]]
+		var result common.APIResponse[common.PaginatedResponse[[]response.TopArtistResult]]
 		body, err := io.ReadAll(w.Body)
 		assert.NoError(t, err)
 
@@ -72,7 +72,7 @@ func TestGetTopAlbums(t *testing.T) {
 		w := doRequest(t, router, http.MethodGet, fmt.Sprintf("/api/users/%d/scrobbles/top/albums", privateUser.ID), nil)
 		assert.Equal(t, http.StatusOK, w.Code)
 
-		var result common.APIResponse[common.PaginatedResponse[[]dto.TopAlbumResult]]
+		var result common.APIResponse[common.PaginatedResponse[[]response.TopAlbumResult]]
 		body, err := io.ReadAll(w.Body)
 		assert.NoError(t, err)
 
@@ -95,7 +95,7 @@ func TestGetTopAlbums(t *testing.T) {
 		w := doRequest(t, router, http.MethodGet, fmt.Sprintf("/api/users/%d/scrobbles/top/albums", regularUser.ID), nil)
 		assert.Equal(t, http.StatusOK, w.Code)
 
-		var result common.APIResponse[common.PaginatedResponse[[]dto.TopAlbumResult]]
+		var result common.APIResponse[common.PaginatedResponse[[]response.TopAlbumResult]]
 		body, err := io.ReadAll(w.Body)
 		assert.NoError(t, err)
 
@@ -119,7 +119,7 @@ func TestGetTopTracks(t *testing.T) {
 		w := doRequest(t, router, http.MethodGet, fmt.Sprintf("/api/users/%d/scrobbles/top/tracks", privateUser.ID), nil)
 		assert.Equal(t, http.StatusOK, w.Code)
 
-		var result common.APIResponse[common.PaginatedResponse[[]dto.TrackResult]]
+		var result common.APIResponse[common.PaginatedResponse[[]response.TrackResult]]
 		body, err := io.ReadAll(w.Body)
 		assert.NoError(t, err)
 
@@ -145,7 +145,7 @@ func TestGetTopTracks(t *testing.T) {
 		w := doRequest(t, router, http.MethodGet, fmt.Sprintf("/api/users/%d/scrobbles/top/tracks", regularUser.ID), nil)
 		assert.Equal(t, http.StatusOK, w.Code)
 
-		var result common.APIResponse[common.PaginatedResponse[[]dto.TrackResult]]
+		var result common.APIResponse[common.PaginatedResponse[[]response.TrackResult]]
 		body, err := io.ReadAll(w.Body)
 		assert.NoError(t, err)
 
@@ -172,7 +172,7 @@ func TestGetHistory(t *testing.T) {
 		w := doRequest(t, router, http.MethodGet, fmt.Sprintf("/api/users/%d/scrobbles/history", privateUser.ID), nil)
 		assert.Equal(t, http.StatusOK, w.Code)
 
-		var result common.APIResponse[common.PaginatedResponse[[]dto.HistoryResult]]
+		var result common.APIResponse[common.PaginatedResponse[[]response.HistoryResult]]
 		body, err := io.ReadAll(w.Body)
 		assert.NoError(t, err)
 
@@ -199,7 +199,7 @@ func TestGetHistory(t *testing.T) {
 		w := doRequest(t, router, http.MethodGet, fmt.Sprintf("/api/users/%d/scrobbles/history", regularUser.ID), nil)
 		assert.Equal(t, http.StatusOK, w.Code)
 
-		var result common.APIResponse[common.PaginatedResponse[[]dto.HistoryResult]]
+		var result common.APIResponse[common.PaginatedResponse[[]response.HistoryResult]]
 		body, err := io.ReadAll(w.Body)
 		assert.NoError(t, err)
 

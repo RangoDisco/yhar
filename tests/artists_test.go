@@ -8,9 +8,9 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/rangodisco/yhar/internal/api/common"
-	"github.com/rangodisco/yhar/internal/api/dto"
-	"github.com/rangodisco/yhar/internal/api/models"
+	"github.com/rangodisco/yhar/api/common"
+	"github.com/rangodisco/yhar/api/dto/request"
+	"github.com/rangodisco/yhar/api/models"
 	"github.com/rangodisco/yhar/tests/factories"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -22,7 +22,7 @@ func TestPatchArtist(t *testing.T) {
 	adminUser := factories.SeedUser(t, db, "admin", "123", "ADMIN", false)
 
 	tracks := factories.CreateScrobbleContent(t, db)
-	body := dto.UpdateArtistInput{Name: new("Updated name")}
+	body := request.UpdateArtistInput{Name: new("Updated name")}
 	out, err := json.Marshal(body)
 	require.NoError(t, err)
 	bytesBody := bytes.NewBuffer(out)

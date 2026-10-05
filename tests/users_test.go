@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/rangodisco/yhar/internal/api/common"
-	"github.com/rangodisco/yhar/internal/api/handlers"
+	"github.com/rangodisco/yhar/api/common"
+	"github.com/rangodisco/yhar/api/handlers"
 	"github.com/rangodisco/yhar/tests/factories"
 	"github.com/stretchr/testify/assert"
 )

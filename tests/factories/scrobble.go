@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/rangodisco/yhar/internal/api/models"
+	"github.com/rangodisco/yhar/api/models"
 	"github.com/stretchr/testify/require"
 	"gorm.io/gorm"
 )

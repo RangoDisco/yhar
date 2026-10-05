@@ -12,9 +12,8 @@ import (
 
 	"github.com/getsentry/sentry-go"
 	"github.com/gin-gonic/gin"
-	serverConfig "github.com/rangodisco/yhar/internal/api/config"
-	ydb "github.com/rangodisco/yhar/internal/api/config/database"
-	"github.com/rangodisco/yhar/internal/api/middlewares"
+	"github.com/rangodisco/yhar/api/config"
+	"github.com/rangodisco/yhar/api/middlewares"
 )
 
 func init() {
@@ -32,7 +31,7 @@ func init() {
 }
 
 func main() {
-	yDb, err := ydb.SetupDatabase()
+	yDb, err := config.SetupDatabase()
 	if err != nil {
 		log.Fatalf("failed to init database: %v", err)
 	}
@@ -43,9 +42,8 @@ func main() {
 	case gin.TestMode:
 		gin.SetMode(gin.TestMode)
 	case gin.ReleaseMode:
-
 		gin.SetMode(gin.ReleaseMode)
-		serverConfig.SetupSentry()
+		config.SetupSentry()
 		// Flush buffered events before the program terminates.
 		// Set the timeout to the maximum duration the program can afford to wait.
 		defer sentry.Flush(10 * time.Second)
@@ -54,7 +52,7 @@ func main() {
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer cancel()
 
-	_, serverServices, handlers, pollers, importers := serverConfig.AutoWire(yDb)
+	_, serverServices, handlers, pollers, importers := config.AutoWire(yDb)
 
 	// Start pollers (subsonic only for now)
 	if os.Getenv("GIN_MODE") == gin.ReleaseMode && pollers.Subsonic != nil {
@@ -72,9 +70,9 @@ func main() {
 		}()
 	}
 
-	serverConfig.SetupLogger(ctx)
+	config.SetupLogger(ctx)
 	// Start router
-	r := serverConfig.SetupRouter(serverServices, handlers, middlewares.Authenticate(serverServices.Auth))
+	r := config.SetupRouter(serverServices, handlers, middlewares.Authenticate(serverServices.Auth))
 
 	srv := &http.Server{
 		Addr:    ":8080",

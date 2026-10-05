@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/rangodisco/yhar/internal/api/models"
+	"github.com/rangodisco/yhar/api/models"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"

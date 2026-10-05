@@ -1,0 +1,50 @@
+package middlewares
+
+import (
+	"net/http"
+	"os"
+	"strings"
+
+	"github.com/gin-gonic/gin"
+	"github.com/rangodisco/yhar/api/common"
+	"github.com/rangodisco/yhar/api/dto/request"
+	"github.com/rangodisco/yhar/api/services"
+)
+
+func Authenticate(auth *services.AuthService) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		ctx := c.Request.Context()
+		authHeader := c.GetHeader("Authorization")
+
+		// Proceed as anon if token was not provided
+		if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
+			c.Set("user", nil)
+			c.Next()
+		} else {
+			stringToken := authHeader[7:]
+			secret := os.Getenv("JWT_SECRET")
+			token, err := services.ParseToken(stringToken, secret)
+			if err != nil {
+				common.RespondWithError(c, http.StatusUnauthorized, err, "Unauthorized")
+				return
+			}
+
+			// Fetch whole user from token claims
+			user, err := auth.GetUserFromToken(ctx, token)
+			if err != nil {
+				common.RespondWithError(c, http.StatusUnauthorized, err, "Unauthorized")
+				return
+			}
+
+			ctxUser := &request.UserPassport{
+				ID:       user.ID,
+				Username: user.Username,
+				Role:     user.Role,
+			}
+
+			// Set user to the context
+			c.Set("user", ctxUser)
+			c.Next()
+		}
+	}
+}

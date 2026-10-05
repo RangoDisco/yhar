@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/rangodisco/yhar/internal/api/models"
+	"github.com/rangodisco/yhar/api/models"
 	"github.com/rangodisco/yhar/tests/factories"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"

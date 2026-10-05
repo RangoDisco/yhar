@@ -6,9 +6,9 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"github.com/rangodisco/yhar/internal/api/config"
-	"github.com/rangodisco/yhar/internal/api/dto"
-	"github.com/rangodisco/yhar/internal/api/models"
+	"github.com/rangodisco/yhar/api/config"
+	"github.com/rangodisco/yhar/api/dto/request"
+	"github.com/rangodisco/yhar/api/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -76,12 +76,11 @@ func SetupRouter(t *testing.T, db *gorm.DB, caller *models.User) *gin.Engine {
 
 	if caller != nil {
 		return config.SetupRouter(s, h, func(c *gin.Context) {
-			c.Set("user", &dto.UserPassport{ID: caller.ID, Username: caller.Username, Role: caller.Role})
-		})
-	} else {
-		return config.SetupRouter(s, h, func(c *gin.Context) {
-			c.Set("user", nil)
+			c.Set("user", &request.UserPassport{ID: caller.ID, Username: caller.Username, Role: caller.Role})
 		})
 	}
 
+	return config.SetupRouter(s, h, func(c *gin.Context) {
+		c.Set("user", nil)
+	})
 }

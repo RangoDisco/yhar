@@ -11,7 +11,7 @@ export const load: PageServerLoad = async ({ url, params, cookies }) => {
 	const artist = url.searchParams.get('artist') ?? '';
 
 	const tracks: Paginated<Track> = await fetcher(
-		`${API_URL}/users/${userID}/scrobbles/top/tracks?period=${period}&page=${page}&artist=${artist}&limit=10`,
+		`${API_URL}/users/${userID}/stats/tracks/top?period=${period}&page=${page}&artist=${artist}&limit=10`,
 		'GET',
 		cookies,
 		null

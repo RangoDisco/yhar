@@ -10,7 +10,7 @@ export const load: PageServerLoad = async ({ url, params, cookies }) => {
 	const period = url.searchParams.get('period') ?? 'week';
 	const artist = url.searchParams.get('artist');
 
-	let queryUrl = `${API_URL}/users/${userID}/scrobbles/top/albums?period=${period}&page=${page}&limit=10`;
+	let queryUrl = `${API_URL}/users/${userID}/stats/albums/top?period=${period}&page=${page}&limit=10`;
 
 	if (artist != null) {
 		queryUrl = queryUrl + `&artist=${artist}`;

@@ -10,7 +10,7 @@ export const load: PageServerLoad = async ({ url, params, cookies }) => {
 	const period = url.searchParams.get('period') ?? 'week';
 
 	const artists: Paginated<Artist> = await fetcher(
-		`${API_URL}/users/${userID}/scrobbles/top/artists?period=${period}&page=${page}&limit=10`,
+		`${API_URL}/users/${userID}/stats/artists/top?period=${period}&page=${page}&limit=10`,
 		'GET',
 		cookies,
 		null

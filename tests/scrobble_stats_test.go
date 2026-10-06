@@ -23,7 +23,7 @@ func TestGetTopArtists(t *testing.T) {
 
 	t.Run("Private user accessing their own artist data", func(t *testing.T) {
 		router := SetupRouter(t, db, &privateUser)
-		w := doRequest(t, router, http.MethodGet, fmt.Sprintf("/api/users/%d/scrobbles/top/artists", privateUser.ID), nil)
+		w := doRequest(t, router, http.MethodGet, fmt.Sprintf("/api/users/%d/stats/artists/top", privateUser.ID), nil)
 		assert.Equal(t, http.StatusOK, w.Code)
 
 		var result common.APIResponse[common.PaginatedResponse[[]response.TopArtistResult]]
@@ -40,13 +40,13 @@ func TestGetTopArtists(t *testing.T) {
 	t.Run("Regular user accessing another private user's artist data", func(t *testing.T) {
 		router := SetupRouter(t, db, &regularUser)
 
-		w := doRequest(t, router, http.MethodGet, fmt.Sprintf("/api/users/%d/scrobbles/top/artists", privateUser.ID), nil)
+		w := doRequest(t, router, http.MethodGet, fmt.Sprintf("/api/users/%d/stats/artists/top", privateUser.ID), nil)
 		assert.Equal(t, http.StatusNotFound, w.Code)
 	})
 
 	t.Run("Regular user accessing public user's artist data", func(t *testing.T) {
 		router := SetupRouter(t, db, &privateUser)
-		w := doRequest(t, router, http.MethodGet, fmt.Sprintf("/api/users/%d/scrobbles/top/artists", regularUser.ID), nil)
+		w := doRequest(t, router, http.MethodGet, fmt.Sprintf("/api/users/%d/stats/artists/top", regularUser.ID), nil)
 		assert.Equal(t, http.StatusOK, w.Code)
 
 		var result common.APIResponse[common.PaginatedResponse[[]response.TopArtistResult]]
@@ -69,7 +69,7 @@ func TestGetTopAlbums(t *testing.T) {
 
 	t.Run("Private user accessing their own album data", func(t *testing.T) {
 		router := SetupRouter(t, db, &privateUser)
-		w := doRequest(t, router, http.MethodGet, fmt.Sprintf("/api/users/%d/scrobbles/top/albums", privateUser.ID), nil)
+		w := doRequest(t, router, http.MethodGet, fmt.Sprintf("/api/users/%d/stats/albums/top", privateUser.ID), nil)
 		assert.Equal(t, http.StatusOK, w.Code)
 
 		var result common.APIResponse[common.PaginatedResponse[[]response.TopAlbumResult]]
@@ -86,13 +86,13 @@ func TestGetTopAlbums(t *testing.T) {
 	t.Run("Regular user accessing another private user's album data", func(t *testing.T) {
 		router := SetupRouter(t, db, &regularUser)
 
-		w := doRequest(t, router, http.MethodGet, fmt.Sprintf("api/users/%d/scrobbles/top/albums", privateUser.ID), nil)
+		w := doRequest(t, router, http.MethodGet, fmt.Sprintf("/api/users/%d/stats/albums/top", privateUser.ID), nil)
 		assert.Equal(t, http.StatusNotFound, w.Code)
 	})
 
 	t.Run("Regular user accessing public user's album data", func(t *testing.T) {
 		router := SetupRouter(t, db, &privateUser)
-		w := doRequest(t, router, http.MethodGet, fmt.Sprintf("/api/users/%d/scrobbles/top/albums", regularUser.ID), nil)
+		w := doRequest(t, router, http.MethodGet, fmt.Sprintf("/api/users/%d/stats/albums/top", regularUser.ID), nil)
 		assert.Equal(t, http.StatusOK, w.Code)
 
 		var result common.APIResponse[common.PaginatedResponse[[]response.TopAlbumResult]]
@@ -116,7 +116,7 @@ func TestGetTopTracks(t *testing.T) {
 
 	t.Run("Private user accessing their own track data", func(t *testing.T) {
 		router := SetupRouter(t, db, &privateUser)
-		w := doRequest(t, router, http.MethodGet, fmt.Sprintf("/api/users/%d/scrobbles/top/tracks", privateUser.ID), nil)
+		w := doRequest(t, router, http.MethodGet, fmt.Sprintf("/api/users/%d/stats/tracks/top", privateUser.ID), nil)
 		assert.Equal(t, http.StatusOK, w.Code)
 
 		var result common.APIResponse[common.PaginatedResponse[[]response.TrackResult]]
@@ -136,13 +136,13 @@ func TestGetTopTracks(t *testing.T) {
 	t.Run("Regular user accessing another private user's track data", func(t *testing.T) {
 		router := SetupRouter(t, db, &regularUser)
 
-		w := doRequest(t, router, http.MethodGet, fmt.Sprintf("/api/users/%d/scrobbles/top/tracks", privateUser.ID), nil)
+		w := doRequest(t, router, http.MethodGet, fmt.Sprintf("/api/users/%d/stats/tracks/top", privateUser.ID), nil)
 		assert.Equal(t, http.StatusNotFound, w.Code)
 	})
 
 	t.Run("Regular user accessing public user's track data", func(t *testing.T) {
 		router := SetupRouter(t, db, &privateUser)
-		w := doRequest(t, router, http.MethodGet, fmt.Sprintf("/api/users/%d/scrobbles/top/tracks", regularUser.ID), nil)
+		w := doRequest(t, router, http.MethodGet, fmt.Sprintf("/api/users/%d/stats/tracks/top", regularUser.ID), nil)
 		assert.Equal(t, http.StatusOK, w.Code)
 
 		var result common.APIResponse[common.PaginatedResponse[[]response.TrackResult]]
@@ -189,7 +189,7 @@ func TestGetHistory(t *testing.T) {
 	t.Run("Regular user accessing another private user's history", func(t *testing.T) {
 		router := SetupRouter(t, db, &regularUser)
 
-		w := doRequest(t, router, http.MethodGet, fmt.Sprintf("/api/users/%d/scrobbles/top/tracks", privateUser.ID), nil)
+		w := doRequest(t, router, http.MethodGet, fmt.Sprintf("/api/users/%d/scrobbles/history", privateUser.ID), nil)
 		assert.Equal(t, http.StatusNotFound, w.Code)
 		assert.Equal(t, 1, 1)
 	})

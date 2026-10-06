@@ -1,16 +1,7 @@
-package dto
+package response
 
 import (
 	"time"
-)
-
-type Period string
-
-const (
-	PeriodWeek    Period = "week"
-	PeriodMonth   Period = "month"
-	PeriodYear    Period = "year"
-	PeriodOverall Period = "overall"
 )
 
 type TopArtistResult struct {

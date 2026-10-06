@@ -9,20 +9,20 @@ export const load: PageServerLoad = async ({ url, params, cookies, locals }) => 
 
 	// TODO: change
 	const artists: Paginated<Artist> = await fetcher(
-		`${API_URL}/users/${userID}/scrobbles/top/artists?period=overall&artist=${artistID}&limit=1`,
+		`${API_URL}/users/${userID}/stats/artists/top?period=overall&artist=${artistID}&limit=1`,
 		'GET',
 		cookies,
 		null
 	);
 
 	const albums: Paginated<Album> = await fetcher(
-		`${API_URL}/users/${userID}/scrobbles/top/albums?&period=overall&artist=${artistID}&limit=9`,
+		`${API_URL}/users/${userID}/stats/albums/top?&period=overall&artist=${artistID}&limit=9`,
 		'GET',
 		cookies,
 		null
 	);
 	const tracks: Paginated<Track> = await fetcher(
-		`${API_URL}/users/${userID}/scrobbles/top/tracks?period=overall&artist=${artistID}&limit=6`,
+		`${API_URL}/users/${userID}/stats/tracks/top?period=overall&artist=${artistID}&limit=6`,
 		'GET',
 		cookies,
 		null

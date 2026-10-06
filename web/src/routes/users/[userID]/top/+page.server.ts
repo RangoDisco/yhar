@@ -16,19 +16,19 @@ export const load: PageServerLoad = async ({ url, params, cookies }) => {
 		tracks: Paginated<Track>;
 	}> => ({
 		artists: await fetcher(
-			`${API_URL}/users/${userID}/scrobbles/top/artists?period=${period}&limit=9`,
+			`${API_URL}/users/${userID}/stats/artists/top?period=${period}&limit=9`,
 			'GET',
 			cookies,
 			null
 		),
 		albums: await fetcher(
-			`${API_URL}/users/${userID}/scrobbles/top/albums?&period=${period}&limit=9`,
+			`${API_URL}/users/${userID}/stats/albums/top?&period=${period}&limit=9`,
 			'GET',
 			cookies,
 			null
 		),
 		tracks: await fetcher(
-			`${API_URL}/users/${userID}/scrobbles/top/tracks?period=${period}&limit=6`,
+			`${API_URL}/users/${userID}/stats/tracks/top?period=${period}&limit=6`,
 			'GET',
 			cookies,
 			null

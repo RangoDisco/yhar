@@ -1,19 +1,16 @@
 package handlers
 
 import (
-	"errors"
+	"fmt"
 	"net/http"
-	"strconv"
-	"time"
 
 	"github.com/gin-gonic/gin"
-	common2 "github.com/rangodisco/yhar/api/common"
-	"github.com/rangodisco/yhar/api/dto"
-	"github.com/rangodisco/yhar/api/repositories"
+	"github.com/rangodisco/yhar/api/common"
+	"github.com/rangodisco/yhar/api/dto/request"
 	"github.com/rangodisco/yhar/api/services"
-	"github.com/rangodisco/yhar/api/utils/convert"
 )
 
+// TODO: should be refactored, too much repetition + god awful param handling
 type ScrobbleStatsHandler struct {
 	service *services.ScrobbleStatsService
 }
@@ -22,25 +19,65 @@ func NewScrobbleStatsHandler(service *services.ScrobbleStatsService) *ScrobbleSt
 	return &ScrobbleStatsHandler{service: service}
 }
 
-// TODO: refacto whole param handling
-func (h *ScrobbleStatsHandler) parseStatsParams(c *gin.Context) (*services.PaginatedStatsRequest, error) {
-	// Extract user ID
-	paramUserID := c.Param("userID")
-	var userID string
-
-	if paramUserID == "me" {
-		currentUser, err := common2.GetUserFromContext(c)
-		if err != nil {
-			return nil, err
+func parseContentParam(c *gin.Context, targetContent *request.ContentType) (string, request.ContentType, error) {
+	if targetContent != nil {
+		switch *targetContent {
+		case request.ContentTypeArtist:
+			return c.Param("artistID"), *targetContent, nil
+		case request.ContentTypeAlbum:
+			return c.Param("albumID"), *targetContent, nil
+		case request.ContentTypeTrack:
+			return c.Param("trackID"), *targetContent, nil
+		default:
+			return "", "", fmt.Errorf("invalid target content: %v", targetContent)
 		}
-		userID = strconv.Itoa(int(currentUser.ID))
-	} else {
-		userID = paramUserID
+	}
+
+	if artistID := c.Query("artist"); artistID != "" {
+		return artistID, request.ContentTypeArtist, nil
+	}
+	if trackID := c.Query("track"); trackID != "" {
+		return trackID, request.ContentTypeTrack, nil
+	}
+	if albumID := c.Query("album"); albumID != "" {
+		return albumID, request.ContentTypeAlbum, nil
+	}
+	return "", "", nil
+}
+
+func (h *ScrobbleStatsHandler) parseStatsParams(c *gin.Context, initTargetContent *request.ContentType) (*request.StatsQueryParams, error) {
+	userID, err := common.ResolveUserID(c)
+	if err != nil {
+		return nil, err
+	}
+
+	targetID, targetContent, err := parseContentParam(c, initTargetContent)
+	if err != nil {
+		return nil, err
+	}
+
+	return &request.StatsQueryParams{
+		UserID:        userID,
+		Period:        request.Period(c.DefaultQuery("period", string(request.PeriodWeek))),
+		TargetContent: targetContent,
+		TargetID:      targetID,
+	}, nil
+}
+
+func (h *ScrobbleStatsHandler) parsePaginatedStatsParams(c *gin.Context) (*request.PaginatedStatsQueryParams, error) {
+	userID, err := common.ResolveUserID(c)
+	if err != nil {
+		return nil, err
+	}
+
+	targetID, targetContent, err := parseContentParam(c, nil)
+	if err != nil {
+		return nil, err
 	}
 
 	// Parse and validate pagination
-	page := convert.ParseInt(c.Query("page"), 1)
-	limit := convert.ParseInt(c.Query("limit"), 10)
+	page := common.ParseInt(c.Query("page"), 1)
+	limit := common.ParseInt(c.Query("limit"), 10)
 
 	if page < 1 {
 		page = 1
@@ -52,236 +89,136 @@ func (h *ScrobbleStatsHandler) parseStatsParams(c *gin.Context) (*services.Pagin
 		limit = 100
 	}
 
-	// Parse period
-	period := dto.Period(c.DefaultQuery("period", string(dto.PeriodWeek)))
-
 	// Build params
-	params := &services.PaginatedStatsRequest{
-		UserID: userID,
-		Period: period,
-		Pagination: struct {
-			Page  int
-			Limit int
-		}{
-			Page:  page,
-			Limit: limit,
-		},
-	}
-
-	// Optional filters
-	if artistID := c.Query("artist"); artistID != "" {
-		params.TargetID = artistID
-		params.TargetContent = repositories.Artist
-	}
-
-	if trackID := c.Query("track"); trackID != "" {
-		params.TargetID = trackID
-		params.TargetContent = repositories.Track
-	}
-
-	if albumID := c.Query("album"); albumID != "" {
-		params.TargetID = albumID
-		params.TargetContent = repositories.Album
-	}
-
-	return params, nil
-}
-func (h *ScrobbleStatsHandler) parseRegularStatsParams(c *gin.Context) (*services.StatsRequest, error) {
-	// Extract user ID
-	paramUserID := c.Param("userID")
-	var userID string
-
-	if paramUserID == "me" {
-		currentUser, err := common2.GetUserFromContext(c)
-		if err != nil {
-			return nil, err
-		}
-		userID = strconv.Itoa(int(currentUser.ID))
-	} else {
-		userID = paramUserID
-	}
-
-	// Build params
-	params := &services.StatsRequest{
-		UserID: userID,
-		Period: dto.Period(c.DefaultQuery("period", string(dto.PeriodWeek))),
-	}
-
-	// Optional filters
-	if artistID := c.Query("artist"); artistID != "" {
-		params.TargetID = artistID
-		params.TargetContent = repositories.Artist
-	}
-
-	if trackID := c.Query("track"); trackID != "" {
-		params.TargetID = trackID
-		params.TargetContent = repositories.Track
-	}
-
-	if albumID := c.Query("album"); albumID != "" {
-		params.TargetID = albumID
-		params.TargetContent = repositories.Album
-	}
-
-	return params, nil
+	return &request.PaginatedStatsQueryParams{
+		UserID:        userID,
+		Period:        request.Period(c.DefaultQuery("period", string(request.PeriodWeek))),
+		TargetContent: targetContent,
+		TargetID:      targetID,
+		Page:          page,
+		Limit:         limit,
+	}, nil
 }
 
 // GetUserTopArtists fetches the most scrobbled artists in a given period for a given user
 func (h *ScrobbleStatsHandler) GetUserTopArtists(c *gin.Context) {
-	ctx := c.Request.Context()
-	params, err := h.parseStatsParams(c)
+	params, err := h.parsePaginatedStatsParams(c)
 	if err != nil {
-		common2.RespondWithError(c, http.StatusBadRequest, err, "Invalid body")
+		common.RespondWithError(c, http.StatusBadRequest, err, "Invalid body")
 		return
 	}
 
-	results, total, err := h.service.FetchUserTopArtists(ctx, params)
+	results, total, err := h.service.FetchUserTopArtists(c.Request.Context(), params)
 	if err != nil {
-		common2.RespondWithError(c, http.StatusInternalServerError, err, "Unable to fetch top artists")
+		common.RespondWithError(c, http.StatusInternalServerError, err, "Unable to fetch top artists")
 		return
 	}
 
-	res := common2.BuildPaginatedResponse(results, params.Pagination.Page, params.Pagination.Limit, total)
+	res := common.BuildPaginatedResponse(results, params.Page, params.Limit, total)
 
-	common2.RespondWithData(c, http.StatusOK, res)
+	common.RespondWithData(c, http.StatusOK, res)
 }
 
 // GetUserTopAlbums fetches the most scrobbled albums in a given period for a given user
 func (h *ScrobbleStatsHandler) GetUserTopAlbums(c *gin.Context) {
-	ctx := c.Request.Context()
-	params, err := h.parseStatsParams(c)
+	params, err := h.parsePaginatedStatsParams(c)
 	if err != nil {
-		common2.RespondWithError(c, http.StatusBadRequest, err, "Invalid body")
+		common.RespondWithError(c, http.StatusBadRequest, err, "Invalid body")
 		return
 	}
 
-	results, total, err := h.service.FetchUserTopAlbums(ctx, params)
+	results, total, err := h.service.FetchUserTopAlbums(c.Request.Context(), params)
 	if err != nil {
-		common2.RespondWithError(c, http.StatusInternalServerError, err, "Unable to fetch top albums")
+		common.RespondWithError(c, http.StatusInternalServerError, err, "Unable to fetch top albums")
 		return
 	}
 
-	res := common2.BuildPaginatedResponse(results, params.Pagination.Page, params.Pagination.Limit, total)
+	res := common.BuildPaginatedResponse(results, params.Page, params.Limit, total)
 
-	common2.RespondWithData(c, http.StatusOK, res)
+	common.RespondWithData(c, http.StatusOK, res)
 }
 
+// GetUserTopTracks fetches the most scrobbled tracks in a given period for a given user
 func (h *ScrobbleStatsHandler) GetUserTopTracks(c *gin.Context) {
-	ctx := c.Request.Context()
-	params, err := h.parseStatsParams(c)
+	params, err := h.parsePaginatedStatsParams(c)
 	if err != nil {
-		common2.RespondWithError(c, http.StatusBadRequest, err, "Invalid body")
+		common.RespondWithError(c, http.StatusBadRequest, err, "Invalid body")
 		return
 	}
 
-	results, total, err := h.service.FetchUserTopTracks(ctx, params)
+	results, total, err := h.service.FetchUserTopTracks(c.Request.Context(), params)
 	if err != nil {
-		common2.RespondWithError(c, http.StatusInternalServerError, err, "Unable to fetch top tracks")
+		common.RespondWithError(c, http.StatusInternalServerError, err, "Unable to fetch top tracks")
 		return
 	}
 
-	res := common2.BuildPaginatedResponse(results, params.Pagination.Page, params.Pagination.Limit, total)
+	res := common.BuildPaginatedResponse(results, params.Page, params.Limit, total)
 
-	common2.RespondWithData(c, http.StatusOK, res)
+	common.RespondWithData(c, http.StatusOK, res)
 }
 
 func (h *ScrobbleStatsHandler) GetUserHistory(c *gin.Context) {
-	ctx := c.Request.Context()
-
-	params, err := h.parseStatsParams(c)
+	params, err := h.parsePaginatedStatsParams(c)
 	if err != nil {
-		common2.RespondWithError(c, http.StatusBadRequest, err, "Invalid body")
+		common.RespondWithError(c, http.StatusBadRequest, err, "Invalid body")
 		return
 	}
 
-	results, total, err := h.service.FetchUserHistory(ctx, params)
+	results, total, err := h.service.FetchUserHistory(c.Request.Context(), params)
 	if err != nil {
-		common2.RespondWithError(c, http.StatusInternalServerError, err, "Unable to fetch history")
+		common.RespondWithError(c, http.StatusInternalServerError, err, "Unable to fetch history")
 		return
 	}
 
-	res := common2.BuildPaginatedResponse(results, params.Pagination.Page, params.Pagination.Limit, total)
+	res := common.BuildPaginatedResponse(results, params.Page, params.Limit, total)
 
-	common2.RespondWithData(c, http.StatusOK, res)
+	common.RespondWithData(c, http.StatusOK, res)
 }
 
 func (h *ScrobbleStatsHandler) GetArtistTimeline(c *gin.Context) {
-	ctx := c.Request.Context()
-	params := services.StatsRequest{
-		UserID: c.Param("userID"),
-		Period: dto.Period(c.DefaultQuery("period", string(dto.PeriodWeek))),
-	}
-
-	artistID := c.Param("artistID")
-	if artistID == "" {
-		common2.RespondWithError(c, http.StatusInternalServerError, errors.New("no artistID provided"), "Unable to fetch line chart data")
-		return
-	}
-
-	params.TargetContent = repositories.Artist
-	params.TargetID = artistID
-	params.End = new(time.Now())
-	params.Start = new(time.Now().Add(time.Duration(-48) * time.Hour))
-
-	res, err := h.service.FetchLineChartData(ctx, &params)
+	params, err := h.parseStatsParams(c, new(request.ContentTypeArtist))
 	if err != nil {
-		common2.RespondWithError(c, http.StatusInternalServerError, err, "Unable to fetch line chart data")
+		common.RespondWithError(c, http.StatusBadRequest, err, "Invalid body")
 		return
 	}
 
-	common2.RespondWithData(c, http.StatusOK, res)
+	res, err := h.service.FetchLineChartData(c.Request.Context(), params)
+	if err != nil {
+		common.RespondWithError(c, http.StatusInternalServerError, err, "Unable to fetch line chart data")
+		return
+	}
+
+	common.RespondWithData(c, http.StatusOK, res)
 }
 
 func (h *ScrobbleStatsHandler) GetAlbumTimeline(c *gin.Context) {
-	ctx := c.Request.Context()
-	params := services.StatsRequest{
-		UserID: c.Param("userID"),
-		Period: dto.Period(c.DefaultQuery("period", string(dto.PeriodWeek))),
-	}
-
-	albumID := c.Param("albumID")
-	if albumID == "" {
-		common2.RespondWithError(c, http.StatusInternalServerError, errors.New("to albumID provided"), "Unable to fetch line chart data")
-		return
-	}
-
-	params.TargetContent = repositories.Album
-	params.TargetID = albumID
-	params.End = new(time.Now())
-	params.Start = new(time.Now().Add(time.Duration(-48) * time.Hour))
-
-	res, err := h.service.FetchLineChartData(ctx, &params)
+	params, err := h.parseStatsParams(c, new(request.ContentTypeAlbum))
 	if err != nil {
-		common2.RespondWithError(c, http.StatusInternalServerError, err, "Unable to fetch line chart data")
+		common.RespondWithError(c, http.StatusBadRequest, err, "Invalid body")
 		return
 	}
 
-	common2.RespondWithData(c, http.StatusOK, res)
+	res, err := h.service.FetchLineChartData(c.Request.Context(), params)
+	if err != nil {
+		common.RespondWithError(c, http.StatusInternalServerError, err, "Unable to fetch line chart data")
+		return
+	}
+
+	common.RespondWithData(c, http.StatusOK, res)
 }
 
 func (h *ScrobbleStatsHandler) GetTrackTimeline(c *gin.Context) {
-	ctx := c.Request.Context()
-	params := services.StatsRequest{
-		UserID: c.Param("userID"),
-		Period: dto.Period(c.DefaultQuery("period", string(dto.PeriodWeek))),
-	}
-
-	trackID := c.Param("trackID")
-	if trackID == "" {
-		common2.RespondWithError(c, http.StatusInternalServerError, errors.New("no trackID provided"), "Unable to fetch line chart data")
-		return
-	}
-
-	params.TargetContent = repositories.Track
-	params.TargetID = trackID
-	params.End = new(time.Now())
-	params.Start = new(time.Now().Add(time.Duration(-48) * time.Hour))
-
-	res, err := h.service.FetchLineChartData(ctx, &params)
+	params, err := h.parseStatsParams(c, new(request.ContentTypeTrack))
 	if err != nil {
-		common2.RespondWithError(c, http.StatusInternalServerError, err, "Unable to fetch line chart data")
+		common.RespondWithError(c, http.StatusBadRequest, err, "Invalid body")
 		return
 	}
 
-	common2.RespondWithData(c, http.StatusOK, res)
+	res, err := h.service.FetchLineChartData(c.Request.Context(), params)
+	if err != nil {
+		common.RespondWithError(c, http.StatusInternalServerError, err, "Unable to fetch line chart data")
+		return
+	}
+
+	common.RespondWithData(c, http.StatusOK, res)
 }

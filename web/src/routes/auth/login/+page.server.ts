@@ -1,7 +1,7 @@
 import { type Actions, fail, redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { API_URL } from '$app/env/private';
-import { fetcher } from '$lib/fetcher';
+import { fetcher } from '#lib/fetcher.js';
 
 export const load: PageServerLoad = async ({ cookies }) => {
 	const token = cookies?.get('access_token');

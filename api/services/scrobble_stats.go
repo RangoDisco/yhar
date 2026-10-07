@@ -20,18 +20,11 @@ func NewScrobbleStatsService(repo *repositories.StatsRepository) *ScrobbleStatsS
 func (s *ScrobbleStatsService) buildRepoParams(req *request.StatsQueryParams) *repositories.StatsQueryParams {
 	start, end := getDateRangeFromPeriod(req.Period)
 
-	if req.Start != nil {
-		start = *req.Start
-	}
-	if req.End != nil {
-		end = *req.End
-	}
-
 	return &repositories.StatsQueryParams{
 		UserID:        req.UserID,
 		Start:         start,
 		End:           end,
-		Interval:      req.Period,
+		Interval:      req.Interval,
 		TargetContent: req.TargetContent,
 		TargetID:      req.TargetID,
 	}
@@ -69,6 +62,8 @@ func getDateRangeFromPeriod(p request.Period) (time.Time, time.Time) {
 	now := time.Now()
 
 	switch p {
+	case request.PeriodDay:
+		return now.AddDate(0, 0, -1), now
 	case request.PeriodWeek:
 		return now.AddDate(0, 0, -7), now
 	case request.PeriodMonth:

@@ -1,4 +1,4 @@
-import { fetcher } from '$lib/fetcher';
+import { fetcher } from '#lib/fetcher.js';
 import { API_URL } from '$app/env/private';
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';

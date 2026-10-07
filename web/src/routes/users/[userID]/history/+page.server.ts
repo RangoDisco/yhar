@@ -1,8 +1,8 @@
 import type { PageServerLoad } from './$types';
 import { API_URL } from '$app/env/private';
-import { fetcher } from '$lib/fetcher';
-import type { Paginated } from '$lib/types/pagination';
-import type { Scrobble } from '$lib/types/content';
+import { fetcher } from '#lib/fetcher.js';
+import type { Paginated } from '#lib/types/pagination.js';
+import type { Scrobble } from '#lib/types/content.js';
 
 export const load: PageServerLoad = async ({ url, params, cookies }) => {
 	const { userID } = params;

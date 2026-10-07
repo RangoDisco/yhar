@@ -1,4 +1,5 @@
-import { error, type Handle } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
+import type { Handle } from '@sveltejs/kit/hooks';
 import { jwtDecode } from 'jwt-decode';
 import type { User } from '@lucide/svelte';
 

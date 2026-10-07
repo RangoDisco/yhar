@@ -1,8 +1,8 @@
 import type { PageServerLoad } from './$types';
-import { fetcher } from '$lib/fetcher';
+import { fetcher } from '#lib/fetcher.js';
 import { API_URL } from '$app/env/private';
-import type { Paginated } from '$lib/types/pagination';
-import type { Track } from '$lib/types/content';
+import type { Paginated } from '#lib/types/pagination.js';
+import type { Track } from '#lib/types/content.js';
 
 export const load: PageServerLoad = async ({ url, params, cookies }) => {
 	const { userID } = params;

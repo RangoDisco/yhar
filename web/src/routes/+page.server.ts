@@ -1,5 +1,5 @@
 import type { PageServerLoad } from './$types';
-import { fetcher } from '$lib/fetcher';
+import { fetcher } from '#lib/fetcher.js';
 import { API_URL } from '$app/env/private';
 import { redirect } from '@sveltejs/kit';
 

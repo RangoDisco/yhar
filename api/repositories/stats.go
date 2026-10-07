@@ -238,7 +238,7 @@ func (r *StatsRepository) FindScrobbleCountByInterval(ctx context.Context, param
 		return nil, fmt.Errorf("invalid content type: %v", params.TargetContent)
 	}
 
-	query := r.Db.WithContext(ctx).Select("COALESCE(SUM(distinct s.sub_count), 0) listened_count, CASE WHEN @period = 'day' THEN ca.date::varchar WHEN @period = 'month' THEN ca.yyyymm ELSE ca.year::varchar END as listened_interval", sql.Named("period", params.Interval)).
+	query := r.Db.WithContext(ctx).Select("COALESCE(SUM(distinct s.sub_count), 0) listened_count, CASE WHEN @interval = 'day' THEN ca.date::varchar WHEN @interval = 'month' THEN ca.yyyymm ELSE ca.year::varchar END as listened_interval", sql.Named("interval", params.Interval)).
 		Table("date_calendar ca").
 		Joins("LEFT JOIN (?) s ON s.scrobble_date = ca.date", subQuery).
 		Where("date >= ?", params.Start).

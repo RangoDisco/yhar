@@ -1,10 +1,9 @@
 package request
 
-import "time"
-
 type Period string
 
 const (
+	PeriodDay     Period = "day"
 	PeriodWeek    Period = "week"
 	PeriodMonth   Period = "month"
 	PeriodYear    Period = "year"
@@ -23,8 +22,7 @@ const (
 type StatsQueryParams struct {
 	UserID        string      `json:"user_id"`
 	Period        Period      `json:"period"`
-	Start         *time.Time  `json:"start,omitempty"`
-	End           *time.Time  `json:"end,omitempty"`
+	Interval      Period      `json:"interval"`
 	TargetContent ContentType `json:"target_content,omitempty"`
 	TargetID      string      `json:"target_id,omitempty"`
 }

@@ -59,6 +59,7 @@ func (h *ScrobbleStatsHandler) parseStatsParams(c *gin.Context, initTargetConten
 	return &request.StatsQueryParams{
 		UserID:        userID,
 		Period:        request.Period(c.DefaultQuery("period", string(request.PeriodWeek))),
+		Interval:      request.Period(c.DefaultQuery("interval", string(request.PeriodDay))),
 		TargetContent: targetContent,
 		TargetID:      targetID,
 	}, nil

@@ -58,6 +58,10 @@ func (s *ScrobbleStatsService) FetchLineChartData(ctx context.Context, params *r
 	return s.repo.FindScrobbleCountByInterval(ctx, s.buildRepoParams(params))
 }
 
+func (s *ScrobbleStatsService) FetchTotalListeningTimeAndCount(ctx context.Context, userID string) (*response.TotalListeningResult, error) {
+	return s.repo.FindTotalListeningTimeAndCountByUser(ctx, userID)
+}
+
 func getDateRangeFromPeriod(p request.Period) (time.Time, time.Time) {
 	now := time.Now()
 

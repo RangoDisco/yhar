@@ -105,7 +105,7 @@ func (h *ScrobbleStatsHandler) parsePaginatedStatsParams(c *gin.Context) (*reque
 func (h *ScrobbleStatsHandler) GetUserTopArtists(c *gin.Context) {
 	params, err := h.parsePaginatedStatsParams(c)
 	if err != nil {
-		common.RespondWithError(c, http.StatusBadRequest, err, "Invalid body")
+		common.RespondWithError(c, http.StatusBadRequest, err, "Invalid parameters")
 		return
 	}
 
@@ -124,7 +124,7 @@ func (h *ScrobbleStatsHandler) GetUserTopArtists(c *gin.Context) {
 func (h *ScrobbleStatsHandler) GetUserTopAlbums(c *gin.Context) {
 	params, err := h.parsePaginatedStatsParams(c)
 	if err != nil {
-		common.RespondWithError(c, http.StatusBadRequest, err, "Invalid body")
+		common.RespondWithError(c, http.StatusBadRequest, err, "Invalid parameters")
 		return
 	}
 
@@ -143,7 +143,7 @@ func (h *ScrobbleStatsHandler) GetUserTopAlbums(c *gin.Context) {
 func (h *ScrobbleStatsHandler) GetUserTopTracks(c *gin.Context) {
 	params, err := h.parsePaginatedStatsParams(c)
 	if err != nil {
-		common.RespondWithError(c, http.StatusBadRequest, err, "Invalid body")
+		common.RespondWithError(c, http.StatusBadRequest, err, "Invalid parameters")
 		return
 	}
 
@@ -161,7 +161,7 @@ func (h *ScrobbleStatsHandler) GetUserTopTracks(c *gin.Context) {
 func (h *ScrobbleStatsHandler) GetUserHistory(c *gin.Context) {
 	params, err := h.parsePaginatedStatsParams(c)
 	if err != nil {
-		common.RespondWithError(c, http.StatusBadRequest, err, "Invalid body")
+		common.RespondWithError(c, http.StatusBadRequest, err, "Invalid parameters")
 		return
 	}
 
@@ -176,16 +176,32 @@ func (h *ScrobbleStatsHandler) GetUserHistory(c *gin.Context) {
 	common.RespondWithData(c, http.StatusOK, res)
 }
 
-func (h *ScrobbleStatsHandler) GetArtistTimeline(c *gin.Context) {
-	params, err := h.parseStatsParams(c, new(request.ContentTypeArtist))
+func (h *ScrobbleStatsHandler) GetTimeline(c *gin.Context) {
+	params, err := h.parseStatsParams(c, nil)
 	if err != nil {
-		common.RespondWithError(c, http.StatusBadRequest, err, "Invalid body")
+		common.RespondWithError(c, http.StatusBadRequest, err, "Invalid parameters")
 		return
 	}
 
 	res, err := h.service.FetchLineChartData(c.Request.Context(), params)
 	if err != nil {
 		common.RespondWithError(c, http.StatusInternalServerError, err, "Unable to fetch line chart data")
+		return
+	}
+
+	common.RespondWithData(c, http.StatusOK, res)
+}
+
+func (h *ScrobbleStatsHandler) GetArtistTimeline(c *gin.Context) {
+	params, err := h.parseStatsParams(c, new(request.ContentTypeArtist))
+	if err != nil {
+		common.RespondWithError(c, http.StatusBadRequest, err, "Invalid parameters")
+		return
+	}
+
+	res, err := h.service.FetchLineChartData(c.Request.Context(), params)
+	if err != nil {
+		common.RespondWithError(c, http.StatusInternalServerError, err, "Unable to artist timeline")
 		return
 	}
 
@@ -195,13 +211,13 @@ func (h *ScrobbleStatsHandler) GetArtistTimeline(c *gin.Context) {
 func (h *ScrobbleStatsHandler) GetAlbumTimeline(c *gin.Context) {
 	params, err := h.parseStatsParams(c, new(request.ContentTypeAlbum))
 	if err != nil {
-		common.RespondWithError(c, http.StatusBadRequest, err, "Invalid body")
+		common.RespondWithError(c, http.StatusBadRequest, err, "Invalid parameters")
 		return
 	}
 
 	res, err := h.service.FetchLineChartData(c.Request.Context(), params)
 	if err != nil {
-		common.RespondWithError(c, http.StatusInternalServerError, err, "Unable to fetch line chart data")
+		common.RespondWithError(c, http.StatusInternalServerError, err, "Unable to fetch album timeline")
 		return
 	}
 
@@ -211,15 +227,31 @@ func (h *ScrobbleStatsHandler) GetAlbumTimeline(c *gin.Context) {
 func (h *ScrobbleStatsHandler) GetTrackTimeline(c *gin.Context) {
 	params, err := h.parseStatsParams(c, new(request.ContentTypeTrack))
 	if err != nil {
-		common.RespondWithError(c, http.StatusBadRequest, err, "Invalid body")
+		common.RespondWithError(c, http.StatusBadRequest, err, "Invalid parameters")
 		return
 	}
 
 	res, err := h.service.FetchLineChartData(c.Request.Context(), params)
 	if err != nil {
-		common.RespondWithError(c, http.StatusInternalServerError, err, "Unable to fetch line chart data")
+		common.RespondWithError(c, http.StatusInternalServerError, err, "Unable to fetch track timeline")
 		return
 	}
 
 	common.RespondWithData(c, http.StatusOK, res)
+}
+
+func (h *ScrobbleStatsHandler) GetTotalListening(c *gin.Context) {
+	userID, err := common.ResolveUserID(c)
+	if err != nil {
+		common.RespondWithError(c, http.StatusBadRequest, err, "Invalid parameters")
+		return
+	}
+
+	result, err := h.service.FetchTotalListeningTimeAndCount(c.Request.Context(), userID)
+	if err != nil {
+		common.RespondWithError(c, http.StatusInternalServerError, err, "Unable to fetch total listening time and count")
+		return
+	}
+
+	common.RespondWithData(c, http.StatusOK, result)
 }

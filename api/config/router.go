@@ -71,5 +71,8 @@ func SetupRouter(
 	userStats.GET("/tracks/top", h.ScrobbleStats.GetUserTopTracks)
 	userStats.GET("/tracks/:trackID/timeline", h.ScrobbleStats.GetTrackTimeline)
 
+	userStats.GET("/scrobbles/timeline", h.ScrobbleStats.GetTimeline)
+	userStats.GET("/scrobbles/total", h.ScrobbleStats.GetTotalListening)
+
 	return r
 }

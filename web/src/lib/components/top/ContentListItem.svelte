@@ -36,7 +36,7 @@
 			<Avatar.Root
 				class="{contentType !== 'artists'
 					? 'rounded-md'
-					: ''} aspect-square h-12 w-12 md:h-16 md:w-16"
+					: ''} aspect-square h-12 w-12"
 			>
 				<Avatar.Image src={pictureUrl} alt={`${title}'s picture`} />
 				<Avatar.Fallback>
@@ -58,12 +58,12 @@
 				{/if}
 				<div class="flex gap-1">
 					{#each parents as parent, i}
-						{#if i < 3}
+						{#if i < 2}
 							{#if i !== 0}
 								·
 							{/if}
 							<a
-								class="text-muted-foreground hover:underline"
+								class="text-muted-foreground hover:underline text-nowrap"
 								href="/users/{page.params.userID}/top/{parentType}/{parent.id}"
 								>{parent.name ?? parent.title}</a
 							>

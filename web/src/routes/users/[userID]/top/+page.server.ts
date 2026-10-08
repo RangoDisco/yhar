@@ -1,9 +1,9 @@
 import type { PageServerLoad } from './$types';
 import { API_URL } from '$app/env/private';
-import { fetcher } from '$lib/fetcher';
-import type { Paginated } from '$lib/types/pagination';
-import type { Album, Artist, Scrobble, Track } from '$lib/types/content';
-import { Period } from '$lib/types/period';
+import { fetcher } from '#lib/fetcher.js';
+import type { Paginated } from '#lib/types/pagination.js';
+import type { Album, Artist, Scrobble, Track } from '#lib/types/content.js';
+import { Period } from '#lib/types/period.js';
 
 export const load: PageServerLoad = async ({ url, params, cookies }) => {
 	const { userID } = params;
@@ -16,19 +16,19 @@ export const load: PageServerLoad = async ({ url, params, cookies }) => {
 		tracks: Paginated<Track>;
 	}> => ({
 		artists: await fetcher(
-			`${API_URL}/users/${userID}/scrobbles/top/artists?period=${period}&limit=9`,
+			`${API_URL}/users/${userID}/stats/artists/top?period=${period}&limit=9`,
 			'GET',
 			cookies,
 			null
 		),
 		albums: await fetcher(
-			`${API_URL}/users/${userID}/scrobbles/top/albums?&period=${period}&limit=9`,
+			`${API_URL}/users/${userID}/stats/albums/top?&period=${period}&limit=9`,
 			'GET',
 			cookies,
 			null
 		),
 		tracks: await fetcher(
-			`${API_URL}/users/${userID}/scrobbles/top/tracks?period=${period}&limit=6`,
+			`${API_URL}/users/${userID}/stats/tracks/top?period=${period}&limit=6`,
 			'GET',
 			cookies,
 			null

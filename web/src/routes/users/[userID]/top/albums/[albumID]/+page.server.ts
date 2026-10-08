@@ -1,20 +1,20 @@
 import type { PageServerLoad } from './$types';
-import { fetcher } from '$lib/fetcher';
+import { fetcher } from '#lib/fetcher.js';
 import { API_URL } from '$app/env/private';
-import type { Paginated } from '$lib/types/pagination';
-import type { Album, Track } from '$lib/types/content';
+import type { Paginated } from '#lib/types/pagination.js';
+import type { Album, Track } from '#lib/types/content.js';
 
 export const load: PageServerLoad = async ({ url, params, cookies, locals }) => {
 	const { userID, albumID } = params;
 	const albums: Paginated<Album> = await fetcher(
-		`${API_URL}/users/${userID}/scrobbles/top/albums?&period=overall&album=${albumID}&limit=1`,
+		`${API_URL}/users/${userID}/stats/albums/top?&period=overall&album=${albumID}&limit=1`,
 		'GET',
 		cookies,
 		null
 	);
 
 	const tracks: Paginated<Track> = await fetcher(
-		`${API_URL}/users/${userID}/scrobbles/top/tracks?period=overall&album=${albumID}&limit=10`,
+		`${API_URL}/users/${userID}/stats/tracks/top?period=overall&album=${albumID}&limit=10`,
 		'GET',
 		cookies,
 		null

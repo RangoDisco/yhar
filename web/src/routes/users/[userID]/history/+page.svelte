@@ -1,14 +1,18 @@
 <script lang="ts">
-    import * as Pagination from "$lib/components/ui/pagination/index";
-    import Paginator from "$lib/components/Paginator.svelte";
-    import HistoryList from "$lib/components/top/tracks/HistoryList.svelte";
-    import SvelteHead from "$lib/components/SvelteHead.svelte";
+	import * as Pagination from '#lib/components/ui/pagination/index.js';
+	import Paginator from '#lib/components/Paginator.svelte';
+	import HistoryList from '#lib/components/top/tracks/HistoryList.svelte';
+	import SvelteHead from '#lib/components/SvelteHead.svelte';
 
-    let {data} = $props();
+	let { data } = $props();
 
-    let currentPage = $derived(parseInt(data.page));
-
+	let currentPage = $derived(parseInt(data.page));
 </script>
-<SvelteHead title="History" description="Listening history."/>
-<HistoryList scrobbles={data.history.results} url={null} parentType="artists"/>
-<Paginator totalCount={data.history.pagination.total_count} page={currentPage} perPage={data.history.results.length}/>
+
+<SvelteHead title="History" description="Listening history." />
+<HistoryList scrobbles={data.history.results} url={null} parentType="artists" />
+<Paginator
+	totalCount={data.history.pagination.total_count}
+	page={currentPage}
+	perPage={data.history.results.length}
+/>

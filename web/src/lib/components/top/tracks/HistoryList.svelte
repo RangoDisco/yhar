@@ -1,17 +1,17 @@
 <script lang="ts">
-
-    import ContentListWrapper from "$lib/components/top/ContentListWrapper.svelte";
-    import HistoryListItem from "$lib/components/top/tracks/HistoryListItem.svelte";
-    import type {Scrobble} from "$lib/types/content";
+    import ContentListWrapper from "#lib/components/top/ContentListWrapper.svelte";
+    import HistoryListItem from "#lib/components/top/tracks/HistoryListItem.svelte";
+    import type {Scrobble} from "#lib/types/content.js";
     import {toast} from "svelte-sonner";
 
     type Props = {
-        scrobbles: Scrobble[]
+        scrobbles: Scrobble[];
         url: string | null;
-        parentType: "artists" | "albums"
-    }
+        parentType: "artists" | "albums";
+        shouldShowDeleteButton?: boolean;
+    };
 
-    let {scrobbles, url = $bindable(null), parentType}: Props = $props();
+    let {scrobbles, url = $bindable(null), parentType, shouldShowDeleteButton = $bindable(true)}: Props = $props();
 
     const handleDelete = async (id: string) => {
         const initialState = scrobbles;
@@ -28,10 +28,10 @@
     };
 </script>
 
-<ContentListWrapper title="HISTORY" url={url}>
-    <div class="flex flex-col gap-2 w-full">
+<ContentListWrapper title="History" {url}>
+    <div class="flex w-full flex-col gap-2">
         {#each scrobbles as scrobble}
-            <HistoryListItem scrobble={scrobble} parentType={parentType} handleDelete={handleDelete}/>
+            <HistoryListItem {scrobble} {parentType} handleDelete={handleDelete} shouldShowDeleteButton={shouldShowDeleteButton}/>
         {/each}
     </div>
 </ContentListWrapper>

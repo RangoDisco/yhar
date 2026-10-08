@@ -29,3 +29,8 @@ export type Track = {
 	album: Album;
 	scrobble_count: number;
 };
+
+export type TimelineResult = {
+	listenedCount: number;
+	periodInterval: string;
+};

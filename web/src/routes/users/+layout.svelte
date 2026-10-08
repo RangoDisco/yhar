@@ -1,17 +1,10 @@
 <script lang="ts">
-    import {Button} from "$lib/components/ui/button";
-    import ModeToggler from "$lib/components/ModeToggler.svelte";
-    import Nav from "$lib/components/Nav.svelte";
+    import Nav from "#lib/components/Nav.svelte";
 
     let {children, data} = $props();
 </script>
 
-<main class="flex flex-col">
-    <div class="flex items-center gap-2 px-6 h-17">
-        <Nav user={data.user}/>
-    </div>
-    <hr/>
-    <div class="lg:max-w-450 w-full mx-auto p-6">
-        {@render children()}
-    </div>
-</main>
+<Nav user={data.user}/>
+<div class="mx-auto w-full p-10 lg:max-w-500">
+    {@render children()}
+</div>

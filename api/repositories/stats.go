@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"os"
 	"time"
 
 	"github.com/rangodisco/yhar/api/dto/request"
@@ -96,7 +95,7 @@ func (r *StatsRepository) FindTopAlbumsForUser(ctx context.Context, params *Pagi
 	if params.TargetContent == request.ContentTypeArtist {
 		query = query.Where("EXISTS(SELECT 1 FROM artist_albums aral2 WHERE aral2.album_id = al.id AND aral2.artist_id = ?)", params.TargetID)
 	} else if params.TargetContent == request.ContentTypeAlbum {
-		query = query.Where("al.id = ? ", params.TargetContent)
+		query = query.Where("al.id = ? ", params.TargetID)
 	}
 
 	err := query.Count(&totalCount).Error
@@ -234,11 +233,9 @@ func (r *StatsRepository) FindScrobbleCountByInterval(ctx context.Context, param
 	case request.ContentTypeTrack:
 		subQuery.Joins("INNER JOIN tracks t ON s.track_id = t.id AND t.id = ?", params.TargetID)
 		break
-	default:
-		return nil, fmt.Errorf("invalid content type: %v", params.TargetContent)
 	}
 
-	query := r.Db.WithContext(ctx).Select("COALESCE(SUM(distinct s.sub_count), 0) listened_count, CASE WHEN @period = 'day' THEN ca.date::varchar WHEN @period = 'month' THEN ca.yyyymm ELSE ca.year::varchar END as listened_interval", sql.Named("period", params.Interval)).
+	query := r.Db.WithContext(ctx).Select("COALESCE(SUM(distinct s.sub_count), 0) listened_count, CASE WHEN @interval = 'day' THEN ca.date::varchar WHEN @interval = 'month' THEN ca.yyyymm WHEN @interval = 'month' THEN ca.year::varchar ELSE '21st century' END as listened_interval", sql.Named("interval", params.Interval)).
 		Table("date_calendar ca").
 		Joins("LEFT JOIN (?) s ON s.scrobble_date = ca.date", subQuery).
 		Where("date >= ?", params.Start).
@@ -252,6 +249,23 @@ func (r *StatsRepository) FindScrobbleCountByInterval(ctx context.Context, param
 	}
 
 	return res, nil
+}
+
+func (r *StatsRepository) FindTotalListeningTimeAndCountByUser(ctx context.Context, userID string) (*response.TotalListeningResult, error) {
+	var res response.TotalListeningResult
+	query := r.Db.WithContext(ctx).
+		Select("count(distinct s.id) as total_scrobbles, (SUM(COALESCE(t.duration, 0))/ 1000000)::bigint as total_duration").
+		Table("scrobbles s").
+		Joins("INNER JOIN tracks t ON s.track_id = t.id").
+		Where("s.user_id = ?", userID).
+		Where("s.deleted_at IS null")
+
+	err := query.Find(&res).Error
+	if err != nil {
+		return nil, fmt.Errorf("unable to fetch total listening time and count: %w", err)
+	}
+
+	return &res, nil
 }
 
 func (r *StatsRepository) buildBaseStatQuery(ctx context.Context, params StatsQueryParams) *gorm.DB {
@@ -280,7 +294,8 @@ func (r *StatsRepository) buildImageURL(imageType, domain, path string) *string 
 		return nil
 	}
 
-	baseURL := os.Getenv("BASE_URL")
+	//baseURL := os.Getenv("BASE_URL")
+	baseURL := "https://api-stats.nero.rangodisco.eu"
 	switch imageType {
 	case "distant":
 		return new(fmt.Sprintf("%s/%s", domain, path))

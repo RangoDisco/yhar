@@ -1,8 +1,8 @@
 import type { PageServerLoad } from './$types';
-import { fetcher } from '$lib/fetcher';
+import { fetcher } from '#lib/fetcher.js';
 import { API_URL } from '$app/env/private';
-import type { Album } from '$lib/types/content';
-import type { Paginated } from '$lib/types/pagination';
+import type { Album } from '#lib/types/content.js';
+import type { Paginated } from '#lib/types/pagination.js';
 
 export const load: PageServerLoad = async ({ url, params, cookies }) => {
 	const { userID } = params;
@@ -10,7 +10,7 @@ export const load: PageServerLoad = async ({ url, params, cookies }) => {
 	const period = url.searchParams.get('period') ?? 'week';
 	const artist = url.searchParams.get('artist');
 
-	let queryUrl = `${API_URL}/users/${userID}/scrobbles/top/albums?period=${period}&page=${page}&limit=10`;
+	let queryUrl = `${API_URL}/users/${userID}/stats/albums/top?period=${period}&page=${page}&limit=10`;
 
 	if (artist != null) {
 		queryUrl = queryUrl + `&artist=${artist}`;

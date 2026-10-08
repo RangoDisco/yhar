@@ -95,7 +95,7 @@ func (r *StatsRepository) FindTopAlbumsForUser(ctx context.Context, params *Pagi
 	if params.TargetContent == request.ContentTypeArtist {
 		query = query.Where("EXISTS(SELECT 1 FROM artist_albums aral2 WHERE aral2.album_id = al.id AND aral2.artist_id = ?)", params.TargetID)
 	} else if params.TargetContent == request.ContentTypeAlbum {
-		query = query.Where("al.id = ? ", params.TargetContent)
+		query = query.Where("al.id = ? ", params.TargetID)
 	}
 
 	err := query.Count(&totalCount).Error

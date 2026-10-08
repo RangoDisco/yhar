@@ -1,5 +1,5 @@
 # Build the application from source
-FROM golang:1.26 AS gin-build-stage
+FROM golang:1.27 AS gin-build-stage
 WORKDIR /app
 COPY go.mod go.sum ./
 RUN go mod download

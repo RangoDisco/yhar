@@ -7,10 +7,10 @@
 	let { children } = $props();
 </script>
 
-<section class="min-h-screen">
+<main class="min-h-screen flex flex-col md:flex-row">
 	<ModeWatcher />
 	<Toaster />
 	<TooltipProvider>
 		{@render children()}
 	</TooltipProvider>
-</section>
+</main>

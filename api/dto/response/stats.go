@@ -52,3 +52,8 @@ type TimelineResult struct {
 	ListeningCount int64  `json:"listenedCount" gorm:"column:listened_count"`
 	PeriodInterval string `json:"periodInterval" gorm:"column:listened_interval"`
 }
+
+type TotalListeningResult struct {
+	TotalScrobbles     int64 `json:"totalScrobbles" gorm:"column:total_scrobbles"`
+	TotalListeningTime int64 `json:"totalDuration" gorm:"column:total_duration"`
+}

@@ -13,7 +13,7 @@
 </script>
 
 <img
-	class="aspect-square w-full object-cover {contentType === 'artists'
+	class="aspect-square w-full object-cover border border-border {contentType === 'artists'
 		? 'rounded-full'
 		: 'rounded-md'}"
 	src={pictureUrl ?? fallback}

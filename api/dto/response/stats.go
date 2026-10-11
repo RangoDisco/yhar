@@ -57,3 +57,7 @@ type TotalListeningResult struct {
 	TotalScrobbles     int64 `json:"totalScrobbles" gorm:"column:total_scrobbles"`
 	TotalListeningTime int64 `json:"totalDuration" gorm:"column:total_duration"`
 }
+
+type AvgDailyListensResult struct {
+	AvgCount float64 `json:"avgCount" gorm:"column:avg_count"`
+}

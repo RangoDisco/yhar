@@ -73,6 +73,7 @@ func SetupRouter(
 
 	userStats.GET("/scrobbles/timeline", h.ScrobbleStats.GetTimeline)
 	userStats.GET("/scrobbles/total", h.ScrobbleStats.GetTotalListening)
+	userStats.GET("/scrobbles/daily-avg", h.ScrobbleStats.GetAvgDailyListens)
 
 	return r
 }

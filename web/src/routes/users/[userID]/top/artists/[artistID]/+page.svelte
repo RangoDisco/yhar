@@ -43,7 +43,7 @@
 
 	<div class="flex flex-col gap-8">
 		<!--TOP ALBUMS-->
-		<ContentListWrapper title="TOP ALBUMS" url="top/albums?artist={data.artist.id}">
+		<ContentListWrapper title="Albums" url="top/albums?artist={data.artist.id}">
 			<div class="grid grid-cols-3 gap-4 lg:grid-cols-9">
 				{#each data.albums.results as album, i (album.id)}
 					<div class={i >= 6 ? 'hidden lg:block' : ''}>
@@ -59,7 +59,7 @@
 		</ContentListWrapper>
 		<div class="flex flex-col gap-8 lg:flex-row lg:gap-36">
 			<!--TOP TRACKS-->
-			<ContentListWrapper title="TOP TRACKS" url="top/tracks?artist={data.artist.id}">
+			<ContentListWrapper title="Tracks" url="top/tracks?artist={data.artist.id}">
 				<div class="flex w-full flex-col gap-4">
 					{#each data.tracks.results as track, i (track.id)}
 						<ContentListItem

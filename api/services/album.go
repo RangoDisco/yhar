@@ -26,15 +26,17 @@ func NewAlbumService(repo *repositories.AlbumRepository, image *ImageService) *A
 }
 
 // GetOrCreateAlbum tries to fetch or create an album if it doesn't exist
-func (s *AlbumService) GetOrCreateAlbum(ctx context.Context, info providers.AlbumMetadata, artists []models.Artist) (*models.Album, error) {
-	filter := repositories.QueryFilter{Key: "title", Value: info.Title}
-	if info.MBID != nil {
-		filter = repositories.QueryFilter{
-			Key: "music_brainz_id", Value: info.MBID,
-		}
+func (s *AlbumService) GetOrCreateAlbum(ctx context.Context, info providers.AlbumMetadata, artists []models.Artist, shouldUseMBID bool) (*models.Album, error) {
+	filters := []repositories.QueryFilter{{Key: "name", Value: artists[0].Name}}
+	if info.MBID != nil && shouldUseMBID {
+		filters = append(filters, repositories.QueryFilter{
+			Key: "a.music_brainz_id", Value: info.MBID,
+		})
+	} else {
+		filters = append(filters, repositories.QueryFilter{Key: "title", Value: info.Title})
 	}
 
-	existingAlbum, err := s.repo.FindOneBy(ctx, []repositories.QueryFilter{filter}, "Artists.Picture", "Picture")
+	existingAlbum, err := s.repo.FindOneByFilter(ctx, filters, "Artists.Picture", "Picture")
 	if err == nil {
 		return existingAlbum, nil
 	}
@@ -61,7 +63,7 @@ func (s *AlbumService) GetOrCreateAlbum(ctx context.Context, info providers.Albu
 	if err != nil {
 		// could happen if another routine inserted the same album first
 		if errors.Is(err, gorm.ErrDuplicatedKey) {
-			return s.repo.FindOneBy(ctx, []repositories.QueryFilter{filter})
+			return s.repo.FindOneBy(ctx, filters)
 		}
 		return nil, err
 	}

@@ -268,6 +268,25 @@ func (r *StatsRepository) FindTotalListeningTimeAndCountByUser(ctx context.Conte
 	return &res, nil
 }
 
+func (r *StatsRepository) FindAvgDailyListens(ctx context.Context, userID string) (*response.AvgDailyListensResult, error) {
+	var res response.AvgDailyListensResult
+
+	subQuery := r.Db.WithContext(ctx).Select("count(s.id) daily_count").
+		Table("scrobbles s").
+		Where("s.user_id = ? AND s.deleted_at IS null", userID).
+		Group("s.scrobbled_at::DATE")
+
+	query := r.Db.WithContext(ctx).Select("AVG(s.daily_count) as avg_count").
+		Table("(?) s", subQuery)
+
+	err := query.Find(&res).Error
+	if err != nil {
+		return nil, fmt.Errorf("unable to fetch average daily listens: %w", err)
+	}
+
+	return &res, nil
+}
+
 func (r *StatsRepository) buildBaseStatQuery(ctx context.Context, params StatsQueryParams) *gorm.DB {
 	query := r.Db.WithContext(ctx).
 		Table("scrobbles").

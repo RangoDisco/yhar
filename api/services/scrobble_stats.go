@@ -62,6 +62,10 @@ func (s *ScrobbleStatsService) FetchTotalListeningTimeAndCount(ctx context.Conte
 	return s.repo.FindTotalListeningTimeAndCountByUser(ctx, userID)
 }
 
+func (s *ScrobbleStatsService) FetchAvgDailyListens(ctx context.Context, userID string) (*response.AvgDailyListensResult, error) {
+	return s.repo.FindAvgDailyListens(ctx, userID)
+}
+
 func getDateRangeFromPeriod(p request.Period) (time.Time, time.Time) {
 	now := time.Now()
 

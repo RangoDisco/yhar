@@ -34,3 +34,16 @@ export type TimelineResult = {
 	listenedCount: number;
 	periodInterval: string;
 };
+
+export type TotalScrobbleDurationAndCount = {
+	totalScrobbles: number;
+	totalDuration: number;
+};
+
+export type AvgDailyScrobbles = {
+	avgCount: number;
+}
+
+export type TotalDistinctCount = {
+	totalCount: number;
+}

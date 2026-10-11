@@ -32,7 +32,7 @@ No roadmap yet, just a list of issues and random draft ideas.
 
 Monorepo with 2 main packages:
 
-- [Server](./internal) backend server, written in Go with Gin & Gorm.
+- [Server](./api) backend server, written in Go with Gin & Gorm.
 - [Web](./web) frontend, written in TypeScript with SvelteKit, ShadcnUI and Vite.
 
 # Why does it exist

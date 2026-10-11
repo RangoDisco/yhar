@@ -271,3 +271,19 @@ func (h *ScrobbleStatsHandler) GetAvgDailyListens(c *gin.Context) {
 
 	common.RespondWithData(c, http.StatusOK, result)
 }
+
+func (h *ScrobbleStatsHandler) GetDistinctListenedCount(c *gin.Context) {
+	userID, err := common.ResolveUserID(c)
+	if err != nil {
+		common.RespondWithError(c, http.StatusBadRequest, err, "Invalid parameters")
+		return
+	}
+
+	result, err := h.service.FetchDistinctListenedCount(c.Request.Context(), userID)
+	if err != nil {
+		common.RespondWithError(c, http.StatusInternalServerError, err, "Unable to fetch total listening time and count")
+		return
+	}
+
+	common.RespondWithData(c, http.StatusOK, result)
+}

@@ -71,7 +71,7 @@
 
 <div class="relative">
     <img
-            class="peer aspect-square h-24 rounded-full md:h-56 {contentType === 'artists'
+            class="peer max-w-fit aspect-square h-24 w-24 rounded-full md:h-56 md:w-56 {contentType === 'artists'
 			? 'rounded-full'
 			: 'rounded-md'}"
             src={pictureUrl ?? fallback}

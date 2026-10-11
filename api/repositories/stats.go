@@ -287,6 +287,22 @@ func (r *StatsRepository) FindAvgDailyListens(ctx context.Context, userID string
 	return &res, nil
 }
 
+func (r *StatsRepository) FindTotalListenedCount(ctx context.Context, userID string) (*response.TotalDistinctListenedResult, error) {
+	var res response.TotalDistinctListenedResult
+	query := r.Db.WithContext(ctx).
+		Select("COUNT(distinct t.id) AS total_count").
+		Table("scrobbles s").
+		Joins("INNER JOIN tracks t ON s.track_id = t.id").
+		Where("s.user_id = ? AND s.deleted_at IS null", userID)
+
+	err := query.Find(&res).Error
+	if err != nil {
+		return nil, fmt.Errorf("unable to fetch total listened count: %w", err)
+	}
+
+	return &res, nil
+}
+
 func (r *StatsRepository) buildBaseStatQuery(ctx context.Context, params StatsQueryParams) *gorm.DB {
 	query := r.Db.WithContext(ctx).
 		Table("scrobbles").

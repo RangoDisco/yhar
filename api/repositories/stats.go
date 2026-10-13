@@ -235,7 +235,7 @@ func (r *StatsRepository) FindScrobbleCountByInterval(ctx context.Context, param
 		break
 	}
 
-	query := r.Db.WithContext(ctx).Select("COALESCE(SUM(distinct s.sub_count), 0) listened_count, CASE WHEN @interval = 'day' THEN ca.date::varchar WHEN @interval = 'month' THEN ca.yyyymm WHEN @interval = 'year' THEN ca.year::varchar ELSE '21st century' END as listened_interval", sql.Named("interval", params.Interval)).
+	query := r.Db.WithContext(ctx).Select("COALESCE(SUM(s.sub_count), 0) listened_count, CASE WHEN @interval = 'day' THEN ca.date::varchar WHEN @interval = 'month' THEN ca.yyyymm WHEN @interval = 'year' THEN ca.year::varchar ELSE '21st century' END as listened_interval", sql.Named("interval", params.Interval)).
 		Table("date_calendar ca").
 		Joins("LEFT JOIN (?) s ON s.scrobble_date = ca.date", subQuery).
 		Where("date >= ?", params.Start).

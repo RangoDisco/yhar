@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/rangodisco/yhar/api/dto/request"
@@ -40,11 +41,11 @@ func NewStatsRepository(Db *gorm.DB) *StatsRepository {
 }
 
 // FindTopArtistsForUser finds all scrobble for given user, and group them by artist
-func (r *StatsRepository) FindTopArtistsForUser(ctx context.Context, params *PaginatedStatsQueryParams) ([]response.TopArtistResult, int64, error) {
+func (r *StatsRepository) FindTopArtistsForUser(ctx context.Context, params *StatsQueryParams, page, limit int) ([]response.TopArtistResult, int64, error) {
 	var res []response.TopArtistResult
 	var totalCount int64
 
-	query := r.buildBaseStatQuery(ctx, params.StatsQueryParams).
+	query := r.buildBaseStatQuery(ctx, params).
 		Select("ar.id AS id, ar.name AS name, ar.music_brainz_id as music_brainz_id, COUNT(scrobbles.id) AS scrobble_count, " +
 			"i.path AS picture_path, i.type AS picture_type, i.domain AS picture_domain").
 		Joins("LEFT JOIN images i ON i.id = ar.picture_id").
@@ -60,7 +61,7 @@ func (r *StatsRepository) FindTopArtistsForUser(ctx context.Context, params *Pag
 	}
 
 	err = query.Order("scrobble_count DESC").
-		Scopes(Paginate(params.Page, params.Limit)).
+		Scopes(Paginate(page, limit)).
 		Find(&res).Error
 
 	if err != nil {
@@ -74,11 +75,11 @@ func (r *StatsRepository) FindTopArtistsForUser(ctx context.Context, params *Pag
 	return res, totalCount, nil
 }
 
-func (r *StatsRepository) FindTopAlbumsForUser(ctx context.Context, params *PaginatedStatsQueryParams) ([]response.TopAlbumResult, int64, error) {
+func (r *StatsRepository) FindTopAlbumsForUser(ctx context.Context, params *StatsQueryParams, page, limit int) ([]response.TopAlbumResult, int64, error) {
 	var res []response.TopAlbumResult
 	var totalCount int64
 
-	query := r.buildBaseStatQuery(ctx, params.StatsQueryParams).
+	query := r.buildBaseStatQuery(ctx, params).
 		Select("al.id as id, al.title as title, al.music_brainz_id as music_brainz_id, " +
 			"i.path AS picture_path, i.type AS picture_type, i.domain AS picture_domain, " +
 			"COUNT(DISTINCT scrobbles.id) AS scrobble_count, " +
@@ -105,7 +106,7 @@ func (r *StatsRepository) FindTopAlbumsForUser(ctx context.Context, params *Pagi
 
 	err = query.
 		Order("scrobble_count DESC").
-		Scopes(Paginate(params.Page, params.Limit)).
+		Scopes(Paginate(page, limit)).
 		Find(&res).Error
 
 	if err != nil {
@@ -123,11 +124,11 @@ func (r *StatsRepository) FindTopAlbumsForUser(ctx context.Context, params *Pagi
 	return res, totalCount, nil
 }
 
-func (r *StatsRepository) FindTopTracksForUser(ctx context.Context, params *PaginatedStatsQueryParams) ([]response.TrackResult, int64, error) {
+func (r *StatsRepository) FindTopTracksForUser(ctx context.Context, params *StatsQueryParams, page, limit int) ([]response.TrackResult, int64, error) {
 	var res []response.TrackResult
 	var totalCount int64
 
-	query := r.buildBaseStatQuery(ctx, params.StatsQueryParams).
+	query := r.buildBaseStatQuery(ctx, params).
 		Select("tr.id as id, tr.title as title, " +
 			"i.path AS picture_path, i.type AS picture_type, i.domain AS picture_domain, " +
 			"jsonb_build_object('id', al.id, 'title', al.title) as album, " +
@@ -151,7 +152,7 @@ func (r *StatsRepository) FindTopTracksForUser(ctx context.Context, params *Pagi
 	}
 
 	err = query.Order("scrobble_count DESC").
-		Scopes(Paginate(params.Page, params.Limit)).
+		Scopes(Paginate(page, limit)).
 		Find(&res).Error
 
 	if err != nil {
@@ -169,11 +170,11 @@ func (r *StatsRepository) FindTopTracksForUser(ctx context.Context, params *Pagi
 	return res, totalCount, nil
 }
 
-func (r *StatsRepository) FindByUserID(ctx context.Context, params *PaginatedStatsQueryParams) ([]response.HistoryResult, int64, error) {
+func (r *StatsRepository) FindByUserID(ctx context.Context, params *StatsQueryParams, page, limit int) ([]response.HistoryResult, int64, error) {
 	var res []response.HistoryResult
 	var totalCount int64
 
-	query := r.buildBaseStatQuery(ctx, params.StatsQueryParams).
+	query := r.buildBaseStatQuery(ctx, params).
 		Select("scrobbles.id as id, scrobbles.scrobbled_at as scrobbled_at, json_build_object('id', tr.id, 'title', tr.title, " +
 			"'picture_path', i.path, 'picture_type', i.type, 'picture_domain', i.domain,  " +
 			"'album', jsonb_build_object('id', al.id, 'title', al.title), " +
@@ -194,7 +195,7 @@ func (r *StatsRepository) FindByUserID(ctx context.Context, params *PaginatedSta
 	}
 
 	err = query.Order("scrobbled_at DESC").
-		Scopes(Paginate(params.Page, params.Limit)).
+		Scopes(Paginate(page, limit)).
 		Find(&res).Error
 
 	if err != nil {
@@ -239,7 +240,7 @@ func (r *StatsRepository) FindScrobbleCountByInterval(ctx context.Context, param
 		Table("date_calendar ca").
 		Joins("LEFT JOIN (?) s ON s.scrobble_date = ca.date", subQuery).
 		Where("date >= ?", params.Start).
-		Where("date <= ?", params.End).
+		Where("date < ?", params.End).
 		Group("listened_interval").
 		Order("listened_interval ASC")
 
@@ -268,13 +269,15 @@ func (r *StatsRepository) FindTotalListeningTimeAndCountByUser(ctx context.Conte
 	return &res, nil
 }
 
-func (r *StatsRepository) FindAvgDailyListens(ctx context.Context, userID string) (*response.AvgDailyListensResult, error) {
+func (r *StatsRepository) FindAvgDailyListens(ctx context.Context, params *StatsQueryParams) (*response.AvgDailyListensResult, error) {
 	var res response.AvgDailyListensResult
 
 	subQuery := r.Db.WithContext(ctx).Select("count(s.id) daily_count").
-		Table("scrobbles s").
-		Where("s.user_id = ? AND s.deleted_at IS null", userID).
-		Group("s.scrobbled_at::DATE")
+		Table("date_calendar ca").
+		Joins("LEFT JOIN scrobbles s ON s.scrobbled_at >= ca.date AND s.scrobbled_at < ca.date + 1 AND s.user_id = ? AND s.deleted_at IS null", params.UserID).
+		Where("ca.date >= ?", params.Start).
+		Where("ca.date < ?", params.End).
+		Group("ca.date")
 
 	query := r.Db.WithContext(ctx).Select("AVG(s.daily_count) as avg_count").
 		Table("(?) s", subQuery)
@@ -303,7 +306,7 @@ func (r *StatsRepository) FindTotalListenedCount(ctx context.Context, userID str
 	return &res, nil
 }
 
-func (r *StatsRepository) buildBaseStatQuery(ctx context.Context, params StatsQueryParams) *gorm.DB {
+func (r *StatsRepository) buildBaseStatQuery(ctx context.Context, params *StatsQueryParams) *gorm.DB {
 	query := r.Db.WithContext(ctx).
 		Table("scrobbles").
 		Joins("JOIN tracks tr ON tr.id = scrobbles.track_id").
@@ -323,14 +326,13 @@ func (r *StatsRepository) buildBaseStatQuery(ctx context.Context, params StatsQu
 	return query
 }
 
-// buildImageURL is a shitty helper that should not exist or at be refactored
+// buildImageURL is a shitty helper that should not exist or at least be refactored
 func (r *StatsRepository) buildImageURL(imageType, domain, path string) *string {
 	if path == "" {
 		return nil
 	}
 
-	//baseURL := os.Getenv("BASE_URL")
-	baseURL := "https://api-stats.nero.rangodisco.eu"
+	baseURL := os.Getenv("BASE_URL")
 	switch imageType {
 	case "distant":
 		return new(fmt.Sprintf("%s/%s", domain, path))

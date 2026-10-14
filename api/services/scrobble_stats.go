@@ -17,44 +17,23 @@ func NewScrobbleStatsService(repo *repositories.StatsRepository) *ScrobbleStatsS
 	return &ScrobbleStatsService{repo: repo}
 }
 
-func (s *ScrobbleStatsService) buildRepoParams(req *request.StatsQueryParams) *repositories.StatsQueryParams {
-	start, end := getDateRangeFromPeriod(req.Period)
-
-	return &repositories.StatsQueryParams{
-		UserID:        req.UserID,
-		Start:         start,
-		End:           end,
-		Interval:      req.Interval,
-		TargetContent: req.TargetContent,
-		TargetID:      req.TargetID,
-	}
+func (s *ScrobbleStatsService) FetchUserTopArtists(ctx context.Context, params *request.StatsParams, pagination *request.Pagination) ([]response.TopArtistResult, int64, error) {
+	return s.repo.FindTopArtistsForUser(ctx, s.buildRepoParams(params), pagination.Page, pagination.Limit)
 }
 
-func (s *ScrobbleStatsService) buildPaginatedRepoParams(req *request.PaginatedStatsQueryParams) *repositories.PaginatedStatsQueryParams {
-	return &repositories.PaginatedStatsQueryParams{
-		StatsQueryParams: *s.buildRepoParams(&req.StatsQueryParams),
-		Page:             req.Page,
-		Limit:            req.Limit,
-	}
+func (s *ScrobbleStatsService) FetchUserTopAlbums(ctx context.Context, params *request.StatsParams, pagination *request.Pagination) ([]response.TopAlbumResult, int64, error) {
+	return s.repo.FindTopAlbumsForUser(ctx, s.buildRepoParams(params), pagination.Page, pagination.Limit)
 }
 
-func (s *ScrobbleStatsService) FetchUserTopArtists(ctx context.Context, params *request.PaginatedStatsQueryParams) ([]response.TopArtistResult, int64, error) {
-	return s.repo.FindTopArtistsForUser(ctx, s.buildPaginatedRepoParams(params))
+func (s *ScrobbleStatsService) FetchUserTopTracks(ctx context.Context, params *request.StatsParams, pagination *request.Pagination) ([]response.TrackResult, int64, error) {
+	return s.repo.FindTopTracksForUser(ctx, s.buildRepoParams(params), pagination.Page, pagination.Limit)
 }
 
-func (s *ScrobbleStatsService) FetchUserTopAlbums(ctx context.Context, params *request.PaginatedStatsQueryParams) ([]response.TopAlbumResult, int64, error) {
-	return s.repo.FindTopAlbumsForUser(ctx, s.buildPaginatedRepoParams(params))
+func (s *ScrobbleStatsService) FetchUserHistory(ctx context.Context, params *request.StatsParams, pagination *request.Pagination) ([]response.HistoryResult, int64, error) {
+	return s.repo.FindByUserID(ctx, s.buildRepoParams(params), pagination.Page, pagination.Limit)
 }
 
-func (s *ScrobbleStatsService) FetchUserTopTracks(ctx context.Context, params *request.PaginatedStatsQueryParams) ([]response.TrackResult, int64, error) {
-	return s.repo.FindTopTracksForUser(ctx, s.buildPaginatedRepoParams(params))
-}
-
-func (s *ScrobbleStatsService) FetchUserHistory(ctx context.Context, params *request.PaginatedStatsQueryParams) ([]response.HistoryResult, int64, error) {
-	return s.repo.FindByUserID(ctx, s.buildPaginatedRepoParams(params))
-}
-
-func (s *ScrobbleStatsService) FetchLineChartData(ctx context.Context, params *request.StatsQueryParams) ([]response.TimelineResult, error) {
+func (s *ScrobbleStatsService) FetchLineChartData(ctx context.Context, params *request.StatsParams) ([]response.TimelineResult, error) {
 	return s.repo.FindScrobbleCountByInterval(ctx, s.buildRepoParams(params))
 }
 
@@ -62,27 +41,47 @@ func (s *ScrobbleStatsService) FetchTotalListeningTimeAndCount(ctx context.Conte
 	return s.repo.FindTotalListeningTimeAndCountByUser(ctx, userID)
 }
 
-func (s *ScrobbleStatsService) FetchAvgDailyListens(ctx context.Context, userID string) (*response.AvgDailyListensResult, error) {
-	return s.repo.FindAvgDailyListens(ctx, userID)
+func (s *ScrobbleStatsService) FetchAvgDailyListens(ctx context.Context, params *request.StatsParams) (*response.AvgDailyListensResult, error) {
+	return s.repo.FindAvgDailyListens(ctx, s.buildRepoParams(params))
 }
 
 func (s *ScrobbleStatsService) FetchDistinctListenedCount(ctx context.Context, userID string) (*response.TotalDistinctListenedResult, error) {
 	return s.repo.FindTotalListenedCount(ctx, userID)
 }
+func (s *ScrobbleStatsService) buildRepoParams(req *request.StatsParams) *repositories.StatsQueryParams {
+	start, end := getDateRangeFromPeriod(req.Period)
+
+	interval := req.Interval
+	if interval == nil {
+		interval = &req.Period
+	}
+
+	return &repositories.StatsQueryParams{
+		UserID:        req.UserID,
+		Start:         start,
+		End:           end,
+		Interval:      *interval,
+		TargetContent: req.TargetContent,
+		TargetID:      req.TargetID,
+	}
+}
 
 func getDateRangeFromPeriod(p request.Period) (time.Time, time.Time) {
 	now := time.Now()
+	// Why is so tedious, am I dumb ?
+	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
+	tomorrow := today.AddDate(0, 0, 1)
 
 	switch p {
 	case request.PeriodDay:
-		return now.AddDate(0, 0, -1), now
+		return today.AddDate(0, 0, -1), tomorrow
 	case request.PeriodWeek:
-		return now.AddDate(0, 0, -7), now
+		return today.AddDate(0, 0, -7), tomorrow
 	case request.PeriodMonth:
-		return now.AddDate(0, -1, 0), now
+		return today.AddDate(0, -1, 0), tomorrow
 	case request.PeriodYear:
-		return now.AddDate(-1, 0, 0), now
+		return today.AddDate(-1, 0, 0), tomorrow
 	default:
-		return time.Time{}, now
+		return time.Time{}, tomorrow
 	}
 }

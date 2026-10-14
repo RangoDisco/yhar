@@ -3,11 +3,10 @@ package request
 type Period string
 
 const (
-	PeriodDay     Period = "day"
-	PeriodWeek    Period = "week"
-	PeriodMonth   Period = "month"
-	PeriodYear    Period = "year"
-	PeriodOverall Period = "overall"
+	PeriodDay   Period = "day"
+	PeriodWeek  Period = "week"
+	PeriodMonth Period = "month"
+	PeriodYear  Period = "year"
 )
 
 type ContentType string
@@ -19,16 +18,10 @@ const (
 	ContentTypeTrack  ContentType = "track"
 )
 
-type StatsQueryParams struct {
+type StatsParams struct {
 	UserID        string      `json:"user_id"`
-	Period        Period      `json:"period"`
-	Interval      Period      `json:"interval"`
+	Period        Period      `form:"period" binding:"required,oneof=day week month year overall"`
+	Interval      *Period     `form:"interval" binding:"omitempty,oneof=day week month year overall"`
 	TargetContent ContentType `json:"target_content,omitempty"`
 	TargetID      string      `json:"target_id,omitempty"`
-}
-
-type PaginatedStatsQueryParams struct {
-	StatsQueryParams
-	Page  int `json:"page" binding:"min=1"`
-	Limit int `json:"limit" binding:"min=1,max=100"`
 }

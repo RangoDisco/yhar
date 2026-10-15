@@ -52,7 +52,7 @@ func (r *StatsRepository) FindTopArtistsForUser(ctx context.Context, params *Sta
 		Group("ar.id, ar.name, i.path, i.type, i.domain")
 
 	if params.TargetContent != "" {
-		query.Where("ar.id = ?", params.TargetID)
+		query = query.Where("ar.id = ?", params.TargetID)
 	}
 
 	err := query.Count(&totalCount).Error

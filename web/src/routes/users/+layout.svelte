@@ -5,6 +5,6 @@
 </script>
 
 <Nav user={data.user}/>
-<div class="mx-auto w-full p-10 lg:max-w-500">
+<div class="mx-auto w-full p-6 lg:max-w-500">
     {@render children()}
 </div>

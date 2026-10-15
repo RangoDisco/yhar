@@ -44,7 +44,7 @@
 	<div class="flex flex-col gap-8">
 		<!--TOP ALBUMS-->
 		<ContentListWrapper title="Albums" url="top/albums?artist={data.artist.id}">
-			<div class="grid grid-cols-3 gap-4 lg:grid-cols-9">
+			<div class="grid gap-4 grid-cols-3 md:grid-flow-col md:grid-cols-[repeat(auto-fill,minmax(160px,1fr))] md:auto-cols-[minmax(160px,1fr)] overflow-auto">
 				{#each data.albums.results as album, i (album.id)}
 					<div class={i >= 6 ? 'hidden lg:block' : ''}>
 						<ContentCard

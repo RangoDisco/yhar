@@ -10,4 +10,5 @@ type Artist struct {
 	PictureID     *int64
 	Picture       Image   `json:"picture" gorm:"foreignkey:PictureID"`
 	MusicBrainzID *string `json:"music_brainz_id" gorm:"uniqueIndex"`
+	SearchVector  string  `json:"search_vector" gorm:"type:tsvector;index:,type:GIN"`
 }

@@ -16,6 +16,7 @@ type Repositories struct {
 	Genre    *repositories.GenreRepository
 	Image    *repositories.ImageRepository
 	Scrobble *repositories.ScrobbleRepository
+	Search   *repositories.SearchRepository
 	Session  *repositories.SessionRepository
 	Stats    *repositories.StatsRepository
 	Track    *repositories.TrackRepository
@@ -31,19 +32,21 @@ type Services struct {
 	Metadata      *services.MetadataService
 	Scrobble      *services.ScrobbleService
 	ScrobbleStats *services.ScrobbleStatsService
+	Search        *services.SearchService
 	Session       *services.SessionService
 	Track         *services.TrackService
 	User          *services.UserService
 }
 
 type Handlers struct {
+	Album         *handlers.AlbumHandler
+	Artist        *handlers.ArtistHandler
+	Auth          *handlers.AuthHandler
+	Image         *handlers.ImageHandler
 	Scrobble      *handlers.ScrobbleHandler
 	ScrobbleStats *handlers.ScrobbleStatsHandler
-	Auth          *handlers.AuthHandler
+	Search        *handlers.SearchHandler
 	User          *handlers.UserHandler
-	Image         *handlers.ImageHandler
-	Artist        *handlers.ArtistHandler
-	Album         *handlers.AlbumHandler
 }
 
 type Pollers struct {
@@ -64,6 +67,7 @@ func AutoWire(db *gorm.DB) (*Repositories, *Services, *Handlers, *Pollers, *Impo
 		User:     repositories.NewUserRepository(db),
 		Track:    repositories.NewTrackRepository(db),
 		Stats:    repositories.NewStatsRepository(db),
+		Search:   repositories.NewSearchRepository(db),
 		Session:  repositories.NewSessionRepository(db),
 	}
 
@@ -83,6 +87,7 @@ func AutoWire(db *gorm.DB) (*Repositories, *Services, *Handlers, *Pollers, *Impo
 	scrobbleStatsService := services.NewScrobbleStatsService(repos.Stats)
 	scrobbleService := services.NewScrobbleService(repos.Scrobble, userService, trackService, artistService, albumService, metaService)
 	sessionService := services.NewSessionService(repos.Session, scrobbleService)
+	searchService := services.NewSearchService(repos.Search)
 
 	svs := &Services{
 		Album:         albumService,
@@ -93,6 +98,7 @@ func AutoWire(db *gorm.DB) (*Repositories, *Services, *Handlers, *Pollers, *Impo
 		Metadata:      metaService,
 		Scrobble:      scrobbleService,
 		ScrobbleStats: scrobbleStatsService,
+		Search:        searchService,
 		Session:       sessionService,
 		Track:         trackService,
 		User:          userService,
@@ -109,6 +115,7 @@ func AutoWire(db *gorm.DB) (*Repositories, *Services, *Handlers, *Pollers, *Impo
 		User:          handlers.NewUserHandler(svs.Auth),
 		Scrobble:      handlers.NewScrobbleHandler(plrs.Subsonic, svs.Scrobble),
 		ScrobbleStats: handlers.NewScrobbleStatsHandler(svs.ScrobbleStats),
+		Search:        handlers.NewSearchHandler(svs.Search),
 		Image:         handlers.NewImageHandler(svs.Image),
 	}
 

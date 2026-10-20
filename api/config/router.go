@@ -50,6 +50,9 @@ func SetupRouter(
 	// CRUD
 	protected.DELETE("/scrobbles/:id", h.Scrobble.Delete)
 
+	// Search
+	protected.GET("/contents/search", h.Search.Search)
+
 	// USER DATA
 	user := protected.Group("/users/:userID")
 	user.Use(middlewares.CheckUserPrivacy(s.User))

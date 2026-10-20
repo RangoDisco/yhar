@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"os"
 	"time"
 
 	"github.com/rangodisco/yhar/api/dto/request"
@@ -67,11 +66,6 @@ func (r *StatsRepository) FindTopArtistsForUser(ctx context.Context, params *Sta
 	if err != nil {
 		return nil, 0, fmt.Errorf("unable to find top artists: %w", err)
 	}
-
-	for i := range res {
-		res[i].PictureURL = r.buildImageURL(res[i].PictureType, res[i].PictureDomain, res[i].PicturePath)
-	}
-
 	return res, totalCount, nil
 }
 
@@ -113,14 +107,6 @@ func (r *StatsRepository) FindTopAlbumsForUser(ctx context.Context, params *Stat
 		return nil, 0, fmt.Errorf("unable to find top albums: %w", err)
 	}
 
-	for i := range res {
-		res[i].PictureURL = r.buildImageURL(res[i].PictureType, res[i].PictureDomain, res[i].PicturePath)
-		for j := range res[i].Artists {
-			a := &res[i].Artists[j]
-			a.PictureURL = r.buildImageURL(a.PictureType, a.PictureDomain, a.PicturePath)
-		}
-	}
-
 	return res, totalCount, nil
 }
 
@@ -158,15 +144,6 @@ func (r *StatsRepository) FindTopTracksForUser(ctx context.Context, params *Stat
 	if err != nil {
 		return nil, 0, fmt.Errorf("unable to find top tracks: %w", err)
 	}
-
-	for i := range res {
-		res[i].PictureURL = r.buildImageURL(res[i].PictureType, res[i].PictureDomain, res[i].PicturePath)
-		for j := range res[i].Artists {
-			a := &res[i].Artists[j]
-			a.PictureURL = r.buildImageURL(a.PictureType, a.PictureDomain, a.PicturePath)
-		}
-	}
-
 	return res, totalCount, nil
 }
 
@@ -200,15 +177,6 @@ func (r *StatsRepository) FindByUserID(ctx context.Context, params *StatsQueryPa
 
 	if err != nil {
 		return nil, 0, fmt.Errorf("unable to find history: %w", err)
-	}
-
-	for i := range res {
-		t := &res[i].Track
-		t.PictureURL = r.buildImageURL(t.PictureType, t.PictureDomain, t.PicturePath)
-		for j := range res[i].Track.Artists {
-			a := &res[i].Track.Artists[j]
-			a.PictureURL = r.buildImageURL(a.PictureType, a.PictureDomain, a.PicturePath)
-		}
 	}
 
 	return res, totalCount, nil
@@ -324,19 +292,4 @@ func (r *StatsRepository) buildBaseStatQuery(ctx context.Context, params *StatsQ
 	}
 
 	return query
-}
-
-// buildImageURL is a shitty helper that should not exist or at least be refactored
-func (r *StatsRepository) buildImageURL(imageType, domain, path string) *string {
-	if path == "" {
-		return nil
-	}
-
-	baseURL := os.Getenv("BASE_URL")
-	switch imageType {
-	case "distant":
-		return new(fmt.Sprintf("%s/%s", domain, path))
-	default:
-		return new(fmt.Sprintf("%s/images/%s", baseURL, path))
-	}
 }

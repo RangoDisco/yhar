@@ -14,6 +14,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 
 	_ "image/jpeg"
@@ -62,8 +63,9 @@ func (s *ImageService) GetOrCreate(ctx context.Context, url string) (*models.Ima
 
 func (s *ImageService) Persist(ctx context.Context, filename string) (*models.Image, error) {
 	model := &models.Image{
-		Path: filename,
-		Type: "local",
+		Path:   filename,
+		Type:   "distant",
+		Domain: os.Getenv("BASE_URL"),
 	}
 
 	err := s.repo.Persist(ctx, model)
@@ -76,30 +78,14 @@ func (s *ImageService) Persist(ctx context.Context, filename string) (*models.Im
 // Validate ensure that the given file respect our requirements
 func (s *ImageService) Validate(file *multipart.FileHeader, buf []byte) error {
 	ext := strings.ToLower(filepath.Ext(file.Filename))
-	isExtValid := false
 
-	for _, allowedExtension := range DefaultConfig.AllowedExtensions {
-		if ext == allowedExtension {
-			isExtValid = true
-			break
-		}
-	}
-
-	if !isExtValid {
+	if !slices.Contains(DefaultConfig.AllowedExtensions, ext) {
 		return fmt.Errorf("extension is not valid got: %s", ext)
 	}
 
 	contentType := http.DetectContentType(buf)
-	isTypeValid := false
 
-	for _, allowedType := range DefaultConfig.AllowedTypes {
-		if contentType == allowedType {
-			isTypeValid = true
-			break
-		}
-	}
-
-	if !isTypeValid {
+	if !slices.Contains(DefaultConfig.AllowedTypes, contentType) {
 		return fmt.Errorf("type is not allowed, got: %s", contentType)
 	}
 

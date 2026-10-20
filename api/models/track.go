@@ -1,6 +1,8 @@
 package models
 
-import "time"
+import (
+	"time"
+)
 
 type Track struct {
 	Timestamps
@@ -12,4 +14,5 @@ type Track struct {
 	MusicBrainzID *string       `json:"music_brainz_id" gorm:"type:varchar(255);default:null;uniqueIndex"`
 	Scrobbles     []Scrobble    `json:"scrobbles" gorm:"foreignkey:TrackID;"`
 	Duration      time.Duration `json:"duration" gorm:"int"`
+	SearchVector  string        `json:"search_vector" gorm:"type:tsvector;index:,type:GIN"`
 }

@@ -1,6 +1,6 @@
 package request
 
 type Pagination struct {
-	Page  int `json:"page" binding:"min=1"`
-	Limit int `json:"limit" binding:"min=1,max=100"`
+	Page  int `json:"page" form:"page" binding:"min=1"`
+	Limit int `json:"limit" form:"limit" binding:"min=1,max=100"`
 }

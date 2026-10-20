@@ -11,11 +11,10 @@ const (
 
 type ContentType string
 
-// TODO: Should not stay there
 const (
-	ContentTypeArtist ContentType = "artist"
-	ContentTypeAlbum  ContentType = "album"
-	ContentTypeTrack  ContentType = "track"
+	ContentTypeArtist ContentType = "artists"
+	ContentTypeAlbum  ContentType = "albums"
+	ContentTypeTrack  ContentType = "tracks"
 )
 
 type StatsParams struct {

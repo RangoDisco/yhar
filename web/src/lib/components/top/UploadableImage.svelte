@@ -1,5 +1,5 @@
 <script lang="ts">
-    import {Button} from "#lib/components/ui/button/index.js";
+    import {Button} from "#lib/components/ui/button/index.ts";
     import {ImageUp} from "@lucide/svelte";
     import disc from "#lib/assets/placeholders/disc-3.svg";
     import user from "#lib/assets/placeholders/user.jpg";

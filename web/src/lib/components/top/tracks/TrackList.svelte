@@ -1,7 +1,7 @@
 <script lang="ts">
     import ContentListItem from "#lib/components/top/ContentListItem.svelte";
     import ContentListWrapper from "#lib/components/top/ContentListWrapper.svelte";
-    import type {Track} from "#lib/types/content.js";
+    import type {Track} from "#lib/types/content.ts";
 
     type Props = {
         tracks: Track[];

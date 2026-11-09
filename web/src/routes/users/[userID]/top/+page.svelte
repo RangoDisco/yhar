@@ -1,9 +1,9 @@
 <script lang="ts">
-    import * as Tabs from "#lib/components/ui/tabs/index.js";
+    import * as Tabs from "#lib/components/ui/tabs/index.ts";
     import ContentListItem from "#lib/components/top/ContentListItem.svelte";
     import ContentListWrapper from "#lib/components/top/ContentListWrapper.svelte";
     import ContentCard from "#lib/components/top/contentCard/ContentCard.svelte";
-    import {Period} from "#lib/types/period.js";
+    import {Period} from "#lib/types/period.ts";
     import HistoryList from "#lib/components/top/tracks/HistoryList.svelte";
     import SvelteHead from "#lib/components/SvelteHead.svelte";
     import Heatmap from "#lib/components/heatmap/Heatmap.svelte";

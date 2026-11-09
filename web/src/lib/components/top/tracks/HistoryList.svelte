@@ -1,7 +1,7 @@
 <script lang="ts">
     import ContentListWrapper from "#lib/components/top/ContentListWrapper.svelte";
     import HistoryListItem from "#lib/components/top/tracks/HistoryListItem.svelte";
-    import type {Scrobble} from "#lib/types/content.js";
+    import type {Scrobble} from "#lib/types/content.ts";
     import {toast} from "svelte-sonner";
 
     type Props = {

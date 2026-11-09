@@ -1,13 +1,13 @@
 <script lang="ts">
-    import * as Avatar from "#lib/components/ui/avatar/index.js";
-    import {Button} from "#lib/components/ui/button/index.js";
+    import * as Avatar from "#lib/components/ui/avatar/index.ts";
+    import {Button} from "#lib/components/ui/button/index.ts";
     import {Trash, ListMusic} from "@lucide/svelte";
     import dayjs from "dayjs";
     import relativeTime from "dayjs/plugin/relativeTime";
-    import * as Tooltip from "#lib/components/ui/tooltip/index.js";
+    import * as Tooltip from "#lib/components/ui/tooltip/index.ts";
 
     import {page} from "$app/state";
-    import type {Scrobble} from "#lib/types/content.js";
+    import type {Scrobble} from "#lib/types/content.ts";
 
     dayjs.extend(relativeTime);
 

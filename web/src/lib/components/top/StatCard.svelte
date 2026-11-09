@@ -1,5 +1,5 @@
 <script lang="ts">
-    import * as Card from "#lib/components/ui/card/index.js";
+    import * as Card from "#lib/components/ui/card/index.ts";
 
     type Props = {
         title: string;

@@ -16,7 +16,7 @@ export const load: PageServerLoad = async ({ url, params, cookies }) => {
 		queryUrl = queryUrl + `&artist=${artist}`;
 	}
 
-	const albums: Paginated<Album> = await fetcher(queryUrl, 'GET', cookies, null);
+	const albums = await fetcher<Paginated<Album>>(queryUrl, 'GET', cookies, null);
 
 	return {
 		period,

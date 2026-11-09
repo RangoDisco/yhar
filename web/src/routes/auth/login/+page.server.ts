@@ -2,6 +2,7 @@ import { type Actions, fail, redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { API_URL } from '$app/env/private';
 import { fetcher } from '#lib/fetcher.js';
+import type { LoginResponse } from '#lib/types/auth.js';
 
 export const load: PageServerLoad = async ({ cookies }) => {
 	const token = cookies?.get('access_token');
@@ -25,7 +26,7 @@ export const actions = {
 			return fail(400, { field: 'password', error: 'Password is required' });
 		}
 		try {
-			const response = await fetcher(
+			const response = await fetcher<LoginResponse>(
 				`${API_URL}/auth/login`,
 				'POST',
 				cookies,

@@ -59,7 +59,7 @@ export const load: PageServerLoad = async ({ url, params, cookies }) => {
 	);
 
 	const history: Paginated<Scrobble> = await fetcher(
-		`${API_URL}/users/${userID}/scrobbles/history`,
+		`${API_URL}/users/${userID}/scrobbles/history?period=overall&page=1`,
 		'GET',
 		cookies,
 		null
@@ -83,7 +83,7 @@ export const load: PageServerLoad = async ({ url, params, cookies }) => {
 	const yearlyScrobbleCount = timeline.reduce((n, { value }) => n + (value || 0), 0);
 
 	const avgDailyScrobbles: AvgDailyScrobbles = await fetcher(
-		`${API_URL}/users/${userID}/stats/scrobbles/daily-avg`,
+		`${API_URL}/users/${userID}/stats/scrobbles/daily-avg?period=year`,
 		'GET',
 		cookies,
 		null

@@ -3,12 +3,12 @@ import { jwtDecode } from 'jwt-decode';
 
 import { API_URL } from '$app/env/private';
 
-export const fetcher = async (
+export async function fetcher<T> (
 	url: string,
 	method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE',
 	cookies: Cookies,
 	body?: string | FormData | null
-) => {
+): Promise<T> {
 	// Build query and fetch
 	const headers: Headers = new Headers();
 

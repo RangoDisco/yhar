@@ -2,11 +2,12 @@ import type { PageServerLoad } from './$types';
 import { fetcher } from '#lib/fetcher.js';
 import { API_URL } from '$app/env/private';
 import { redirect } from '@sveltejs/kit';
+import type { GetMeResponse } from '#lib/types/auth.ts';
 
 export const load: PageServerLoad = async ({ cookies }) => {
 	if (cookies.get('access_token')) {
 		// Get current user and redirect to their profile
-		const response = await fetcher(`${API_URL}/users/me`, 'GET', cookies, null);
+		const response = await fetcher<GetMeResponse>(`${API_URL}/users/me`, 'GET', cookies, null);
 		const userID = response.user.id;
 
 		redirect(302, `/users/${userID}/top`);

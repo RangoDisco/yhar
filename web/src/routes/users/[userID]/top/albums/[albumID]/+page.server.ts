@@ -4,17 +4,17 @@ import { API_URL } from '$app/env/private';
 import type { Paginated } from '#lib/types/pagination.js';
 import type { Album, Track } from '#lib/types/content.js';
 
-export const load: PageServerLoad = async ({ url, params, cookies, locals }) => {
+export const load: PageServerLoad = async ({ params, cookies, locals }) => {
 	const { userID, albumID } = params;
-	const albums: Paginated<Album> = await fetcher(
-		`${API_URL}/users/${userID}/stats/albums/top?&period=overall&album=${albumID}&limit=1`,
+	const albums = await fetcher<Paginated<Album>>(
+		`${API_URL}/users/${userID}/stats/albums/top?&period=overall&albums=${albumID}&limit=1`,
 		'GET',
 		cookies,
 		null
 	);
 
-	const tracks: Paginated<Track> = await fetcher(
-		`${API_URL}/users/${userID}/stats/tracks/top?period=overall&album=${albumID}&limit=10`,
+	const tracks = await fetcher<Paginated<Track>>(
+		`${API_URL}/users/${userID}/stats/tracks/top?period=overall&albums=${albumID}&limit=10`,
 		'GET',
 		cookies,
 		null

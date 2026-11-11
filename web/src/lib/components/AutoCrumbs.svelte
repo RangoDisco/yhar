@@ -59,11 +59,14 @@
             <BreadcrumbItem>
                 {#if i < items.length - 1}
                     <BreadcrumbLink href={item.href}>{item.label}</BreadcrumbLink>
-                    <BreadcrumbSeparator/>
                 {:else}
                     <BreadcrumbPage>{item.label}</BreadcrumbPage>
                 {/if}
             </BreadcrumbItem>
+
+            {#if i < items.length - 1}
+                <BreadcrumbSeparator/>
+            {/if}
         {/each}
     </BreadcrumbList>
 </Breadcrumb>

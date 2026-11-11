@@ -21,7 +21,7 @@
 		x="date"
 		c="value"
 		cScale={scaleThreshold()}
-		cRange={['var(--chart-1-100)', 'var(--chart-1-300)', 'var(--chart-1-500)', 'var(--chart-1)']}
+		cRange={['var(--color-chart-1-100)', 'var(--color-chart-1-300)', 'var(--color-chart-1-500)', 'var(--color-chart-1)']}
 		cDomain={[25, 50, 75]}
 		padding={{ top: 20, bottom: 0 }}
 	>

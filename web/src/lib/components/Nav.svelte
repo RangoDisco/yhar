@@ -1,59 +1,80 @@
 <script lang="ts">
-    import * as Tooltip from "#lib/components/ui/tooltip/index.ts";
-    import {Button} from "#lib/components/ui/button/index.ts";
+    import * as Sidebar from "#lib/components/ui/sidebar/index.js";
+    import type {ComponentProps} from "svelte";
     import ModeToggler from "#lib/components/ModeToggler.svelte";
-    import House from "@lucide/svelte/icons/house";
     import Logout from "@lucide/svelte/icons/log-out";
+    import House from "@lucide/svelte/icons/house";
     import ContentSearch from "#lib/components/ContentSearch.svelte";
 
-    type Props = {
+    type NavProps = {
         user: {
             id: string;
             username: string;
             role: "USER" | "ADMIN";
             expiresAt: number;
         };
-    };
+    } & ComponentProps<typeof Sidebar.Root>;
 
-    let {user}: Props = $props();
+    let {ref = $bindable(null), user, ...restProps}: NavProps = $props();
 </script>
+<Sidebar.Root
+        bind:ref
+        collapsible="icon" class="overflow-hidden border-e" {...restProps}
+>
+    <Sidebar.Header>
+        <Sidebar.Menu>
+            <Sidebar.MenuItem>
+                <Sidebar.MenuButton size="lg"
+                                    class="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
+                    {#snippet child({props})}
+                        <a href="/" {...props}>
+                            <div
+                                    class="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground"
+                            >
+                                Y
+                            </div>
+                            <div class="grid flex-1 text-start text-sm leading-tight">
+                                <span class="truncate font-medium">Yhar</span>
+                            </div>
+                        </a>
+                    {/snippet}
+                </Sidebar.MenuButton>
+            </Sidebar.MenuItem>
+        </Sidebar.Menu>
+    </Sidebar.Header>
 
-<nav class="bg-background z-1 h-fit w-full md:h-screen md:w-fit sticky left-0 top-0 p-4 md:py-6 border-r">
-    <div class="flex h-full md:flex-col flex-wrap items-center justify-between gap-2">
-        <div class="flex flex-col gap-2">
-            <Tooltip.Root>
-                <Tooltip.Trigger>
-                    <Button href="/" variant="ghost" size="icon">
-                        <House/>
-                    </Button>
-                </Tooltip.Trigger>
-                <Tooltip.Content side="right" align="center">
-                    <p>Home</p>
-                </Tooltip.Content>
-            </Tooltip.Root>
+    <Sidebar.Content>
+        <Sidebar.Group>
+            <Sidebar.GroupContent>
+                <Sidebar.Menu>
+                    <Sidebar.MenuItem>
+                        <ContentSearch/>
+                    </Sidebar.MenuItem>
+                </Sidebar.Menu>
+            </Sidebar.GroupContent>
+        </Sidebar.Group>
+    </Sidebar.Content>
 
-            <ContentSearch/>
-        </div>
-        <div class="flex md:flex-col items-center gap-2">
-            <div>
+    <Sidebar.Footer class="flex flex-col items-center">
+        <Sidebar.Menu>
+            <Sidebar.MenuItem>
                 <ModeToggler/>
-            </div>
-            {#if user}
-                <div>
+            </Sidebar.MenuItem>
+
+            <Sidebar.MenuItem>
+                {#if user}
                     <form method="POST" action="/auth/logout">
-                        <Tooltip.Root>
-                            <Tooltip.Trigger>
-                                <Button size="icon" type="submit" variant="destructive">
+                        <Sidebar.MenuButton>
+                            {#snippet child({props})}
+                                <button type="submit" {...props}>
                                     <Logout/>
-                                </Button>
-                            </Tooltip.Trigger>
-                            <Tooltip.Content side="right" align="center">
-                                <p>Logout</p>
-                            </Tooltip.Content>
-                        </Tooltip.Root>
+                                    <span>Logout</span>
+                                </button>
+                            {/snippet}
+                        </Sidebar.MenuButton>
                     </form>
-                </div>
-            {/if}
-        </div>
-    </div>
-</nav>
+                {/if}
+            </Sidebar.MenuItem>
+        </Sidebar.Menu>
+    </Sidebar.Footer>
+</Sidebar.Root>

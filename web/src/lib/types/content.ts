@@ -1,18 +1,22 @@
+export type ContentType = 'artists' | 'albums' | 'tracks';
+
 export type Artist = {
 	id: string;
 	name: string;
 	music_brainz_id: string | null;
-	picture_url: string;
 	scrobble_count: number | null;
+	picturePath: string | null;
+	pictureDomain: string | null;
 };
 
 export type Album = {
 	id: string;
 	music_brainz_id: string | null;
 	title: string;
-	picture_url: string;
 	scrobble_count: number | null;
 	artists: Artist[] | null;
+	picturePath: string | null;
+	pictureDomain: string | null;
 };
 
 export type Scrobble = {
@@ -25,9 +29,10 @@ export type Track = {
 	id: string;
 	title: string;
 	artists: Artist[] | null;
-	picture_url: string;
 	album: Album;
 	scrobble_count: number;
+	picturePath: string | null;
+	pictureDomain: string | null;
 };
 
 export type TimelineResult = {
@@ -42,8 +47,16 @@ export type TotalScrobbleDurationAndCount = {
 
 export type AvgDailyScrobbles = {
 	avgCount: number;
-}
+};
 
 export type TotalDistinctCount = {
 	totalCount: number;
-}
+};
+
+export type SearchResult = {
+	contentType: ContentType;
+	contentID: string;
+	title: string;
+	path: string;
+	domain: string;
+};

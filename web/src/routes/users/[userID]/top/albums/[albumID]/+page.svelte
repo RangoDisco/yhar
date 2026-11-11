@@ -14,7 +14,7 @@
 <main class="flex flex-col gap-8">
 	<section class="flex items-center gap-4">
 		<UploadableImage
-			pictureUrl={data.album.picture_url}
+			pictureUrl={`${data.album.pictureDomain}/images/${data.album.picturePath}`}
 			alt="{data.album.title}'s picture"
 			contentType="albums"
 			contentID={parseInt(data.album.id)}

@@ -28,7 +28,7 @@
 					index={firstIndex + i}
 					title={track.title}
 					parents={track.artists}
-					pictureUrl={track.picture_url}
+					pictureUrl={`${track.pictureDomain}/images/${track.picturePath}`}
 					scrobbleCount={track.scrobble_count}
 					parentType="artists"
 					contentType="tracks"

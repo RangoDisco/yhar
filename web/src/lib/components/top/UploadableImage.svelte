@@ -1,15 +1,15 @@
 <script lang="ts">
     import {Button} from "#lib/components/ui/button/index.ts";
     import {ImageUp} from "@lucide/svelte";
-    import disc from "#lib/assets/placeholders/disc-3.svg";
-    import user from "#lib/assets/placeholders/user.jpg";
     import {toast} from "svelte-sonner";
+    import ContentPicture from "#lib/components/ContentPicture.svelte";
+    import type {ContentType} from "#lib/types/content.ts";
 
     type Props = {
         pictureUrl: string;
         alt: string;
         contentID: number;
-        contentType: "artists" | "albums";
+        contentType: ContentType;
         uploadEnabled?: boolean;
     };
 
@@ -20,9 +20,9 @@
         contentType,
         uploadEnabled = $bindable(false)
     }: Props = $props();
+
     let input: HTMLInputElement | null = $state(null);
-    let image: Element | null = $state(null);
-    let fallback = $derived(contentType === "artists" ? user : disc);
+    let image: HTMLImageElement | null = $state(null);
 
     const handleClick = (e: Event): void => {
         e.preventDefault();
@@ -70,14 +70,12 @@
 </script>
 
 <div class="relative">
-    <img
-            class="peer max-w-fit aspect-square h-24 w-24 rounded-full md:h-56 md:w-56 {contentType === 'artists'
-			? 'rounded-full'
-			: 'rounded-md'}"
-            src={pictureUrl ?? fallback}
-            bind:this={image}
+    <ContentPicture
+            class="peer max-w-fit h-24 w-24 md:h-56 md:w-56"
+            url={pictureUrl}
+            contentType={contentType}
+            bind:img={image}
             {alt}
-            onerror={() => (pictureUrl = fallback)}
     />
 
     {#if uploadEnabled}

@@ -28,7 +28,7 @@
 					index={firstIndex + i}
 					contentID={album.id}
 					title={album.title}
-					pictureUrl={album.picture_url}
+					pictureUrl={`${album.pictureDomain}/images/${album.picturePath}`}
 					scrobbleCount={album.scrobble_count}
 					parentType="artists"
 					parents={album.artists}

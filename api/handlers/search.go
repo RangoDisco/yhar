@@ -31,7 +31,7 @@ func (h *SearchHandler) Search(c *gin.Context) {
 		return
 	}
 
-	paginated := common.BuildPaginatedResponse(res, 1, query.Pagination.Limit, totalCount)
+	paginated := common.BuildPaginatedResponse(res, query.Pagination.Page, query.Pagination.Limit, totalCount)
 
 	common.RespondWithData(c, 200, paginated)
 }

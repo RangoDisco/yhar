@@ -38,7 +38,7 @@
 			<Paginator
 				totalCount={data.albums.pagination.total_count}
 				page={currentPage}
-				perPage={data.albums.results.length}
+				perPage={PER_PAGE}
 			/>
 		</Tabs.Content>
 	{/each}

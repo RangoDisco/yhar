@@ -15,30 +15,24 @@ import type {
 import { Period } from '#lib/types/period.js';
 import { timeDay } from 'd3-time';
 
-export const load: PageServerLoad = async ({ url, params, cookies }) => {
+export const load: PageServerLoad = async ({ params, cookies }) => {
 	const { userID } = params;
 
 	// PERIOD DATA //
-	const getStreamedPeriodData = async (
-		period: Period
-	): Promise<{
-		artists: Paginated<Artist>;
-		albums: Paginated<Album>;
-		tracks: Paginated<Track>;
-	}> => ({
-		artists: await fetcher(
+	const getStreamedPeriodData = async (period: Period) => ({
+		artists: await fetcher<Paginated<Artist>>(
 			`${API_URL}/users/${userID}/stats/artists/top?period=${period}&limit=8`,
 			'GET',
 			cookies,
 			null
 		),
-		albums: await fetcher(
+		albums: await fetcher<Paginated<Album>>(
 			`${API_URL}/users/${userID}/stats/albums/top?&period=${period}&limit=8`,
 			'GET',
 			cookies,
 			null
 		),
-		tracks: await fetcher(
+		tracks: await fetcher<Paginated<Track>>(
 			`${API_URL}/users/${userID}/stats/tracks/top?period=${period}&limit=8`,
 			'GET',
 			cookies,
@@ -51,14 +45,14 @@ export const load: PageServerLoad = async ({ url, params, cookies }) => {
 	const month = getStreamedPeriodData(Period.month).catch(() => null);
 	const week = await getStreamedPeriodData(Period.week);
 
-	const totalScrobblesStats: TotalScrobbleDurationAndCount = await fetcher(
+	const totalScrobblesStats = await fetcher<TotalScrobbleDurationAndCount>(
 		`${API_URL}/users/${userID}/stats/scrobbles/total`,
 		'GET',
 		cookies,
 		null
 	);
 
-	const history: Paginated<Scrobble> = await fetcher(
+	const history = await fetcher<Paginated<Scrobble>>(
 		`${API_URL}/users/${userID}/scrobbles/history?period=overall&page=1`,
 		'GET',
 		cookies,
@@ -66,7 +60,7 @@ export const load: PageServerLoad = async ({ url, params, cookies }) => {
 	);
 
 	// HEATMAP //
-	const rawTimeline: TimelineResult[] = await fetcher(
+	const rawTimeline = await fetcher<TimelineResult[]>(
 		`${API_URL}/users/${userID}/stats/scrobbles/timeline?period=year&interval=day`,
 		'GET',
 		cookies,
@@ -82,14 +76,14 @@ export const load: PageServerLoad = async ({ url, params, cookies }) => {
 
 	const yearlyScrobbleCount = timeline.reduce((n, { value }) => n + (value || 0), 0);
 
-	const avgDailyScrobbles: AvgDailyScrobbles = await fetcher(
+	const avgDailyScrobbles = await fetcher<AvgDailyScrobbles>(
 		`${API_URL}/users/${userID}/stats/scrobbles/daily-avg?period=year`,
 		'GET',
 		cookies,
 		null
 	);
 
-	const totalDistinctTracksCount: TotalDistinctCount = await fetcher(
+	const totalDistinctTracksCount = await fetcher<TotalDistinctCount>(
 		`${API_URL}/users/${userID}/stats/tracks/total`,
 		'GET',
 		cookies,

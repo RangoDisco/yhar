@@ -34,9 +34,10 @@ func (s *AuthService) ComparePassword(password, hash string) bool {
 }
 
 // CreateTokens creates a JWT and its refresh with user's name as claim
-func (s *AuthService) CreateTokens(username, role string) (string, string, error) {
+func (s *AuthService) CreateTokens(id int64, username, role string) (string, string, error) {
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"id":       id,
 		"username": username,
 		"role":     role,
 		"exp":      time.Now().Add(time.Minute * 60).Unix(),
@@ -49,6 +50,7 @@ func (s *AuthService) CreateTokens(username, role string) (string, string, error
 	}
 
 	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"id":       id,
 		"username": username,
 		"role":     role,
 		"exp":      time.Now().Add(time.Hour * 168).Unix(),
@@ -70,7 +72,17 @@ func (s *AuthService) RefreshToken(t string) (string, error) {
 		return "", fmt.Errorf("unable to parse token: %w", err)
 	}
 
-	newToken, _, err := s.CreateTokens(token.Claims.(jwt.MapClaims)["username"].(string), token.Claims.(jwt.MapClaims)["role"].(string))
+	id, ok := token.Claims.(jwt.MapClaims)["id"]
+	if !ok {
+		return "", fmt.Errorf("token missing id claim")
+	}
+
+	intID, ok := id.(int64)
+	if !ok {
+		return "", fmt.Errorf("token id claim is not a valid value")
+	}
+
+	newToken, _, err := s.CreateTokens(intID, token.Claims.(jwt.MapClaims)["username"].(string), token.Claims.(jwt.MapClaims)["role"].(string))
 	if err != nil {
 		return "", fmt.Errorf("unable to generate new token from refresh: %w", err)
 	}
@@ -95,7 +107,7 @@ func (s *AuthService) HandleUserLogin(ctx context.Context, request request.Login
 		return "", "", errors.New("invalid password")
 	}
 
-	token, refresh, err := s.CreateTokens(user.Username, user.Role.Name)
+	token, refresh, err := s.CreateTokens(user.ID, user.Username, user.Role.Name)
 	if err != nil {
 		return "", "", err
 	}

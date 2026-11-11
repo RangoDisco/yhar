@@ -43,7 +43,7 @@
 
 	<div class="flex flex-col gap-8">
 		<!--TOP ALBUMS-->
-		<ContentListWrapper title="Albums" url="top/albums?artist={data.artist.id}">
+		<ContentListWrapper title="Albums" url="top/albums?artists={data.artist.id}">
 			<div class="grid gap-4 grid-cols-3 md:grid-flow-col md:grid-cols-[repeat(auto-fill,minmax(160px,1fr))] md:auto-cols-[minmax(160px,1fr)] overflow-auto">
 				{#each data.albums.results as album, i (album.id)}
 					<div class={i >= 6 ? 'hidden lg:block' : ''}>
@@ -59,7 +59,7 @@
 		</ContentListWrapper>
 		<div class="flex flex-col gap-8 lg:flex-row lg:gap-36">
 			<!--TOP TRACKS-->
-			<ContentListWrapper title="Tracks" url="top/tracks?artist={data.artist.id}">
+			<ContentListWrapper title="Tracks" url="top/tracks?artists={data.artist.id}">
 				<div class="flex w-full flex-col gap-4">
 					{#each data.tracks.results as track, i (track.id)}
 						<ContentListItem
@@ -78,7 +78,7 @@
 			<!--HISTORY-->
 			<HistoryList
 				scrobbles={data.history.results}
-				url="history?artist={data.artist.id}"
+				url="history?artists={data.artist.id}"
 				parentType="albums"
 			/>
 		</div>

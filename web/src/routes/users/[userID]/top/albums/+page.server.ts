@@ -8,12 +8,12 @@ export const load: PageServerLoad = async ({ url, params, cookies }) => {
 	const { userID } = params;
 	const page = url.searchParams.get('page') ?? '1';
 	const period = url.searchParams.get('period') ?? 'week';
-	const artist = url.searchParams.get('artist');
+	const artist = url.searchParams.get('artists');
 
 	let queryUrl = `${API_URL}/users/${userID}/stats/albums/top?period=${period}&page=${page}&limit=10`;
 
 	if (artist != null) {
-		queryUrl = queryUrl + `&artist=${artist}`;
+		queryUrl = queryUrl + `&artists=${artist}`;
 	}
 
 	const albums = await fetcher<Paginated<Album>>(queryUrl, 'GET', cookies, null);

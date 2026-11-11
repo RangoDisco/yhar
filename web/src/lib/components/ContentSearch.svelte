@@ -1,7 +1,7 @@
 <script lang="ts">
     import * as Command from "#lib/components/ui/command/index.ts";
-    import * as Tooltip from "#lib/components/ui/tooltip/index.ts";
-    import {Button} from "#lib/components/ui/button/index.ts";
+    import * as Kbd from "#lib/components/ui/kbd/index.js";
+    import * as Sidebar from "#lib/components/ui/sidebar/index.ts";
     import {Spinner} from "#lib/components/ui/spinner/index.ts";
     import type {SearchResult} from "#lib/types/content.ts";
     import {debounce} from "#lib/utils.ts";
@@ -93,17 +93,17 @@
 <svelte:document onkeydown={handleKeyDown}/>
 
 <div class="flex flex-col gap-4">
-    <Tooltip.Root>
-        <Tooltip.Trigger>
-            <Button onclick={() => (open = true)} variant="ghost" class="w-full" size="icon">
-                <Search/>
-            </Button>
-        </Tooltip.Trigger>
-        <Tooltip.Content side="right" align="center">
-            <p>Search ⌘K</p>
-        </Tooltip.Content>
-    </Tooltip.Root>
-
+    <Sidebar.MenuButton
+            onclick={() => (open = true)}>
+        {#snippet tooltipContent()}
+            <div>
+                Search
+                <Kbd.Root>⌘K</Kbd.Root>
+            </div>
+        {/snippet}
+        <Search/>
+        <span>Search</span>
+    </Sidebar.MenuButton>
 
     <Command.Dialog bind:open={open} shouldFilter={false}>
         <Command.Input

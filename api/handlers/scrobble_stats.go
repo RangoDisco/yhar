@@ -165,13 +165,13 @@ func parseContentParam(c *gin.Context, targetContent *request.ContentType) (stri
 		}
 	}
 
-	if artistID := c.Query("artist"); artistID != "" {
+	if artistID := c.Query("artists"); artistID != "" {
 		return artistID, request.ContentTypeArtist, nil
 	}
-	if trackID := c.Query("track"); trackID != "" {
+	if trackID := c.Query("tracks"); trackID != "" {
 		return trackID, request.ContentTypeTrack, nil
 	}
-	if albumID := c.Query("album"); albumID != "" {
+	if albumID := c.Query("albums"); albumID != "" {
 		return albumID, request.ContentTypeAlbum, nil
 	}
 	return "", "", nil

@@ -1,13 +1,13 @@
 <script lang="ts">
-    import * as Avatar from "#lib/components/ui/avatar/index.ts";
+    import * as Tooltip from "#lib/components/ui/tooltip/index.ts";
     import {Button} from "#lib/components/ui/button/index.ts";
-    import {Trash, ListMusic} from "@lucide/svelte";
+    import {Trash} from "@lucide/svelte";
     import dayjs from "dayjs";
     import relativeTime from "dayjs/plugin/relativeTime";
-    import * as Tooltip from "#lib/components/ui/tooltip/index.ts";
 
     import {page} from "$app/state";
     import type {Scrobble} from "#lib/types/content.ts";
+    import ContentPicture from "#lib/components/ContentPicture.svelte";
 
     dayjs.extend(relativeTime);
 
@@ -23,12 +23,11 @@
 
 <article class="flex items-center justify-between gap-4">
     <div class="flex w-full min-w-0 items-center gap-4">
-        <Avatar.Root class="h-8 w-8 rounded-md lg:h-10 lg:w-10">
-            <Avatar.Image src={scrobble.track.picture_url} alt={`${scrobble.track.title}'s picture`}/>
-            <Avatar.Fallback class="h-8 w-8 rounded-md">
-                <ListMusic size={18} class="text-muted-foreground"/>
-            </Avatar.Fallback>
-        </Avatar.Root>
+        <ContentPicture
+                url={`${scrobble.track.pictureDomain}/images/${scrobble.track.picturePath}`}
+                alt={`${scrobble.track.title}`}
+                contentType="tracks"
+        />
         <div class="flex w-full min-w-0 justify-between">
             <div class="flex flex-col min-w-0">
                 <span class="line-clamp-1 w-full min-w-0 text-lg">{scrobble.track.title}</span>

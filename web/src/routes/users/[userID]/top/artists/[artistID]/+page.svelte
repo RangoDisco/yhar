@@ -16,7 +16,7 @@
 <main class="flex flex-col gap-8">
 	<section class="flex w-full items-start gap-8">
 		<UploadableImage
-			pictureUrl={data.artist.picture_url}
+			pictureUrl={`${data.artist.pictureDomain}/images/${data.artist.picturePath}`}
 			alt="{data.artist.name}'s picture"
 			contentType="artists"
 			contentID={parseInt(data.artist.id)}
@@ -49,7 +49,7 @@
 					<div class={i >= 6 ? 'hidden lg:block' : ''}>
 						<ContentCard
 							title={album.title ?? album.name}
-							pictureUrl={album.picture_url}
+							pictureUrl={`${album.pictureDomain}/images/${album.picturePath}`}
 							contentType="albums"
 							contentID={album.id}
 						/>
@@ -65,7 +65,7 @@
 						<ContentListItem
 							index={i + 1}
 							title={track.title}
-							pictureUrl={track.picture_url}
+							pictureUrl={`${track.pictureDomain}/images/${track.picturePath}`}
 							scrobbleCount={track.scrobble_count}
 							parentType="albums"
 							parents={[track.album]}

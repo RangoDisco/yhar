@@ -29,7 +29,7 @@
 					contentID={artist.id}
 					title={artist.name}
 					parents={[]}
-					pictureUrl={artist.picture_url}
+					pictureUrl={`${artist.pictureDomain}/images/${artist.picturePath}`}
 					scrobbleCount={artist.scrobble_count}
 					parentType={null}
 					contentType="artists"

@@ -1,10 +1,7 @@
 <script lang="ts">
-	import * as Avatar from '#lib/components/ui/avatar/index.js';
-	import disc from '#lib/assets/placeholders/disc-3.svg';
-	import user from '#lib/assets/placeholders/user.jpg';
-
 	import { page } from '$app/state';
-	import type { Album, Artist } from '#lib/types/content.js';
+	import type {Album, Artist, ContentType} from "#lib/types/content.js";
+	import ContentPicture from "#lib/components/ContentPicture.svelte";
 
 	type Props = {
 		contentID?: string | null;
@@ -13,7 +10,7 @@
 		parentType: 'artists' | 'albums';
 		parents: Artist[] | Album[] | null;
 		pictureUrl: string | null;
-		contentType: string;
+		contentType: ContentType;
 		scrobbleCount: number | null;
 	};
 
@@ -33,20 +30,12 @@
 	<div class="flex items-center gap-4">
 		<h3 class="w-6 text-lg">{index}</h3>
 		<div class="flex items-center gap-4">
-			<Avatar.Root
-				class="{contentType !== 'artists'
-					? 'rounded-md'
-					: ''} aspect-square h-12 w-12"
-			>
-				<Avatar.Image src={pictureUrl} alt={`${title}'s picture`} />
-				<Avatar.Fallback>
-					<img
-						class="h-12 w-12 rounded-full"
-						src={contentType === 'artists' ? user : disc}
-						alt="Artist placeholder"
-					/>
-				</Avatar.Fallback>
-			</Avatar.Root>
+			<ContentPicture
+				class="h-12 w-12"
+				url={pictureUrl}
+				contentType={contentType}
+				alt={`${title}'s picture`}
+			/>
 			<div class="flex flex-col">
 				{#if contentID}
 					<a

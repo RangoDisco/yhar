@@ -30,7 +30,7 @@
         />
         <div class="flex w-full min-w-0 justify-between">
             <div class="flex flex-col min-w-0">
-                <span class="line-clamp-1 w-full min-w-0 text-lg">{scrobble.track.title}</span>
+                <a class="line-clamp-1 w-full min-w-0 text-lg hover:underline" href="/users/{page.params.userID}/top/tracks/{scrobble.track.id}">{scrobble.track.title}</a>
                 <div class="flex gap-1">
                     {#if parentType === 'artists'}
                         {#each scrobble.track.artists as artist, i}

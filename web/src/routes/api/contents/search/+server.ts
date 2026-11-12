@@ -7,11 +7,14 @@ import type { Paginated } from '#lib/types/pagination.ts';
 export const GET: RequestHandler = async ({ url, cookies }) => {
 	const value = url.searchParams.get('value');
 	const page = url.searchParams.get('page');
-	const res = await fetcher<Paginated<SearchResult>>(
-		`${API_URL}/contents/search?value=${value}&page=${page}&limit=10`,
-		'GET',
-		cookies
-	);
+	const type = url.searchParams.get('type');
+
+	let targetUrl = `${API_URL}/contents/search?value=${value}&page=${page}&limit=10`;
+	if (type) {
+		targetUrl += `&type=${type}`;
+	}
+
+	const res = await fetcher<Paginated<SearchResult>>(targetUrl, 'GET', cookies);
 
 	return Response.json({ ...res });
 };

@@ -61,6 +61,7 @@ func TestRefresh(t *testing.T) {
 	regularUser := factories.SeedUser(t, db, "regularUser", "123", "USER", false)
 
 	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"id":       regularUser.ID,
 		"username": regularUser.Username,
 		"role":     regularUser.Role.Name,
 		"exp":      time.Now().Add(time.Hour * 168).Unix(),

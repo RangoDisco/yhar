@@ -77,12 +77,12 @@ func (s *AuthService) RefreshToken(t string) (string, error) {
 		return "", fmt.Errorf("token missing id claim")
 	}
 
-	intID, ok := id.(int64)
+	floatID, ok := id.(float64)
 	if !ok {
 		return "", fmt.Errorf("token id claim is not a valid value")
 	}
 
-	newToken, _, err := s.CreateTokens(intID, token.Claims.(jwt.MapClaims)["username"].(string), token.Claims.(jwt.MapClaims)["role"].(string))
+	newToken, _, err := s.CreateTokens(int64(floatID), token.Claims.(jwt.MapClaims)["username"].(string), token.Claims.(jwt.MapClaims)["role"].(string))
 	if err != nil {
 		return "", fmt.Errorf("unable to generate new token from refresh: %w", err)
 	}

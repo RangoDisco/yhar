@@ -8,9 +8,10 @@ export const load: PageServerLoad = async ({ url, params, cookies }) => {
 	const { userID } = params;
 	const page = url.searchParams.get('page') ?? '1';
 	const artist = url.searchParams.get('artists') ?? '';
+	const tracks = url.searchParams.get('tracks') ?? '';
 
 	const history = await fetcher<Paginated<Scrobble>>(
-		`${API_URL}/users/${userID}/scrobbles/history?artists=${artist}&page=${page}&period=overall&limit=20`,
+		`${API_URL}/users/${userID}/scrobbles/history?artists=${artist}&tracks=${tracks}&page=${page}&period=overall&limit=20`,
 		'GET',
 		cookies,
 		null

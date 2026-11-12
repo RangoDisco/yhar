@@ -9,6 +9,7 @@
     };
 
     let {tracks, params = $bindable("")}: Props = $props();
+    console.log(tracks)
 </script>
 
 <ContentListWrapper title="Top tracks" url="top/tracks{params}">
@@ -22,6 +23,7 @@
                     parentType="artists"
                     parents={track.artists}
                     contentType="tracks"
+                    contentID={track.id}
             />
         {/each}
     </div>

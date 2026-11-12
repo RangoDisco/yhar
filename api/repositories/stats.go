@@ -126,10 +126,13 @@ func (r *StatsRepository) FindTopTracksForUser(ctx context.Context, params *Stat
 		Joins("LEFT JOIN images ari ON ari.id = ar.picture_id").
 		Group("tr.id, tr.title, al.id, i.path, i.type, i.domain")
 
-	if params.TargetContent == request.ContentTypeArtist {
+	switch params.TargetContent {
+	case request.ContentTypeArtist:
 		query = query.Where("EXISTS(SELECT 1 FROM track_artists trar2 WHERE trar2.track_id = tr.id AND trar2.artist_id = ?)", params.TargetID)
-	} else if params.TargetContent == request.ContentTypeAlbum {
+	case request.ContentTypeAlbum:
 		query = query.Where("al.id = ?", params.TargetID)
+	case request.ContentTypeTrack:
+		query = query.Where("tr.id = ?", params.TargetID)
 	}
 
 	err := query.Count(&totalCount).Error
@@ -164,6 +167,8 @@ func (r *StatsRepository) FindByUserID(ctx context.Context, params *StatsQueryPa
 
 	if params.TargetContent == request.ContentTypeArtist {
 		query = query.Where("EXISTS(SELECT 1 FROM track_artists trar2 WHERE trar2.track_id = tr.id AND trar2.artist_id = ?)", params.TargetID)
+	} else if params.TargetContent == request.ContentTypeTrack {
+		query = query.Where("tr.id = ?", params.TargetID)
 	}
 
 	err := query.Count(&totalCount).Error

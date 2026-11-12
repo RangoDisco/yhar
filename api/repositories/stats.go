@@ -46,7 +46,7 @@ func (r *StatsRepository) FindTopArtistsForUser(ctx context.Context, params *Sta
 
 	query := r.buildBaseStatQuery(ctx, params).
 		Select("ar.id AS id, ar.name AS name, ar.music_brainz_id as music_brainz_id, COUNT(scrobbles.id) AS scrobble_count, " +
-			"i.path AS picture_path, i.type AS picture_type, i.domain AS picture_domain").
+			"i.path AS \"picturePath\", i.type AS \"pictureType\", i.domain AS \"pictureDomain\"").
 		Joins("LEFT JOIN images i ON i.id = ar.picture_id").
 		Group("ar.id, ar.name, i.path, i.type, i.domain")
 
@@ -75,10 +75,10 @@ func (r *StatsRepository) FindTopAlbumsForUser(ctx context.Context, params *Stat
 
 	query := r.buildBaseStatQuery(ctx, params).
 		Select("al.id as id, al.title as title, al.music_brainz_id as music_brainz_id, " +
-			"i.path AS picture_path, i.type AS picture_type, i.domain AS picture_domain, " +
+			"i.path AS \"picturePath\", i.type AS \"pictureType\", i.domain AS \"pictureDomain\", " +
 			"COUNT(DISTINCT scrobbles.id) AS scrobble_count, " +
 			"JSON_AGG(DISTINCT jsonb_build_object('id', ar_al.id, 'name', ar_al.name, " +
-			"'picture_path', ari.path, 'picture_type', ari.type, 'picture_domain', ari.domain)) as artists").
+			"'picturePath', ari.path, 'pictureType', ari.type, 'pictureDomain', ari.domain)) as artists").
 		Joins("JOIN albums al ON al.id = tr.album_id").
 		Joins("LEFT JOIN images i ON i.id = al.picture_id").
 		Joins("JOIN artist_albums aral ON aral.album_id = al.id").
@@ -116,11 +116,11 @@ func (r *StatsRepository) FindTopTracksForUser(ctx context.Context, params *Stat
 
 	query := r.buildBaseStatQuery(ctx, params).
 		Select("tr.id as id, tr.title as title, " +
-			"i.path AS picture_path, i.type AS picture_type, i.domain AS picture_domain, " +
-			"jsonb_build_object('id', al.id, 'title', al.title) as album, " +
+			"i.path AS \"picturePath\", i.type AS \"pictureType\", i.domain AS \"pictureDomain\", " +
+			"jsonb_build_object('id', al.id, 'title', al.title, 'picturePath', i.path, 'pictureType', i.type, 'pictureDomain', i.domain) as album, " +
 			"COUNT(DISTINCT scrobbles.id) AS scrobble_count, " +
 			"JSON_AGG(DISTINCT jsonb_build_object('id', ar.id, 'name', ar.name, " +
-			"'picture_path', ari.path, 'picture_type', ari.type, 'picture_domain', ari.domain)) as artists").
+			"'picturePath', ari.path, 'pictureType', ari.type, 'pictureDomain', ari.domain)) as artists").
 		Joins("JOIN albums al ON al.id = tr.album_id").
 		Joins("LEFT JOIN images i ON i.id = al.picture_id").
 		Joins("LEFT JOIN images ari ON ari.id = ar.picture_id").
@@ -152,11 +152,13 @@ func (r *StatsRepository) FindByUserID(ctx context.Context, params *StatsQueryPa
 	var totalCount int64
 
 	query := r.buildBaseStatQuery(ctx, params).
-		Select("scrobbles.id as id, scrobbles.scrobbled_at as scrobbled_at, json_build_object('id', tr.id, 'title', tr.title, " +
-			"'picture_path', i.path, 'picture_type', i.type, 'picture_domain', i.domain,  " +
-			"'album', jsonb_build_object('id', al.id, 'title', al.title), " +
+		Select("scrobbles.id as id, scrobbles.scrobbled_at as scrobbled_at, " +
+			"json_build_object('id', tr.id, 'title', tr.title, " +
+			"'picturePath', i.path, 'pictureDomain', i.domain, " +
+			"'album', jsonb_build_object('id', al.id, 'title', al.title, " +
+			"'picturePath', i.path, 'pictureDomain', i.domain), " +
 			"'artists', JSON_AGG(DISTINCT jsonb_build_object('id', ar.id, 'name', ar.name, " +
-			"'picture_path', ari.path, 'picture_type', ari.type, 'picture_domain', ari.domain))) as track").
+			"'picturePath', ari.path, 'pictureDomain', ari.domain))) as track").
 		Joins("JOIN albums al ON al.id = tr.album_id").
 		Joins("LEFT JOIN images i ON i.id = al.picture_id").
 		Joins("LEFT JOIN images ari ON ari.id = ar.picture_id").

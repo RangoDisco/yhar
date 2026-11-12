@@ -9,8 +9,8 @@ type TopArtistResult struct {
 	Name          string  `json:"name"`
 	MusicBrainzID *string `json:"music_brainz_id,omitempty"`
 	ScrobbleCount *int    `json:"scrobble_count,omitempty"` // could sometimes be nil/0 when used in some queries
-	PicturePath   string  `json:"picturePath" gorm:"column:picture_path"`
-	PictureDomain string  `json:"pictureDomain" gorm:"column:picture_domain"`
+	PicturePath   string  `json:"picturePath" gorm:"column:picturePath"`
+	PictureDomain string  `json:"pictureDomain" gorm:"column:pictureDomain"`
 }
 
 type TopAlbumResult struct {
@@ -19,8 +19,8 @@ type TopAlbumResult struct {
 	Artists       []TopArtistResult `json:"artists" gorm:"serializer:json"`
 	MusicBrainzID *string           `json:"music_brainz_id,omitempty"`
 	ScrobbleCount *int              `json:"scrobble_count,omitempty"` // could sometimes be nil/0 when used in some queries
-	PicturePath   string            `json:"picturePath" gorm:"column:picture_path"`
-	PictureDomain string            `json:"pictureDomain" gorm:"column:picture_domain"`
+	PicturePath   string            `json:"picturePath" gorm:"column:picturePath"`
+	PictureDomain string            `json:"pictureDomain" gorm:"column:pictureDomain"`
 }
 
 type TrackResult struct {
@@ -29,8 +29,8 @@ type TrackResult struct {
 	Artists       []TopArtistResult `json:"artists" gorm:"serializer:json"`
 	Album         TopAlbumResult    `json:"album" gorm:"serializer:json"`
 	ScrobbleCount *int              `json:"scrobble_count,omitempty"` // could be nil in the history query
-	PicturePath   string            `json:"picturePath" gorm:"column:picture_path"`
-	PictureDomain string            `json:"pictureDomain" gorm:"column:picture_domain"`
+	PicturePath   string            `json:"picturePath" gorm:"column:picturePath"`
+	PictureDomain string            `json:"pictureDomain" gorm:"column:pictureDomain"`
 }
 
 type HistoryResult struct {

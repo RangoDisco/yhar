@@ -3,10 +3,13 @@
 	import * as Chart from '#lib/components/ui/chart/index.js';
 	import { Chart as LayerChart, Calendar, Layer, Rect, Tooltip } from 'layerchart';
 	import { scaleThreshold } from 'd3-scale';
+	import type {TimelineResult} from "#lib/types/content.ts";
 
 	const lastDayOfYear = dayjs().toDate();
 	const firstDayOfYear = dayjs(lastDayOfYear).subtract(1, 'year').toDate();
 	const { data } = $props();
+
+	const heatmapData = $derived(data.map((item: TimelineResult) => ({ value: item.listenedCount > 0 ? item.listenedCount : null, date: dayjs(item.periodInterval.slice(0, 10)).toDate() })));
 
 	const chartConfig = {
 		background: {
@@ -17,7 +20,7 @@
 
 <Chart.Container config={chartConfig} class="aspect-6/1 min-h-38">
 	<LayerChart
-		{data}
+		data={heatmapData}
 		x="date"
 		c="value"
 		cScale={scaleThreshold()}

@@ -3,7 +3,6 @@ import { fetcher } from '#lib/fetcher.js';
 import { API_URL } from '$app/env/private';
 import type { Paginated } from '#lib/types/pagination.js';
 import type { Album, Artist, Scrobble, Track, TimelineResult } from '#lib/types/content.js';
-import { timeDay } from 'd3-time';
 
 export const load: PageServerLoad = async ({ params, cookies, locals }) => {
 	const { userID, artistID } = params;
@@ -36,19 +35,12 @@ export const load: PageServerLoad = async ({ params, cookies, locals }) => {
 		null
 	);
 
-	const rawTimeline = await fetcher<TimelineResult[]>(
+	const timeline = await fetcher<TimelineResult[]>(
 		`${API_URL}/users/${userID}/stats/artists/${artistID}/timeline?period=year&interval=day`,
 		'GET',
 		cookies,
 		null
 	);
-
-	const timeline = rawTimeline.map((item) => {
-		return {
-			date: timeDay.floor(new Date(item.periodInterval)),
-			value: item.listenedCount > 0 ? item.listenedCount : null
-		};
-	});
 
 	return {
 		artist: artists.results[0],

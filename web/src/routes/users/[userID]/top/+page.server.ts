@@ -13,7 +13,6 @@ import type {
 	Track
 } from '#lib/types/content.js';
 import { Period } from '#lib/types/period.js';
-import { timeDay } from 'd3-time';
 
 export const load: PageServerLoad = async ({ params, cookies }) => {
 	const { userID } = params;
@@ -60,21 +59,14 @@ export const load: PageServerLoad = async ({ params, cookies }) => {
 	);
 
 	// HEATMAP //
-	const rawTimeline = await fetcher<TimelineResult[]>(
+	const timeline = await fetcher<TimelineResult[]>(
 		`${API_URL}/users/${userID}/stats/scrobbles/timeline?period=year&interval=day`,
 		'GET',
 		cookies,
 		null
 	);
 
-	const timeline = rawTimeline.map((item) => {
-		return {
-			date: timeDay.floor(new Date(item.periodInterval)),
-			value: item.listenedCount > 0 ? item.listenedCount : null
-		};
-	});
-
-	const yearlyScrobbleCount = timeline.reduce((n, { value }) => n + (value || 0), 0);
+	const yearlyScrobbleCount = timeline.reduce((n, { listenedCount }) => n + (listenedCount || 0), 0);
 
 	const avgDailyScrobbles = await fetcher<AvgDailyScrobbles>(
 		`${API_URL}/users/${userID}/stats/scrobbles/daily-avg?period=year`,

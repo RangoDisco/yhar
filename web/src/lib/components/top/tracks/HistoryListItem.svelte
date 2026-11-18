@@ -24,6 +24,7 @@
 <article class="flex items-center justify-between gap-4">
     <div class="flex w-full min-w-0 items-center gap-4">
         <ContentPicture
+                class="h-12 w-12"
                 url={`${scrobble.track.pictureDomain}/images/${scrobble.track.picturePath}`}
                 alt={`${scrobble.track.title}`}
                 contentType="tracks"

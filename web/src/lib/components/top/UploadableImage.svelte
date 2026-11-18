@@ -82,7 +82,7 @@
         <Button
                 variant="outline"
                 size="icon"
-                class="invisible absolute right-0 bottom-0 cursor-pointer peer-hover:visible hover:visible"
+                class="invisible absolute right-1 bottom-1 cursor-pointer peer-hover:visible hover:visible"
                 onclick={handleClick}
         >
             <ImageUp/>

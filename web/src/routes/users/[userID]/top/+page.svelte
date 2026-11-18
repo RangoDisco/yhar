@@ -89,6 +89,7 @@
                                             parentType="artists"
                                             parents={track.artists}
                                             contentType="tracks"
+                                            contentID={track.id}
                                     />
                                 {/each}
                             </div>

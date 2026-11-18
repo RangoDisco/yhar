@@ -11,10 +11,11 @@
     import Search from "@lucide/svelte/icons/search";
     import ContentPicture from "#lib/components/ContentPicture.svelte";
     import type {Paginated} from "#lib/types/pagination.ts";
+    import {useSidebar} from "#lib/components/ui/sidebar/index.ts";
 
     let open = $state(false);
     let searchQuery = $state("");
-    let contentType: string | null = $state(null);
+    let contentType: string = $state("");
     let results: SearchResult[] | null = $state(null);
     let isLoading = $state(false);
     let isLoadingMore = $state(false);
@@ -22,6 +23,7 @@
     let hasNextPage = $state(false);
     let currentPage = $state(1);
     let bottomListRef: HTMLDivElement | null = $state(null);
+    let {setOpenMobile} = useSidebar();
 
     const handleKeyDown = (event: KeyboardEvent) => {
         if (event.key === "k" && (event.metaKey || event.ctrlKey)) {
@@ -30,9 +32,14 @@
         }
     };
 
-    const fetchPage = async (query: string, page: number, type?: string | null = null) => {
+    const handleNav = () => {
+        setOpenMobile(false);
+        open = false;
+    }
+
+    const fetchPage = async (query: string, page: number, type: string = "") => {
         isLoadingMore = true;
-        contentType = null;
+        contentType = "";
 
         let url = `/api/contents/search?value=${query}&page=${page}`;
         if (type) {
@@ -58,7 +65,7 @@
         isLoadingMore = false;
     };
 
-    const handleSearch = debounce(async (query: string, type?: string | null) => {
+    const handleSearch = debounce(async (query: string, type: string) => {
         isLoading = true;
         results = null;
         hasError = false;
@@ -77,7 +84,7 @@
     $effect(() => {
         if (!open) {
             searchQuery = "";
-            contentType = null;
+            contentType = "";
             results = null;
             hasNextPage = false;
             currentPage = 1;
@@ -133,7 +140,7 @@
                 <Tabs.Root value={contentType} class="w-full mt-3 px-2" activationMode="manual"
                            onValueChange={(value) => handleSearch(searchQuery, value)}>
                     <Tabs.List>
-                        <Tabs.Trigger value={null}>All</Tabs.Trigger>
+                        <Tabs.Trigger value="">All</Tabs.Trigger>
                         <Tabs.Trigger value="artists">Artists</Tabs.Trigger>
                         <Tabs.Trigger value="albums">Albums</Tabs.Trigger>
                         <Tabs.Trigger value="tracks">Tracks</Tabs.Trigger>
@@ -154,7 +161,7 @@
                                 href={`/users/${page.params.userID}/top/${result.contentType}/${result.contentID}`}
                                 class="cursor-pointer max-h-14"
                                 value={result.contentID}
-                                onclick={() => (open = false)}
+                                onclick={handleNav}
                         >
                             <ContentPicture
                                     class="h-8 min-w-8"
